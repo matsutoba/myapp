@@ -1,7 +1,3 @@
 export default function Home() {
-  return (
-    <main>
-      <h1>Welcome to MyApp</h1>
-    </main>
-  );
+  return <h1 className="p-10">Welcome to MyApp</h1>;
 }
