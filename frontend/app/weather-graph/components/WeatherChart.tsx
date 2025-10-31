@@ -8,6 +8,7 @@ import {
   Bar,
   CartesianGrid,
   ComposedChart,
+  Legend,
   Line,
   ResponsiveContainer,
   XAxis,
@@ -57,11 +58,7 @@ export const WeatherChart: React.FC<WeatherChartProps> = ({
           data={data}
           margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
         >
-          <text
-            x={100} // グラフ中央付近
-            y={60} // 上からの位置
-            style={{ fontSize: 16, fontWeight: 'bold' }}
-          >
+          <text x={100} y={45} style={{ fontSize: 16, fontWeight: 'bold' }}>
             {cityName}
           </text>
 
@@ -79,7 +76,7 @@ export const WeatherChart: React.FC<WeatherChartProps> = ({
               value: '気温 (°C)',
               position: 'top',
               offset: 16,
-              fontSize: 14,
+              fontSize: 12,
             }}
             yAxisId="left"
             unit="°C"
@@ -92,7 +89,7 @@ export const WeatherChart: React.FC<WeatherChartProps> = ({
               value: '降水量 (mm)',
               position: 'top',
               offset: 16,
-              fontSize: 14,
+              fontSize: 12,
             }}
             yAxisId="right"
             orientation="right"
@@ -101,15 +98,33 @@ export const WeatherChart: React.FC<WeatherChartProps> = ({
             ticks={[0, 10, 30]}
             unit="mm"
           />
-          <Bar yAxisId="right" dataKey="rain" fill="#60a5fa" barSize={20} />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="temp"
-            stroke="#fb923c"
-            strokeWidth={2}
-            dot={false}
+
+          <Legend
+            verticalAlign="top"
+            height={36}
+            wrapperStyle={{ fontSize: 12 }}
           />
+          {displaySwitch.rain && (
+            <Bar
+              name="降水量"
+              yAxisId="right"
+              dataKey="rain"
+              fill="#60a5fa"
+              barSize={20}
+            />
+          )}
+
+          {displaySwitch.temp && (
+            <Line
+              name="気温"
+              yAxisId="left"
+              type="monotone"
+              dataKey="temp"
+              stroke="#fb923c"
+              strokeWidth={2}
+              dot={false}
+            />
+          )}
         </ComposedChart>
       </ResponsiveContainer>
     </div>
