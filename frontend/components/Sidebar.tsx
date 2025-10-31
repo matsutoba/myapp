@@ -30,11 +30,11 @@ export default function Sidebar({
           Home
         </Link>
         <Link
-          href="/dashboard"
+          href="/weather-graph"
           className="hover:bg-gray-700 px-3 py-2 rounded"
           onClick={onClose}
         >
-          ダッシュボード
+          日本の天気
         </Link>
         {/* 追加メニュー */}
       </nav>
