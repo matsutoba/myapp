@@ -1,6 +1,6 @@
 import { addDyas } from '@/lib/date/addDays';
 import { formatDate } from '@/lib/date/formatDate';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface UseWeatherQueryProps {
@@ -18,7 +18,7 @@ export const useWeatherQuery = ({
   const startDate = formatDate(addDyas(date, -1), { formatStr: 'yyyy-MM-dd' });
   const endDate = formatDate(addDyas(date, 1), { formatStr: 'yyyy-MM-dd' });
 
-  const query = useQuery({
+  const query = useSuspenseQuery({
     queryKey: ['weatherData', currentDate, latitude, longitude],
     queryFn: async () => {
       const url = 'https://api.open-meteo.com/v1/forecast';
