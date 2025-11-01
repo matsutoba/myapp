@@ -47,7 +47,7 @@ export const WeatherChartContent: React.FC<WeatherChartProps> = ({
         data={data}
         margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
       >
-        <text x={100} y={45} style={{ fontSize: 16, fontWeight: 'bold' }}>
+        <text x={90} y={90} style={{ fontSize: 16, fontWeight: 'bold' }}>
           {cityName}
         </text>
 
