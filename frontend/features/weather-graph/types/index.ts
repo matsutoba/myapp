@@ -5,7 +5,9 @@ export interface City {
   longitude: number;
 }
 
-export interface DisplaySwitch {
+export interface DisplayKind {
   temp: boolean;
   rain: boolean;
 }
+
+export type DisplayMode = 'map' | 'dashboard';

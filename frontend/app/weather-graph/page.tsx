@@ -1,7 +1,7 @@
 'use client';
 
-import { WeatherDashboard } from './components/WeatherDashboard';
+import { Main } from './components/Main';
 
 export default function Home() {
-  return <WeatherDashboard />;
+  return <Main />;
 }

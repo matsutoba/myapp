@@ -1,38 +1,32 @@
 'use client';
 
-import { AnimationPopup } from '@/components/AnimationPopup';
 import { CITIES } from '@/features/weather-graph/constants';
-import { City } from '@/features/weather-graph/types';
-import { useState } from 'react';
-import { GeoMap } from './GeoMap';
+import { DisplayKind } from '@/features/weather-graph/types';
 import { WeatherChart } from './WeatherChart';
 
-export const WeatherDashboard: React.FC = () => {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [selectedCity, setSelectedCity] = useState<City | null>(null);
-  const [markerRef, setMarkerRef] = useState<SVGPathElement | null>(null);
+interface WeatherDashboardProps {
+  date: Date;
+  displayKind: DisplayKind;
+}
 
-  const handleSelectCity = ({
-    city,
-    element,
-  }: {
-    city: City;
-    element: SVGPathElement;
-  }) => {
-    setSelectedCity(city);
-    setMarkerRef(element);
-  };
-
+export const WeatherDashboard: React.FC<WeatherDashboardProps> = ({
+  date: currentDate,
+  displayKind,
+}) => {
   return (
-    <div className="w-full h-full flex justify-center items-center relative">
-      <GeoMap cities={CITIES} onSelectCity={handleSelectCity} />
-      <AnimationPopup
-        isOpen={!!selectedCity}
-        referenceElement={markerRef}
-        onClose={() => setSelectedCity(null)}
-      >
-        <WeatherChart date={currentDate} city={selectedCity!} />
-      </AnimationPopup>
+    <div className="w-full h-full p-2 overflow-auto">
+      <div className="grid gap-8">
+        <div className="grid grid-cols-2 gap-1">
+          {CITIES.map((city) => (
+            <WeatherChart
+              date={currentDate}
+              key={city.name}
+              city={city}
+              displayKind={displayKind}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

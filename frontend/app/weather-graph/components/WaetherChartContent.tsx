@@ -1,7 +1,7 @@
 'use client';
 
 import { useWeatherQuery } from '@/features/weather-graph/hooks/useWeatherQuery';
-import { DisplaySwitch } from '@/features/weather-graph/types';
+import { DisplayKind } from '@/features/weather-graph/types';
 import { formatDate } from '@/lib/date/formatDate';
 import React, { useMemo } from 'react';
 import {
@@ -17,7 +17,7 @@ import {
 
 interface WeatherChartProps {
   cityName: string;
-  displaySwitch: DisplaySwitch;
+  displayKind: DisplayKind;
   date: Date;
   latitude: number;
   longitude: number;
@@ -25,7 +25,7 @@ interface WeatherChartProps {
 
 export const WeatherChartContent: React.FC<WeatherChartProps> = ({
   cityName,
-  displaySwitch,
+  displayKind,
   date,
   latitude,
   longitude,
@@ -35,10 +35,10 @@ export const WeatherChartContent: React.FC<WeatherChartProps> = ({
   const data = useMemo(() => {
     return weatherData?.map((item: any, index: number) => ({
       date: formatDate(item!.time, { formatStr: 'MM/dd HH:00' }),
-      temp: displaySwitch.temp ? item!.temperature_2m : undefined,
-      rain: displaySwitch.rain ? item!.rain : undefined,
+      temp: displayKind.temp ? item!.temperature_2m : undefined,
+      rain: displayKind.rain ? item!.rain : undefined,
     }));
-  }, [weatherData, displaySwitch]);
+  }, [weatherData, displayKind]);
 
   return (
     <>
@@ -92,7 +92,7 @@ export const WeatherChartContent: React.FC<WeatherChartProps> = ({
             height={36}
             wrapperStyle={{ fontSize: 12 }}
           />
-          {displaySwitch.rain && (
+          {displayKind.rain && (
             <Bar
               name="降水量"
               yAxisId="right"
@@ -102,7 +102,7 @@ export const WeatherChartContent: React.FC<WeatherChartProps> = ({
             />
           )}
 
-          {displaySwitch.temp && (
+          {displayKind.temp && (
             <Line
               name="気温"
               yAxisId="left"
