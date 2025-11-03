@@ -1,26 +1,22 @@
 'use client';
 
-import { DisplaySwitch } from '@/features/weather-graph/types';
+import { City, DisplayKind } from '@/features/weather-graph/types';
 import React, { Suspense } from 'react';
 import { WeatherChartContent } from './WaetherChartContent';
 
 interface WeatherChartProps {
-  cityName: string;
-  displaySwitch: DisplaySwitch;
   date: Date;
-  latitude: number;
-  longitude: number;
+  city: City;
+  displayKind: DisplayKind;
 }
 
 export const WeatherChart: React.FC<WeatherChartProps> = ({
-  cityName,
-  displaySwitch,
   date,
-  latitude,
-  longitude,
+  city: { latitude, longitude, name: cityName },
+  displayKind,
 }) => {
   return (
-    <div className="w-full h-70 relative">
+    <div className="w-full h-80 relative">
       <Suspense
         fallback={
           <div
@@ -33,7 +29,7 @@ export const WeatherChart: React.FC<WeatherChartProps> = ({
       >
         <WeatherChartContent
           cityName={cityName}
-          displaySwitch={displaySwitch}
+          displayKind={displayKind}
           date={date}
           latitude={latitude}
           longitude={longitude}
