@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  # Go API サービス
+  go:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    environment:
+      - GO_ENV=production
+    command: ./main
+    expose:
+      - "8080"
+
+  # MySQL サービス
+  db:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    container_name: mysql
+    platform: linux/x86_64  # Apple Silicon対応
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Tokyo
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/init:/docker-entrypoint-initdb.d
+
+  # PHP サービス（将来的に使用）
+  # php:
+  #   build:
+  #     context: ../php
+  #     dockerfile: Dockerfile
+  #   container_name: php-app
+  #   ports:
+  #     - "9000:9000"
+  #   volumes:
+  #     - ../php:/var/www/html
+  #   depends_on:
+  #     - db
+
+volumes:
+  db_data:
