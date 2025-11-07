@@ -1,0 +1,15 @@
+# docker/mysql/Dockerfile
+FROM mysql:8.0
+
+# タイムゾーンと文字コードを日本向けに設定
+ENV TZ=Asia/Tokyo
+ENV LANG=C.UTF-8
+
+# カスタム設定を追加（my.cnfがあれば）
+COPY ./conf.d/my.cnf /etc/mysql/conf.d/my.cnf
+
+# 初期化スクリプトをコピー
+COPY ./init /docker-entrypoint-initdb.d
+
+# mysqlユーザーがアクセスできるように権限を調整
+RUN chown -R mysql:mysql /etc/mysql/conf.d /docker-entrypoint-initdb.d

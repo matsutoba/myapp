@@ -1,0 +1,35 @@
+# === OS / エディタ ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === Node / Next.js ===
+node_modules/
+.next/
+out/
+dist/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# === Go ===
+/go/bin/
+/go/pkg/
+/go/.air.toml
+/go/go.sum
+/go/go.mod
+
+# === Docker ボリューム / ビルド成果物 ===
+docker/mysql/data/
+docker/go/bin/
+docker/php/vendor/
+docker-compose.override.yml
+
+# === Logs ===
+*.log
+
+# === その他一時ファイル ===
+*.swp
+*.swo
