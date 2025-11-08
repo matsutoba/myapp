@@ -1,56 +1,59 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
-	"net/http"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/gin-gonic/gin"
+	"github.com/matsubara/myapp/internal/common/config"
+	"github.com/matsubara/myapp/internal/common/db/migration"
+	"github.com/matsubara/myapp/internal/common/db/migration/seeder"
+
+	crmRouter "github.com/matsubara/myapp/internal/crm/router"
 )
 
 func main() {
 
+	/*
+	 * 環境変数読み込み
+	 */
+	log.Print("Loading environment variables...")
+	config.LoadEnv()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	/*
+	 * DB接続
+	 */
+	log.Print("Setting up database...")
+	db := config.SetupDatabase()
+	log.Print("Database connected:", db != nil)
 
-		// DB 接続
-		dsn := "root:password@tcp(mysql:3306)/myapp" // mysql サービス名とパスワードを確認
-		db, err := sql.Open("mysql", dsn)
-		if err != nil {
-			log.Fatal("DB接続エラー:", err)
-		}
+	/*
+	 * マイグレーション実行
+	 */
+	log.Print("Running database migrations...")
+	migration.AutoMigrate(db)
+	log.Print("Database migrations completed.")
 
-		// 接続確認
-		if err := db.Ping(); err != nil {
-			log.Fatal("DB未接続:", err)
-		}
+	/*
+	 * シードデータ投入
+	 */
+	log.Print("Seeding initial data...")
+	seeder.SeedAll(db)
+	log.Print("Data seeding completed.")
 
-		rows, err := db.Query("SELECT id, name, email FROM users where id=1")
-		if err != nil {
-			http.Error(w, "DBクエリエラー", 500)
-			return
-		}
-		defer rows.Close()
+	/*
+	 * ルート定義
+	 */
+	log.Print("Setup router...")
+	r := gin.Default()
+	// 共通ベースパス /api
+	apiGroup := r.Group("/api")
+	// 各モジュールのルートを登録
+	crmRouter.RegisterRoutes(apiGroup, db)
 
-		type User struct {
-			ID    int
-			Name  string
-			Email string
-		}
-		var users []User
-		for rows.Next() {
-			var u User
-			if err := rows.Scan(&u.ID, &u.Name, &u.Email); err != nil {
-				http.Error(w, "DBスキャンエラー", 500)
-				return
-			}
-			users = append(users, u)
-		}
-
-		fmt.Fprintf(w, "%+v", users)
-	})
-
-	log.Println("Server running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	/*
+	 * サーバー起動
+	 */
+	log.Print("Starting server on :8080...")
+	r.Run(":8080")
+	log.Print("Server started.")
 }
