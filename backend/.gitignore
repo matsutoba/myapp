@@ -14,11 +14,8 @@ dist/
 .env.production.local
 
 # === Go ===
-/go/bin/
-/go/pkg/
-/go/.air.toml
-/go/go.sum
-/go/go.mod
+go/tmp
+go/.env
 
 # === Docker ボリューム / ビルド成果物 ===
 docker/mysql/data/
