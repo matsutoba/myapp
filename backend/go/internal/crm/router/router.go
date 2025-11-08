@@ -9,12 +9,17 @@ import (
 )
 
 func RegisterRoutes(r *gin.RouterGroup, db *gorm.DB) {
-	crmRepo := repositories.NewCustomerRepository(db)
-	crmService := services.NewCustomerService(crmRepo)
-	crmController := controllers.NewCustomerController(crmService)
+	customerRepo := repositories.NewCustomerRepository(db)
+	customerService := services.NewCustomerService(customerRepo)
+	customerController := controllers.NewCustomerController(customerService)
+
+	userRepo := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepo)
+	userController := controllers.NewUserController(userService)
 
 	api := r.Group("/crm")
 	{
-		api.GET("/customers", crmController.GetCustomers)
+		api.GET("/customers", customerController.GetCustomers)
+		api.GET("/users", userController.GetUsers)
 	}
 }
