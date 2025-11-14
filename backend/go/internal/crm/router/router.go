@@ -19,7 +19,14 @@ func RegisterRoutes(r *gin.RouterGroup, db *gorm.DB) {
 
 	api := r.Group("/crm")
 	{
-		api.GET("/customers", customerController.GetCustomers)
+		customers := api.Group("/customers")
+		{
+			customers.GET("", customerController.GetCustomers)
+			customers.GET("/:id", customerController.GetCustomerByID)
+			customers.POST("", customerController.CreateCustomer)
+			customers.PUT("/:id", customerController.UpdateCustomer)
+			customers.DELETE("/:id", customerController.DeleteCustomer)
+		}
 
 		users := api.Group("/users")
 		{
