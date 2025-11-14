@@ -14,7 +14,7 @@ type UserRepository interface {
 	FindByID(id uint) (*models.User, error)
 	FindByEmail(email string) (*models.User, error)
 	Create(user models.User) (*models.User, error)
-	Update(user *models.User) error
+	Update(user models.User) error
 	Delete(id uint) error
 }
 
@@ -61,7 +61,7 @@ func (r *userRepository) Create(newUser models.User) (*models.User, error) {
 	return &newUser, result.Error
 }
 
-func (r *userRepository) Update(user *models.User) error {
+func (r *userRepository) Update(user models.User) error {
 	return r.db.Save(user).Error
 }
 
