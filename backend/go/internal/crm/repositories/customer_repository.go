@@ -60,5 +60,12 @@ func (r *customerRepository) Update(customer models.Customer) (*models.Customer,
 }
 
 func (r *customerRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Customer{}, id).Error
+	result := r.db.Delete(&models.Customer{}, id)
+	if result.Error != nil {
+		return errors.ErrDeleteFailed
+	}
+	if result.RowsAffected == 0 {
+		return errors.ErrNotFound
+	}
+	return nil
 }

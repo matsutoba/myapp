@@ -26,6 +26,7 @@ var (
 	ErrNotFound       = NewAppError(1002, "not found")
 	ErrInsertFailed   = NewAppError(1003, "create failed")
 	ErrUpdateFailed   = NewAppError(1004, "update failed")
+	ErrDeleteFailed   = NewAppError(1005, "delete failed")
 
 	// Validation Errors
 	ErrInvalidInput  = NewAppError(2001, "invalid input")
