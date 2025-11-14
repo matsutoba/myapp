@@ -33,9 +33,9 @@ func (m *UserRepository) FindByID(id uint) (*models.User, error) {
 	return user, args.Error(1)
 }
 
-func (m *UserRepository) Update(user models.User) error {
+func (m *UserRepository) Update(user models.User) (*models.User, error) {
 	args := m.Called(user)
-	return args.Error(1)
+	return &user, args.Error(1)
 }
 
 func (m *UserRepository) Delete(id uint) error {

@@ -13,9 +13,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestUserService_CreateUser(t *testing.T) {
+func setupUserService(t *testing.T) (*mocks.UserRepository, services.UserService) {
 	mockRepo := new(mocks.UserRepository)
 	service := services.NewUserService(mockRepo)
+	t.Cleanup(func() { mockRepo.AssertExpectations(t) })
+	return mockRepo, service
+}
+
+func TestUserService_CreateUser(t *testing.T) {
+	mockRepo, service := setupUserService(t)
 
 	input := dto.CreateUserRequest{
 		Name:     "Taro",
@@ -24,7 +30,6 @@ func TestUserService_CreateUser(t *testing.T) {
 		Role:     "user",
 	}
 
-	// モックの期待値
 	mockRepo.On("Create", mock.AnythingOfType("models.User")).Return(&models.User{
 		ID:    1,
 		Name:  input.Name,
@@ -36,13 +41,10 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, input.Email, user.Email)
-
-	mockRepo.AssertExpectations(t)
 }
 
 func TestUserService_GetAllUsers(t *testing.T) {
-	mockRepo := new(mocks.UserRepository)
-	service := services.NewUserService(mockRepo)
+	mockRepo, service := setupUserService(t)
 
 	mockRepo.On("GetAll").Return([]models.User{
 		{ID: 1, Name: "Taro", Email: "taro@example.com"},
@@ -53,13 +55,25 @@ func TestUserService_GetAllUsers(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Len(t, users, 2)
+}
 
-	mockRepo.AssertExpectations(t)
+func TestUserService_FindUserByID(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	mockRepo.On("FindByID", uint(1)).Return(&models.User{
+		ID:    1,
+		Name:  "Taro",
+		Email: "taro@example.com",
+	}, nil)
+
+	user, err := service.FindUserByID(1)
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint(1), user.ID)
 }
 
 func TestUserService_FindUserByID_NotFound(t *testing.T) {
-	mockRepo := new(mocks.UserRepository)
-	service := services.NewUserService(mockRepo)
+	mockRepo, service := setupUserService(t)
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("not found"))
 
@@ -67,19 +81,43 @@ func TestUserService_FindUserByID_NotFound(t *testing.T) {
 
 	assert.Nil(t, user)
 	assert.Equal(t, appErrors.AppErrUserNotFound, err)
-
-	mockRepo.AssertExpectations(t)
 }
 
-func TestUserService_UpdateUser(t *testing.T) {
-	mockRepo := new(mocks.UserRepository)
-	service := services.NewUserService(mockRepo)
+func TestUserService_FindUserByEmail(t *testing.T) {
+	mockRepo, service := setupUserService(t)
 
-	existingUser := models.User{
+	mockRepo.On("FindByEmail", "taro@example.com").Return(&models.User{
 		ID:    1,
 		Name:  "Taro",
 		Email: "taro@example.com",
-		Role:  "user",
+	}, nil)
+
+	user, err := service.FindUserByEmail("taro@example.com")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "taro@example.com", user.Email)
+}
+
+func TestUserService_FindUserByEmail_NotFound(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	mockRepo.On("FindByEmail", "notfound@example.com").Return(nil, errors.New("not found"))
+
+	user, err := service.FindUserByEmail("notfound@example.com")
+
+	assert.Nil(t, user)
+	assert.Equal(t, appErrors.AppErrUserNotFound, err)
+}
+
+func TestUserService_UpdateUser(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	existingUser := models.User{
+		ID:       1,
+		Name:     "Taro",
+		Email:    "taro@example.com",
+		Password: "password",
+		Role:     "user",
 	}
 
 	input := dto.UpdateUserRequest{
@@ -89,24 +127,40 @@ func TestUserService_UpdateUser(t *testing.T) {
 		Role:     "admin",
 	}
 
-	mockRepo.On("FindByID", uint(1)).Return(existingUser, nil)
+	mockRepo.On("FindByID", uint(1)).Return(&existingUser, nil)
+	mockRepo.On("Update", mock.AnythingOfType("models.User")).Return(&models.User{
+		ID:       1,
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: input.Password,
+		Role:     input.Role,
+	}, nil)
 
-	err := service.UpdateUser(1, input)
+	user, err := service.UpdateUser(1, input)
 
 	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
+	assert.Equal(t, input.Name, user.Name)
+	assert.Equal(t, input.Email, user.Email)
+	assert.Equal(t, input.Password, user.Password)
+	assert.Equal(t, input.Role, user.Role)
 }
 
-/*
 func TestUserService_DeleteUser(t *testing.T) {
-	mockRepo := new(mocks.UserRepository)
-	service := services.NewUserService(mockRepo)
+	mockRepo, service := setupUserService(t)
 
-	mockRepo.On("Delete", uint(1)).Return(nil)
+	t.Run("削除成功", func(t *testing.T) {
+		mockRepo.On("Delete", uint(1)).Return(nil)
 
-	err := service.DeleteUser(1)
+		err := service.DeleteUser(1)
 
-	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
+		assert.NoError(t, err)
+	})
+
+	t.Run("削除対象なし", func(t *testing.T) {
+		mockRepo.On("Delete", uint(2)).Return(appErrors.ErrNotFound)
+
+		err := service.DeleteUser(2)
+
+		assert.Equal(t, appErrors.ErrNotFound, err)
+	})
 }
-*/
