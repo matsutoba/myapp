@@ -80,7 +80,7 @@ func (cc *CustomerController) UpdateCustomer(c *gin.Context) {
 		return
 	}
 
-	err = cc.service.UpdateCustomer(uint(id), customer)
+	_, err = cc.service.UpdateCustomer(uint(id), customer)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

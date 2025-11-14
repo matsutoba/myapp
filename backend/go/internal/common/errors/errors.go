@@ -34,8 +34,10 @@ var (
 	// Application Errors (users)
 	AppErrUserAlreadyExists = NewAppError(10001, "user already exists")
 	AppErrUserNotFound      = NewAppError(10002, "user not found")
+	AppErrUserUpdateFailed  = NewAppError(10003, "user update failed")
 
 	// Application Errors (customers)
 	AppErrCustomerAlreadyExists = NewAppError(11001, "customer already exists")
 	AppErrCustomerNotFound      = NewAppError(11002, "customer not found")
+	AppErrCustomerUpdateFailed  = NewAppError(11003, "customer update failed")
 )

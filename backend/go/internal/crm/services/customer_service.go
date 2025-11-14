@@ -14,7 +14,7 @@ type CustomerService interface {
 	GetAllCustomers() ([]models.Customer, error)
 	FindByID(id uint) (*models.Customer, error)
 	CreateCustomer(customer dto.CreateCustomerRequest) (*models.Customer, error)
-	UpdateCustomer(id uint, customer dto.UpdateCustomerRequest) error
+	UpdateCustomer(id uint, customer dto.UpdateCustomerRequest) (*models.Customer, error)
 	DeleteCustomer(id uint) error
 }
 
@@ -52,10 +52,10 @@ func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*mode
 	return s.repo.Create(newCustomer)
 }
 
-func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerRequest) error {
+func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerRequest) (*models.Customer, error) {
 	existingCustomer, err := s.repo.FindByID(id)
 	if err != nil {
-		return errors.AppErrCustomerNotFound
+		return nil, errors.AppErrCustomerNotFound
 	}
 
 	existingCustomer.Name = input.Name
@@ -63,7 +63,11 @@ func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerReques
 	existingCustomer.Phone = input.Phone
 	existingCustomer.Address = input.Address
 
-	return s.repo.Update(*existingCustomer)
+	customer, err := s.repo.Update(*existingCustomer)
+	if err != nil {
+		return nil, errors.AppErrCustomerUpdateFailed
+	}
+	return customer, nil
 }
 
 func (s *customerService) DeleteCustomer(id uint) error {

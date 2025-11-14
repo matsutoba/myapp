@@ -80,7 +80,8 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if err := uc.service.UpdateUser(uint(id), user); err != nil {
+	_, err = uc.service.UpdateUser(uint(id), user)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
