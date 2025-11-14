@@ -87,7 +87,7 @@ func (s *userService) UpdateUser(id uint, input dto.UpdateUserRequest) error {
 	existingUser.Role = input.Role
 	existingUser.Password = input.Password
 
-	return s.repo.Update(existingUser)
+	return s.repo.Update(*existingUser)
 }
 
 func (s *userService) DeleteUser(id uint) error {
