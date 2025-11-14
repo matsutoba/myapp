@@ -3,29 +3,26 @@ package seeder
 import (
 	"log"
 
+	"github.com/matsubara/myapp/internal/common/security"
 	"github.com/matsubara/myapp/internal/crm/models"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 func SeedUsers(db *gorm.DB) {
 	// パスワードをハッシュ化
-	hashPassword := func(pw string) string {
-		bytes, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-		return string(bytes)
-	}
+	hashPassword, nil := security.HashPassword("password")
 
 	admin := models.User{
 		Name:     "管理者",
 		Email:    "admin@example.com",
-		Password: hashPassword("password"), // 初期パスワード
+		Password: hashPassword,
 		Role:     "admin",
 	}
 
 	user := models.User{
 		Name:     "一般ユーザー",
 		Email:    "user@example.com",
-		Password: hashPassword("password"),
+		Password: hashPassword,
 		Role:     "user",
 	}
 
