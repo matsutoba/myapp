@@ -16,7 +16,7 @@ type UserService interface {
 	FindUserByID(id uint) (*models.User, error)
 	FindUserByEmail(email string) (*models.User, error)
 	CreateUser(user dto.CreateUserRequest) (*models.User, error)
-	UpdateUser(id uint, user dto.UpdateUserRequest) error
+	UpdateUser(id uint, user dto.UpdateUserRequest) (*models.User, error)
 	DeleteUser(id uint) error
 }
 
@@ -75,11 +75,11 @@ func (s *userService) CreateUser(input dto.CreateUserRequest) (*models.User, err
 	return newUser, nil
 }
 
-func (s *userService) UpdateUser(id uint, input dto.UpdateUserRequest) error {
+func (s *userService) UpdateUser(id uint, input dto.UpdateUserRequest) (*models.User, error) {
 
 	existingUser, err := s.repo.FindByID(uint(id))
 	if err != nil {
-		return errors.AppErrUserNotFound
+		return nil, errors.AppErrUserNotFound
 	}
 
 	existingUser.Name = input.Name
@@ -87,7 +87,11 @@ func (s *userService) UpdateUser(id uint, input dto.UpdateUserRequest) error {
 	existingUser.Role = input.Role
 	existingUser.Password = input.Password
 
-	return s.repo.Update(*existingUser)
+	user, err := s.repo.Update(*existingUser)
+	if err != nil {
+		return nil, errors.AppErrUserUpdateFailed
+	}
+	return user, nil
 }
 
 func (s *userService) DeleteUser(id uint) error {

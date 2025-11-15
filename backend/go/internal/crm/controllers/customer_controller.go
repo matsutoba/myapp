@@ -29,60 +29,72 @@ func NewCustomerController(s services.CustomerService) *CustomerController {
 func (cc *CustomerController) GetCustomers(c *gin.Context) {
 	customers, err := cc.service.GetAllCustomers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, customers)
+	c.JSON(http.StatusOK, dto.ToCustomerListResponse(customers))
 }
 
 func (cc *CustomerController) GetCustomerByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors.ErrInvalidInput})
+		errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
 		return
 	}
 
 	customer, err := cc.service.FindByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err == errors.AppErrCustomerNotFound || err == errors.ErrNotFound {
+			errors.WriteError(c, http.StatusNotFound, err)
+			return
+		}
+		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, customer)
+	c.JSON(http.StatusOK, dto.ToCustomerResponse(customer))
 }
 
 func (cc *CustomerController) CreateCustomer(c *gin.Context) {
 	var customer dto.CreateCustomerRequest
 	if err := c.ShouldBindJSON(&customer); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors.ErrBindingFailed})
+		errors.WriteError(c, http.StatusBadRequest, errors.ErrBindingFailed)
 		return
 	}
 
 	newCustomer, err := cc.service.CreateCustomer(customer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err == errors.AppErrCustomerAlreadyExists {
+			errors.WriteError(c, http.StatusConflict, err)
+			return
+		}
+		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusCreated, newCustomer)
+	c.JSON(http.StatusCreated, dto.ToCustomerResponse(newCustomer))
 }
 
 func (cc *CustomerController) UpdateCustomer(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors.ErrInvalidInput})
+		errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
 		return
 	}
 
 	var customer dto.UpdateCustomerRequest
 	if err := c.ShouldBindJSON(&customer); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors.ErrBindingFailed})
+		errors.WriteError(c, http.StatusBadRequest, errors.ErrBindingFailed)
 		return
 	}
 
-	err = cc.service.UpdateCustomer(uint(id), customer)
+	_, err = cc.service.UpdateCustomer(uint(id), customer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err == errors.AppErrCustomerNotFound || err == errors.ErrNotFound {
+			errors.WriteError(c, http.StatusNotFound, err)
+			return
+		}
+		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -92,11 +104,16 @@ func (cc *CustomerController) DeleteCustomer(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors.ErrInvalidInput})
+		errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
 		return
 	}
 	if err := cc.service.DeleteCustomer(uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// 削除対象が存在しない場合でも No Content を返す
+		if err == errors.ErrNotFound || err == errors.AppErrCustomerNotFound {
+			c.Status(http.StatusNoContent)
+			return
+		}
+		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
 	c.Status(http.StatusNoContent)

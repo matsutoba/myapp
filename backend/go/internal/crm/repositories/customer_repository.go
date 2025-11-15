@@ -13,7 +13,7 @@ type CustomerRepository interface {
 	GetAll() ([]models.Customer, error)
 	FindByID(id uint) (*models.Customer, error)
 	Create(customer models.Customer) (*models.Customer, error)
-	Update(customer models.Customer) error
+	Update(customer models.Customer) (*models.Customer, error)
 	Delete(id uint) error
 }
 
@@ -51,10 +51,21 @@ func (r *customerRepository) Create(newCustomer models.Customer) (*models.Custom
 	return &newCustomer, result.Error
 }
 
-func (r *customerRepository) Update(customer models.Customer) error {
-	return r.db.Save(customer).Error
+func (r *customerRepository) Update(customer models.Customer) (*models.Customer, error) {
+	result := r.db.Save(customer)
+	if result.Error != nil {
+		return nil, errors.ErrUpdateFailed
+	}
+	return &customer, nil
 }
 
 func (r *customerRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Customer{}, id).Error
+	result := r.db.Delete(&models.Customer{}, id)
+	if result.Error != nil {
+		return errors.ErrDeleteFailed
+	}
+	if result.RowsAffected == 0 {
+		return errors.ErrNotFound
+	}
+	return nil
 }
