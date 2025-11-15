@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/matsubara/myapp/internal/common/middleware"
 	"github.com/matsubara/myapp/internal/customer/controller"
 	"github.com/matsubara/myapp/internal/customer/repository"
 	"github.com/matsubara/myapp/internal/customer/service"
@@ -14,13 +15,14 @@ func RegisterRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	customerService := service.NewCustomerService(customerRepo)
 	customerController := controller.NewCustomerController(customerService)
 
-	// Customer routes
+	// Customer routes (認証必須)
 	customers := r.Group("/customers")
+	customers.Use(middleware.AuthMiddleware())
 	{
 		customers.GET("", customerController.GetCustomers)
-		customers.GET("/:id", customerController.GetCustomerByID)
+		customers.GET(":id", customerController.GetCustomerByID)
 		customers.POST("", customerController.CreateCustomer)
-		customers.PUT("/:id", customerController.UpdateCustomer)
-		customers.DELETE("/:id", customerController.DeleteCustomer)
+		customers.PUT(":id", customerController.UpdateCustomer)
+		customers.DELETE(":id", customerController.DeleteCustomer)
 	}
 }
