@@ -1,0 +1,50 @@
+@host = http://localhost:8080
+
+### Login first to capture token for subsequent requests
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@example.com",
+    "password": "password"
+}
+
+### Create Customer
+POST {{host}}/api/customers
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "name": "Test Customer",
+    "email": "test@example.com",
+    "phone": "123-456-7890",
+    "address": "123 Test St, Test City, TC 12345"
+}
+
+### Get All Customers
+GET {{host}}/api/customers
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Find Customer By Id
+GET {{host}}/api/customers/4
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Update Customer
+PUT {{host}}/api/customers/4
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "name": "Updated Customer",
+    "email": "update@example.com",
+    "phone": "987-654-3210",
+    "address": "456 Update Ave, Update City, UC 54321"
+}
+
+### Delete Customer
+DELETE {{host}}/api/customers/3
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}

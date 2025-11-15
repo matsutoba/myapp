@@ -32,6 +32,10 @@ var (
 	ErrInvalidInput  = NewAppError(2001, "invalid input")
 	ErrBindingFailed = NewAppError(2002, "binding failed")
 
+	// Authentication Errors
+	ErrUnauthorized = NewAppError(3001, "invalid email or password")
+	ErrInvalidToken = NewAppError(3002, "invalid token")
+
 	// Application Errors (users)
 	AppErrUserAlreadyExists = NewAppError(10001, "user already exists")
 	AppErrUserNotFound      = NewAppError(10002, "user not found")

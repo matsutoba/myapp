@@ -1,0 +1,51 @@
+@host = http://localhost:8080
+
+### Login first to capture token for subsequent requests
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password"
+}
+
+### Create User
+POST {{host}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123",
+  "role": "user"
+}
+
+### Get All Users
+GET {{host}}/api/users
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Find User By Id
+GET {{host}}/api/users/15
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Update User
+PUT {{host}}/api/users/15
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Updated User",
+  "email": "update@example.com",
+  "password": "newpassword123",
+  "role": "admin"
+}
+
+### Delete User
+DELETE {{host}}/api/users/13
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
+

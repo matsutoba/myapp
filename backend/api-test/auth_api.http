@@ -1,0 +1,25 @@
+@host = http://localhost:8080
+
+### Login (get tokens)
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password"
+}
+
+### The following requests use response variables from "login":
+#   Access token:  {{login.response.body.token}}
+#   Refresh token: {{login.response.body.refresh_token}}
+
+### Refresh access token (optional)
+# Uses the refresh token from login response
+POST {{host}}/api/auth/refresh
+Authorization: Bearer {{login.response.body.refresh_token}}
+
+### Logout (optional)
+# Uses the refresh token from login response
+POST {{host}}/api/auth/logout
+Authorization: Bearer {{login.response.body.refresh_token}}
