@@ -9,19 +9,27 @@ import (
 	"github.com/matsubara/myapp/internal/common/security"
 )
 
-// AuthMiddleware checks JWT token in Authorization header
+// AuthMiddleware はJWT認証ミドルウェアを提供
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Authorizationヘッダの確認
 		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
-			return
-		}
-		// Bearer prefix対応
 		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
 			tokenString = tokenString[7:]
 		}
-		// Use the same secret/key source as token generation
+		// なければCookieを確認 (accessToken優先、fallbackでレガシーなauthToken)
+		if tokenString == "" {
+			if cookie, err := c.Cookie("accessToken"); err == nil && cookie != "" {
+				tokenString = cookie
+			} else if legacy, err2 := c.Cookie("authToken"); err2 == nil && legacy != "" {
+				tokenString = legacy
+			}
+		}
+		if tokenString == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+			return
+		}
+		// トークン検証
 		secretKey := config.GetEnv("JWT_SECRET_KEY", "your-secret-key")
 		claims, err := security.ValidateToken(tokenString, secretKey)
 		if err != nil {
