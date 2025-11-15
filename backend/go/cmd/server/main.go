@@ -47,6 +47,9 @@ func main() {
 	 */
 	log.Print("Setup router...")
 	r := gin.Default()
+	// ヘルスチェック
+	r.GET("/healthz", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
+
 	// 共通ベースパス /api
 	apiGroup := r.Group("/api")
 	// 各モジュールのルートを登録
