@@ -19,10 +19,13 @@ func RegisterRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	customers := r.Group("/customers")
 	customers.Use(middleware.AuthMiddleware())
 	{
+		// 読み取りは認証済みユーザー全員可能
 		customers.GET("", customerController.GetCustomers)
 		customers.GET(":id", customerController.GetCustomerByID)
-		customers.POST("", customerController.CreateCustomer)
-		customers.PUT(":id", customerController.UpdateCustomer)
-		customers.DELETE(":id", customerController.DeleteCustomer)
+
+		// 作成・更新・削除はadmin専用
+		customers.POST("", middleware.RequireAdmin(), customerController.CreateCustomer)
+		customers.PUT(":id", middleware.RequireAdmin(), customerController.UpdateCustomer)
+		customers.DELETE(":id", middleware.RequireAdmin(), customerController.DeleteCustomer)
 	}
 }
