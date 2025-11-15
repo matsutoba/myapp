@@ -4,10 +4,11 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { LoginRequest, LoginResponse } from '../types';
 
+const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
+
 export async function loginAction(formData: LoginRequest) {
   try {
-    const apiHost = process.env.API_HOST || 'http://localhost:8080';
-    const response = await fetch(`${apiHost}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -19,7 +20,7 @@ export async function loginAction(formData: LoginRequest) {
       const errorData = await response.json();
       return {
         success: false,
-        error: errorData.message || 'ログインに失敗しました',
+        error: errorData.error || errorData.message || 'ログインに失敗しました',
       };
     }
 
@@ -83,8 +84,7 @@ export async function logoutAction() {
   // バックエンドのlogout APIを呼び出してリフレッシュトークンを失効
   if (refreshToken) {
     try {
-      const apiHost = process.env.API_HOST || 'http://localhost:8080';
-      await fetch(`${apiHost}/api/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
