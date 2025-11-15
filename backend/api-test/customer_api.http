@@ -1,6 +1,19 @@
-### Create Customer
-POST http://localhost:8080/api/crm/customers
+@host = http://localhost:8080
+
+### Login first to capture token for subsequent requests
+# @name login
+POST {{host}}/api/auth/login
 Content-Type: application/json
+
+{
+    "email": "admin@example.com",
+    "password": "password"
+}
+
+### Create Customer
+POST {{host}}/api/customers
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
     "name": "Test Customer",
@@ -10,16 +23,19 @@ Content-Type: application/json
 }
 
 ### Get All Customers
-GET http://localhost:8080/api/crm/customers
+GET {{host}}/api/customers
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 ### Find Customer By Id
-GET http://localhost:8080/api/crm/customers/4
+GET {{host}}/api/customers/4
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 ### Update Customer
-PUT http://localhost:8080/api/crm/customers/4
+PUT {{host}}/api/customers/4
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
     "name": "Updated Customer",
@@ -29,5 +45,6 @@ Content-Type: application/json
 }
 
 ### Delete Customer
-DELETE http://localhost:8080/api/crm/customers/3
+DELETE {{host}}/api/customers/3
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}

@@ -1,6 +1,19 @@
-### Create User
-POST http://localhost:8080/api/crm/users
+@host = http://localhost:8080
+
+### Login first to capture token for subsequent requests
+# @name login
+POST {{host}}/api/auth/login
 Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password"
+}
+
+### Create User
+POST {{host}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "name": "Test User",
@@ -10,16 +23,19 @@ Content-Type: application/json
 }
 
 ### Get All Users
-GET http://localhost:8080/api/crm/users
+GET {{host}}/api/users
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 ### Find User By Id
-GET http://localhost:8080/api/crm/users/15
+GET {{host}}/api/users/15
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 ### Update User
-PUT http://localhost:8080/api/crm/users/15
-Content-Type: application/json  
+PUT {{host}}/api/users/15
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "name": "Updated User",
@@ -29,6 +45,7 @@ Content-Type: application/json
 }
 
 ### Delete User
-DELETE http://localhost:8080/api/crm/users/13
+DELETE {{host}}/api/users/13
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
