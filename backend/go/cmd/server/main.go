@@ -8,7 +8,9 @@ import (
 	"github.com/matsubara/myapp/internal/common/db/migration"
 	"github.com/matsubara/myapp/internal/common/db/migration/seeder"
 
-	crmRouter "github.com/matsubara/myapp/internal/crm/router"
+	authRouter "github.com/matsubara/myapp/internal/auth/router"
+	customerRouter "github.com/matsubara/myapp/internal/customer/router"
+	userRouter "github.com/matsubara/myapp/internal/user/router"
 )
 
 func main() {
@@ -48,7 +50,9 @@ func main() {
 	// 共通ベースパス /api
 	apiGroup := r.Group("/api")
 	// 各モジュールのルートを登録
-	crmRouter.RegisterRoutes(apiGroup, db)
+	authRouter.RegisterRoutes(apiGroup, db)
+	userRouter.RegisterRoutes(apiGroup, db)
+	customerRouter.RegisterRoutes(apiGroup, db)
 
 	/*
 	 * サーバー起動

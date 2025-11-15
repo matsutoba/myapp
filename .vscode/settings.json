@@ -1,0 +1,26 @@
+{
+  // 保存時に自動でフォーマット
+  "editor.formatOnSave": true,
+
+  // デフォルトフォーマッタをPrettierに指定
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // タブやインデントの設定（Prettierと一致させる）
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  // 保存時に不要なホワイトスペースを削除
+  "files.trimTrailingWhitespace": true,
+
+  // 自動改行
+  "files.autoSave": "off",
+
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  "[go]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  }
+}

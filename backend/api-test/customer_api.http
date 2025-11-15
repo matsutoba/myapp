@@ -1,0 +1,33 @@
+### Create Customer
+POST http://localhost:8080/api/crm/customers
+Content-Type: application/json
+
+{
+    "name": "Test Customer",
+    "email": "test@example.com",
+    "phone": "123-456-7890",
+    "address": "123 Test St, Test City, TC 12345"
+}
+
+### Get All Customers
+GET http://localhost:8080/api/crm/customers
+Accept: application/json
+
+### Find Customer By Id
+GET http://localhost:8080/api/crm/customers/4
+Accept: application/json
+
+### Update Customer
+PUT http://localhost:8080/api/crm/customers/4
+Content-Type: application/json
+
+{
+    "name": "Updated Customer",
+    "email": "update@example.com",
+    "phone": "987-654-3210",
+    "address": "456 Update Ave, Update City, UC 54321"
+}
+
+### Delete Customer
+DELETE http://localhost:8080/api/crm/customers/3
+Accept: application/json

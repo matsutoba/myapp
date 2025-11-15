@@ -1,0 +1,34 @@
+### Create User
+POST http://localhost:8080/api/crm/users
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123",
+  "role": "user"
+}
+
+### Get All Users
+GET http://localhost:8080/api/crm/users
+Accept: application/json
+
+### Find User By Id
+GET http://localhost:8080/api/crm/users/15
+Accept: application/json
+
+### Update User
+PUT http://localhost:8080/api/crm/users/15
+Content-Type: application/json  
+
+{
+  "name": "Updated User",
+  "email": "update@example.com",
+  "password": "newpassword123",
+  "role": "admin"
+}
+
+### Delete User
+DELETE http://localhost:8080/api/crm/users/13
+Accept: application/json
+
