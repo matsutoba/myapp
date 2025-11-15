@@ -1,25 +1,39 @@
-import type { User } from '@/features/auth/types';
-import { cookies } from 'next/headers';
+'use client';
+
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import GlobalMenu from '../../components/GlobalMenu';
 import TitleBar from '../../components/TitleBar';
 
-export default async function MainLayout({
+export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const userCookie = cookieStore.get('user')?.value;
-  let userName = 'Guest';
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
-  if (userCookie) {
-    try {
-      const user: User = JSON.parse(userCookie);
-      userName = user.name || user.email || 'User';
-    } catch {
-      // If parsing fails, use default
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/login');
     }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
+
+  // 未ログイン時はリダイレクトするので何も表示しない
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const userName = user?.name || user?.email || 'User';
 
   return (
     <>
