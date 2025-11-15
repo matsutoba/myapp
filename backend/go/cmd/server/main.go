@@ -7,6 +7,7 @@ import (
 	"github.com/matsubara/myapp/internal/common/config"
 	"github.com/matsubara/myapp/internal/common/db/migration"
 	"github.com/matsubara/myapp/internal/common/db/migration/seeder"
+	commonMiddleware "github.com/matsubara/myapp/internal/common/middleware"
 
 	authRouter "github.com/matsubara/myapp/internal/auth/router"
 	customerRouter "github.com/matsubara/myapp/internal/customer/router"
@@ -47,6 +48,8 @@ func main() {
 	 */
 	log.Print("Setup router...")
 	r := gin.Default()
+	// CORS (must be before defining route groups)
+	r.Use(commonMiddleware.CORSMiddleware())
 	// ヘルスチェック
 	r.GET("/healthz", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
 
