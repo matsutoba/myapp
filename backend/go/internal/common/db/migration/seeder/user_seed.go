@@ -1,6 +1,7 @@
 package seeder
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/matsubara/myapp/internal/common/security"
@@ -19,14 +20,19 @@ func SeedUsers(db *gorm.DB) {
 		Role:     "admin",
 	}
 
-	user := domain.User{
-		Name:     "一般ユーザー",
-		Email:    "user@example.com",
-		Password: hashPassword,
-		Role:     "user",
-	}
+	users := []domain.User{admin}
 
-	users := []domain.User{admin, user}
+	// userをlength個生成
+	const length = 100
+	for i := 1; i <= length; i++ {
+		u := domain.User{
+			Name:     fmt.Sprintf("ユーザー%d", i),
+			Email:    fmt.Sprintf("user%d@example.com", i),
+			Password: hashPassword,
+			Role:     "user",
+		}
+		users = append(users, u)
+	}
 
 	for _, u := range users {
 		if err := db.FirstOrCreate(&u, domain.User{Email: u.Email}).Error; err != nil {

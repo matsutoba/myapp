@@ -1,14 +1,38 @@
 'use client';
 
+import { USER_ROLES } from '@/constants';
+import { User } from '@/features/auth/types';
 import Link from 'next/link';
 
 export default function Sidebar({
   isOpen,
+  user,
   onClose,
 }: {
   isOpen: boolean;
+  user: User | null;
   onClose: () => void;
 }) {
+  const isAdmin = user?.role === USER_ROLES.ADMIN;
+  const menuItems = [
+    {
+      title: 'Home',
+      href: '/',
+    },
+    ...(isAdmin
+      ? [
+          {
+            title: '管理者メニュー',
+            href: '/admin',
+          },
+        ]
+      : []),
+    {
+      title: '日本の天気',
+      href: '/weather-graph',
+    },
+  ];
+
   return (
     <div
       className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white transform ${
@@ -22,21 +46,16 @@ export default function Sidebar({
         </button>
       </div>
       <nav className="flex flex-col space-y-1 p-4">
-        <Link
-          href="/"
-          className="hover:bg-gray-700 px-3 py-2 rounded"
-          onClick={onClose}
-        >
-          Home
-        </Link>
-        <Link
-          href="/weather-graph"
-          className="hover:bg-gray-700 px-3 py-2 rounded"
-          onClick={onClose}
-        >
-          日本の天気
-        </Link>
-        {/* 追加メニュー */}
+        {menuItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="hover:bg-gray-700 px-3 py-2 rounded"
+            onClick={onClose}
+          >
+            {item.title}
+          </Link>
+        ))}
       </nav>
     </div>
   );

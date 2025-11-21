@@ -1,12 +1,12 @@
 'use client';
 
+import GlobalMenu from '@/components/GlobalMenu';
+import TitleBar from '@/components/TitleBar';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import GlobalMenu from '../../components/GlobalMenu';
-import TitleBar from '../../components/TitleBar';
 
-export default function MainLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,10 +15,14 @@ export default function MainLayout({
   const { user, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace('/login');
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace('/login');
+      } else if (user?.role !== 'admin') {
+        router.replace('/dashboard');
+      }
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, user, router]);
 
   if (isLoading) {
     return (
@@ -28,10 +32,11 @@ export default function MainLayout({
     );
   }
 
-  // 未ログイン時はリダイレクトするので何も表示しない
-  if (!isAuthenticated) {
+  if (!isAuthenticated || user?.role !== 'admin') {
     return null;
   }
+
+  const userName = user?.name || user?.email || 'User';
 
   return (
     <>

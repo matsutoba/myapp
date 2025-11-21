@@ -17,10 +17,19 @@ import { cookies } from 'next/headers';
 
 const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
 
+export interface ApiErrorDetail {
+  code: number;
+  message: string;
+}
+
+export interface ApiErrorResponse {
+  error: ApiErrorDetail;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
+  error?: ApiErrorDetail;
 }
 
 /*
@@ -54,11 +63,31 @@ export async function apiServer<T>(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData: ApiErrorResponse | undefined = await response
+        .json()
+        .catch(() => undefined);
+
+      if (errorData?.error) {
+        return {
+          success: false,
+          error: errorData.error,
+        };
+      }
+
       return {
         success: false,
-        error:
-          errorData.error || errorData.message || `HTTP ${response.status}`,
+        error: {
+          code: response.status,
+          message: response.statusText || `HTTP ${response.status}`,
+        },
+      };
+    }
+
+    // 204 No Content の場合はボディが空なのでJSONパースをスキップ
+    if (response.status === 204) {
+      return {
+        success: true,
+        data: undefined as T,
       };
     }
 
@@ -71,7 +100,10 @@ export async function apiServer<T>(
     console.error('API Server Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: {
+        code: 0,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
     };
   }
 }
@@ -100,11 +132,31 @@ export async function apiClient<T>(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData: ApiErrorResponse | undefined = await response
+        .json()
+        .catch(() => undefined);
+
+      if (errorData?.error) {
+        return {
+          success: false,
+          error: errorData.error,
+        };
+      }
+
       return {
         success: false,
-        error:
-          errorData.error || errorData.message || `HTTP ${response.status}`,
+        error: {
+          code: response.status,
+          message: response.statusText || `HTTP ${response.status}`,
+        },
+      };
+    }
+
+    // 204 No Content の場合はボディが空なのでJSONパースをスキップ
+    if (response.status === 204) {
+      return {
+        success: true,
+        data: undefined as T,
       };
     }
 
@@ -117,7 +169,10 @@ export async function apiClient<T>(
     console.error('API Client Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: {
+        code: 0,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
     };
   }
 }

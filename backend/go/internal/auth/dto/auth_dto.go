@@ -13,7 +13,7 @@ type LoginRequest struct {
 // LoginResponse はログインレスポンスの構造体
 type LoginResponse struct {
 	Token        string           `json:"token"`
-	RefreshToken string           `json:"refresh_token"`
+	RefreshToken string           `json:"refreshToken"`
 	User         AuthUserResponse `json:"user"`
 }
 

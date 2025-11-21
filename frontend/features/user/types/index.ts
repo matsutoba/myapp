@@ -3,10 +3,10 @@ export interface User {
   name: string;
   email: string;
   role: string;
-  is_active: boolean;
-  last_login_at?: string;
-  created_at: string;
-  updated_at: string;
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateUserRequest {

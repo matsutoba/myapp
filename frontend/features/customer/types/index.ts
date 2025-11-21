@@ -4,8 +4,8 @@ export interface Customer {
   email: string;
   phone: string;
   address: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCustomerRequest {
