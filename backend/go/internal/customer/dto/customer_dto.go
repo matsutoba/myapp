@@ -27,8 +27,8 @@ type CustomerResponse struct {
 	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
 	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // CustomerListResponse は顧客一覧取得時のレスポンス（簡易版）

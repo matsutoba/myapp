@@ -26,10 +26,10 @@ type UserResponse struct {
 	Name        string     `json:"name"`
 	Email       string     `json:"email"`
 	Role        string     `json:"role"`
-	IsActive    bool       `json:"is_active"`
-	LastLoginAt *time.Time `json:"last_login_at"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	IsActive    bool       `json:"isActive"`
+	LastLoginAt *time.Time `json:"lastLoginAt"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
 }
 
 // UserListResponse はユーザー一覧取得時のレスポンス（簡易版）
@@ -38,7 +38,7 @@ type UserListResponse struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
-	IsActive bool   `json:"is_active"`
+	IsActive bool   `json:"isActive"`
 }
 
 // ToUserResponse はモデルをレスポンスDTOに変換

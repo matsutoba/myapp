@@ -1,4 +1,4 @@
-import FeatureTitleBar from '@/components/FeatureTitleBar';
+import { FeatureTitleBar } from '@/components/ui';
 
 export default function DashboardLayout({
   children,

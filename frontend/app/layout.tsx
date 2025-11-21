@@ -1,3 +1,4 @@
+import { ThemeProvider } from '../components/ui/theme/ThemeProvider';
 import '../styles/globals.css';
 
 export default function RootLayout({
@@ -7,7 +8,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="flex flex-col h-screen">{children}</body>
+      <body className="flex flex-col h-screen">
+        <ThemeProvider>
+          {/* ThemeToggle uses useTheme, so must be inside ThemeProvider */}
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

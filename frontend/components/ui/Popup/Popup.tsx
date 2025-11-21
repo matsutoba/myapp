@@ -2,25 +2,29 @@
 
 import { flip, offset, shift, useFloating } from '@floating-ui/react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
+import { IconButton } from '../IconButton/IconButton';
 
-interface AnimationPopupProps {
+export type PopupSize = 'small' | 'medium' | 'large';
+
+interface PopupProps {
   isOpen: boolean;
   referenceElement: Element | null;
   children?: React.ReactNode;
   onClose: () => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: PopupSize;
+  className?: string;
 }
 
-export const AnimationPopup: React.FC<AnimationPopupProps> = ({
+export function Popup({
   isOpen,
   referenceElement,
   children,
   size = 'medium',
   onClose,
-}) => {
-  const { x, y, refs, strategy, floatingStyles } = useFloating({
+  className = '',
+}: PopupProps) {
+  const { x, y, refs, strategy } = useFloating({
     middleware: [offset(10), flip(), shift()],
   });
 
@@ -50,7 +54,7 @@ export const AnimationPopup: React.FC<AnimationPopupProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className={`absolute bg-white rounded-2xl shadow-xl p-4 ${popupSize} origin-center border border-gray-100`}
+          className={`absolute bg-card text-on-surface rounded-lg shadow-lg p-md ${popupSize} origin-center border border-surface ${className}`}
           style={{
             position: strategy,
             top: y ?? 0,
@@ -59,12 +63,12 @@ export const AnimationPopup: React.FC<AnimationPopupProps> = ({
         >
           <div className="grid">
             <div className="flex justify-end">
-              <button
+              <IconButton
+                icon="X"
+                size="sm"
                 onClick={onClose}
-                className="hover:bg-gray-200 rounded-full cursor-pointer p-1"
-              >
-                <X />
-              </button>
+                aria-label="閉じる"
+              />
             </div>
             {children}
           </div>
@@ -72,4 +76,4 @@ export const AnimationPopup: React.FC<AnimationPopupProps> = ({
       )}
     </AnimatePresence>
   );
-};
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimationPopup } from '@/components/AnimationPopup';
+import { Popup } from '@/components/ui';
 import { CITIES } from '@/features/weather-graph/constants';
 import { City, DisplayKind } from '@/features/weather-graph/types';
 import { useState } from 'react';
@@ -33,7 +33,7 @@ export const GeoMapBoard: React.FC<GeoMapBoardProps> = ({
   return (
     <>
       <GeoMap cities={CITIES} onSelectCity={handleSelectCity} />
-      <AnimationPopup
+      <Popup
         isOpen={!!selectedCity}
         referenceElement={markerRef}
         onClose={() => setSelectedCity(null)}
@@ -43,7 +43,7 @@ export const GeoMapBoard: React.FC<GeoMapBoardProps> = ({
           city={selectedCity!}
           displayKind={displayKind}
         />
-      </AnimationPopup>
+      </Popup>
     </>
   );
 };

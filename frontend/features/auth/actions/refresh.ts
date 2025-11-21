@@ -54,7 +54,7 @@ export async function refreshTokensAction(): Promise<{
       sameSite: 'lax',
       maxAge: accessMaxAge,
     });
-    cookieStore.set('refreshToken', data.refresh_token, {
+    cookieStore.set('refreshToken', data.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

@@ -1,7 +1,7 @@
 'use client';
 
+import { FeatureTitleBar } from '@/components/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import FeatureTitleBar from '@/components/FeatureTitleBar';
 
 const queryClient = new QueryClient();
 

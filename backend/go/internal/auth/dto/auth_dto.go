@@ -13,7 +13,7 @@ type LoginRequest struct {
 // LoginResponse はログインレスポンスの構造体
 type LoginResponse struct {
 	Token        string           `json:"token"`
-	RefreshToken string           `json:"refresh_token"`
+	RefreshToken string           `json:"refreshToken"`
 	User         AuthUserResponse `json:"user"`
 }
 
@@ -22,6 +22,7 @@ type AuthUserResponse struct {
 	ID    uint   `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name,omitempty"`
+	Role  string `json:"role"`
 }
 
 // ToLoginResponse はUserモデルからLoginResponseを生成
@@ -33,6 +34,7 @@ func ToLoginResponse(user *domain.User, token string, refreshToken string) Login
 			ID:    user.ID,
 			Email: user.Email,
 			Name:  user.Name,
+			Role:  user.Role,
 		},
 	}
 }
