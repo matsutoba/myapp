@@ -9,7 +9,7 @@ export function HamburgerButton({
 }: HamburgerButtonProps) {
   return (
     <button
-      className={`hover:bg-gray-600 rounded p-1 transition-colors ${className}`}
+      className={`hover-bg-surface rounded p-sm transition-colors text-on-surface ${className}`}
       aria-label="メニューを開く"
       {...props}
     >

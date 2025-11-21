@@ -29,16 +29,16 @@ export function IconButton({
 
   const variantStyles: Record<IconButtonVariant, string> = {
     default: active
-      ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-      : 'hover:bg-gray-200 text-gray-700',
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+      ? 'bg-primary text-on-primary hover-bg-primary'
+      : 'bg-transparent text-muted hover-bg-surface',
+    primary: 'bg-primary text-on-primary hover-bg-primary focus-ring-primary',
+    danger: 'bg-danger text-on-danger hover-bg-danger',
   };
 
   const sizeStyles: Record<IconButtonSize, string> = {
-    sm: 'p-1',
-    md: 'p-2',
-    lg: 'p-3',
+    sm: 'p-sm',
+    md: 'p-md',
+    lg: 'p-lg',
   };
 
   const defaultIconSizes: Record<IconButtonSize, number> = {

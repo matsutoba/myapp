@@ -54,7 +54,7 @@ export function Popup({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className={`absolute bg-white rounded-2xl shadow-xl p-4 ${popupSize} origin-center border border-gray-100 ${className}`}
+          className={`absolute bg-card text-on-surface rounded-lg shadow-lg p-md ${popupSize} origin-center border border-surface ${className}`}
           style={{
             position: strategy,
             top: y ?? 0,

@@ -117,7 +117,7 @@ export function Sidebar({
       {isOpen && (
         <div
           className={`fixed inset-0 ${
-            overlayOpaque ? 'bg-black/50' : 'bg-transparent'
+            overlayOpaque ? 'overlay-opaque' : 'overlay-transparent'
           } z-40 transition-opacity`}
           onClick={onClose}
           aria-hidden="true"
@@ -130,15 +130,15 @@ export function Sidebar({
         role={isOpen ? 'dialog' : undefined}
         aria-modal={isOpen ? true : undefined}
         tabIndex={-1}
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white transform ${
+        className={`fixed top-0 left-0 h-full w-64 bg-surface text-on-surface transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out z-50`}
       >
-        <div className="p-4 flex justify-between items-center border-b border-gray-700">
+        <div className="p-4 flex justify-between items-center border-b border-surface">
           <span className="font-bold text-lg">{title}</span>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded transition-colors"
+            className="p-2 hover-bg-surface rounded transition-colors"
             aria-label="Close menu"
           >
             ✕
@@ -149,7 +149,7 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
-              className="hover:bg-gray-700 px-3 py-2 rounded transition-colors flex items-center gap-2"
+              className="hover-bg-surface px-3 py-2 rounded transition-colors flex items-center gap-2"
               onClick={onClose}
             >
               {item.icon && <span>{item.icon}</span>}

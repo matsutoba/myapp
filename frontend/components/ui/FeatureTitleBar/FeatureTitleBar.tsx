@@ -9,7 +9,7 @@ export function FeatureTitleBar({
 }: FeatureTitleBarProps) {
   return (
     <div
-      className={`h-10 bg-gray-200 flex items-center px-4 font-semibold ${className}`}
+      className={`h-10 bg-secondary text-on-secondary flex items-center px-md font-semibold ${className}`}
     >
       {title}
     </div>

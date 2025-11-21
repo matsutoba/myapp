@@ -6,11 +6,11 @@ interface AlertProps {
   className?: string;
 }
 
-const variantMap = {
-  info: 'bg-blue-100 border-blue-400 text-blue-700',
-  success: 'bg-green-100 border-green-400 text-green-700',
-  warning: 'bg-yellow-100 border-yellow-400 text-yellow-700',
-  error: 'bg-red-100 border-red-400 text-red-700',
+const variantMap: Record<string, string> = {
+  info: 'bg-primary text-on-primary border-surface',
+  success: 'bg-success text-on-success border-surface',
+  warning: 'bg-warning text-on-warning border-surface',
+  error: 'bg-danger text-on-danger border-surface',
 };
 
 export function Alert({
@@ -21,7 +21,7 @@ export function Alert({
   const variantClass = variantMap[variant];
 
   return (
-    <div className={`p-3 border rounded ${variantClass} ${className}`}>
+    <div className={`p-md border rounded ${variantClass} ${className}`}>
       {children}
     </div>
   );

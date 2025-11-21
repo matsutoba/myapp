@@ -57,7 +57,7 @@ export default function UsersPage() {
       <Container>
         <Stack spacing="lg">
           <Stack direction="horizontal" justify="between" align="center">
-            <Button onClick={() => router.push('/admin/users/new')}>
+            <Button size="sm" onClick={() => router.push('/admin/users/new')}>
               新規作成
             </Button>
           </Stack>
@@ -114,13 +114,13 @@ export default function UsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                       <IconButton
                         icon="Pencil"
-                        size="md"
+                        size="sm"
                         onClick={() => router.push(`/admin/users/${user.id}`)}
                         aria-label="編集"
                       />
                       <IconButton
                         icon="Trash"
-                        size="md"
+                        size="sm"
                         onClick={() => handleDelete(user.id)}
                         aria-label="削除"
                       />

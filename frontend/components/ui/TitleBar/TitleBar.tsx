@@ -1,5 +1,6 @@
 'use client';
 
+import { HamburgerButton } from '../HamburgerButton/HamburgerButton';
 import { IconButton } from '../IconButton/IconButton';
 
 interface User {
@@ -12,6 +13,7 @@ interface TitleBarProps {
   user: User | null;
   appName?: string;
   adminRole?: string;
+  onClickHamburger?: () => void;
   onLogout?: () => void;
   className?: string;
 }
@@ -20,6 +22,7 @@ export function TitleBar({
   user,
   appName = 'MyApp',
   adminRole = 'admin',
+  onClickHamburger,
   onLogout,
   className = '',
 }: TitleBarProps) {
@@ -29,9 +32,17 @@ export function TitleBar({
 
   return (
     <div
-      className={`h-8 ${bgColor} text-white flex justify-between items-center px-3 ${className}`}
+      className={`h-10 ${
+        role === adminRole
+          ? 'bg-primary text-on-primary'
+          : 'bg-surface text-on-surface'
+      } flex justify-between items-center px-md ${className}`}
     >
-      <div className="font-bold">{appName}</div>
+      <div className="flex items-center gap-2">
+        {onClickHamburger && <HamburgerButton onClick={onClickHamburger} />}
+        <div className="font-bold">{appName}</div>
+      </div>
+
       <div className="flex items-center gap-2">
         {user && <span className="text-sm">{displayName}</span>}
         {onLogout && (
@@ -40,7 +51,7 @@ export function TitleBar({
             size="sm"
             onClick={onLogout}
             aria-label="ログアウト"
-            className="text-white hover:bg-gray-700"
+            className="text-on-surface hover-bg-surface"
           />
         )}
       </div>

@@ -21,14 +21,10 @@ export function Button({
     'rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
 
   const variantStyles: Record<ButtonVariant, string> = {
-    primary:
-      'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-gray-400',
-    secondary:
-      'bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500 disabled:bg-gray-100',
-    danger:
-      'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-gray-400',
-    ghost:
-      'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500 disabled:opacity-50',
+    primary: 'bg-primary text-on-primary hover-bg-primary focus-ring-primary',
+    secondary: 'bg-secondary text-on-secondary',
+    danger: 'bg-danger text-on-danger hover-bg-danger',
+    ghost: 'bg-transparent text-foreground hover-bg-surface',
   };
 
   const sizeStyles: Record<ButtonSize, string> = {

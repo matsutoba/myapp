@@ -16,7 +16,6 @@ export { Checkbox } from './Checkbox/Checkbox';
 export { Input } from './Input/Input';
 
 export { Select } from './Select/Select';
-export type { SelectOption } from './Select/Select';
 
 export { Sidebar, type SidebarItem } from './Sidebar/Sidebar';
 

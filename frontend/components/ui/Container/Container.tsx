@@ -17,9 +17,9 @@ const sizeMap = {
 
 const paddingMap = {
   none: '',
-  sm: 'p-2',
-  md: 'p-4',
-  lg: 'p-6',
+  sm: 'p-sm',
+  md: 'p-md',
+  lg: 'p-lg',
 };
 
 export function Container({
