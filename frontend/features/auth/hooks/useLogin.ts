@@ -16,9 +16,8 @@ export function useLogin() {
 
     try {
       const result = await loginAction(formData);
-
       if (!result.success) {
-        setError(result.error || 'ログインに失敗しました');
+        setError('メールアドレスまたはパスワードが違います');
         throw new Error(result.error);
       }
 
