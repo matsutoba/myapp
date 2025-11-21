@@ -1,10 +1,11 @@
 'use client';
 
+import { TitleBar } from '@/components/ui';
+import { logoutAction } from '@/features/auth/actions/login';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import GlobalMenu from '../../components/GlobalMenu';
-import TitleBar from '../../components/TitleBar';
 
 export default function MainLayout({
   children,
@@ -33,9 +34,13 @@ export default function MainLayout({
     return null;
   }
 
+  const handleLogout = async () => {
+    await logoutAction();
+  };
+
   return (
     <>
-      <TitleBar user={user} />
+      <TitleBar user={user} onLogout={handleLogout} />
       <GlobalMenu user={user} />
       <main className="flex-1 overflow-auto">{children}</main>
     </>

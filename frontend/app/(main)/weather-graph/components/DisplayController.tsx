@@ -1,10 +1,5 @@
+import { Checkbox, IconButton } from '@/components/ui';
 import { DisplayKind, DisplayMode } from '@/features/weather-graph/types';
-import {
-  ChevronLeft,
-  ChevronRight,
-  LayoutDashboard,
-  MapPinned,
-} from 'lucide-react';
 
 interface DisplayControllerProps {
   currentDate: Date;
@@ -40,73 +35,59 @@ export const DisplayController: React.FC<DisplayControllerProps> = ({
       <div className="px-2 h-full border rounded-md flex items-center gap-4">
         <span>表示モード</span>
         <div className="flex">
-          <button
-            className="hover:bg-gray-200 rounded-full p-2"
+          <IconButton
+            icon="MapPinned"
             onClick={() => onDisplayModeChange('map')}
-          >
-            <MapPinned
-              color={currentDisplayMode === 'map' ? '#60a5fa' : undefined}
-            />
-          </button>
-          <button
-            className="hover:bg-gray-200 rounded-full p-2"
+            active={currentDisplayMode === 'map'}
+            aria-label="マップ表示"
+          />
+          <IconButton
+            icon="LayoutDashboard"
             onClick={() => onDisplayModeChange('dashboard')}
-          >
-            <LayoutDashboard
-              color={currentDisplayMode === 'dashboard' ? '#60a5fa' : undefined}
-            />
-          </button>
+            active={currentDisplayMode === 'dashboard'}
+            aria-label="ダッシュボード表示"
+          />
         </div>
       </div>
 
       <div className="px-2 h-full border rounded-md flex items-center justify-center gap-6">
         <div className="flex items-center justify-center">
-          <button
+          <IconButton
+            icon="ChevronLeft"
             onClick={handlePrev}
-            className="hover:bg-gray-200 rounded-full"
-          >
-            <ChevronLeft />
-          </button>
+            aria-label="前の日"
+          />
           {currentDate.toLocaleDateString()}
-          <button
+          <IconButton
+            icon="ChevronRight"
             onClick={handleNext}
-            className="hover:bg-gray-200 rounded-full"
-          >
-            <ChevronRight />
-          </button>
+            aria-label="次の日"
+          />
         </div>
 
-        <div className="flex gap-2">
-          <div>
-            <input
-              id="tempCheckbox"
-              type="checkbox"
-              className="mr-1"
-              checked={currentDisplayKind.temp}
-              onChange={(e) =>
-                onDisplaySwitchChange({
-                  temp: e.target.checked,
-                  rain: currentDisplayKind.rain,
-                })
-              }
-            />
-            <label htmlFor="tempCheckbox">気温</label>
-          </div>
-          <div>
-            <input
-              id="rainCheckbox"
-              type="checkbox"
-              className="mr-1"
-              checked={currentDisplayKind.rain}
-              onChange={(e) =>
-                onDisplaySwitchChange({
-                  temp: currentDisplayKind.temp,
-                  rain: e.target.checked,
-                })
-              }
-            />
-            <label htmlFor="rainCheckbox">降水量</label>
-          </div>
+        <div className="flex gap-4">
+          <Checkbox
+            id="tempCheckbox"
+            label="気温"
+            checked={currentDisplayKind.temp}
+            onChange={(e) =>
+              onDisplaySwitchChange({
+                temp: e.target.checked,
+                rain: currentDisplayKind.rain,
+              })
+            }
+          />
+          <Checkbox
+            id="rainCheckbox"
+            label="降水量"
+            checked={currentDisplayKind.rain}
+            onChange={(e) =>
+              onDisplaySwitchChange({
+                temp: currentDisplayKind.temp,
+                rain: e.target.checked,
+              })
+            }
+          />
         </div>
       </div>
 

@@ -1,7 +1,8 @@
 'use client';
 
 import GlobalMenu from '@/components/GlobalMenu';
-import TitleBar from '@/components/TitleBar';
+import { TitleBar } from '@/components/ui';
+import { logoutAction } from '@/features/auth/actions/login';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -36,11 +37,13 @@ export default function AdminLayout({
     return null;
   }
 
-  const userName = user?.name || user?.email || 'User';
+  const handleLogout = async () => {
+    await logoutAction();
+  };
 
   return (
     <>
-      <TitleBar user={user} />
+      <TitleBar user={user} onLogout={handleLogout} />
       <GlobalMenu user={user} />
       <main className="flex-1 overflow-auto">{children}</main>
     </>

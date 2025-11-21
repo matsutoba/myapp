@@ -1,11 +1,18 @@
 'use client';
 
-import FeatureTitleBar from '@/components/FeatureTitleBar';
+import {
+  Badge,
+  Button,
+  Card,
+  Container,
+  FeatureTitleBar,
+  IconButton,
+  Stack,
+} from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import { getUsers } from '@/features/user/actions/getUsers';
 import { deleteUser } from '@/features/user/actions/updateUser';
 import type { User } from '@/features/user/types';
-import { Pencil, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -47,93 +54,84 @@ export default function UsersPage() {
   return (
     <div>
       <FeatureTitleBar title="ユーザー管理" />
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => router.push('/admin/users/new')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            新規作成
-          </button>
-        </div>
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  名前
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  メール
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  ロール
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  ステータス
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  操作
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        user.role === USER_ROLES.ADMIN
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        user.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {user.isActive ? '有効' : '無効'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                    <button
-                      onClick={() => router.push(`/admin/users/${user.id}`)}
-                      className="hover:bg-gray-200 rounded-full p-1"
-                    >
-                      <Pencil size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="hover:bg-gray-200 rounded-full p-1"
-                    >
-                      <Trash size={20} />
-                    </button>
-                  </td>
+      <Container>
+        <Stack spacing="lg">
+          <Stack direction="horizontal" justify="between" align="center">
+            <Button onClick={() => router.push('/admin/users/new')}>
+              新規作成
+            </Button>
+          </Stack>
+          <Card padding="none" className="overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    名前
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    メール
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    ロール
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    ステータス
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    操作
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Badge
+                        variant={
+                          user.role === USER_ROLES.ADMIN ? 'admin' : 'user'
+                        }
+                      >
+                        {user.role}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Badge variant={user.isActive ? 'success' : 'danger'}>
+                        {user.isActive ? '有効' : '無効'}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                      <IconButton
+                        icon="Pencil"
+                        size="md"
+                        onClick={() => router.push(`/admin/users/${user.id}`)}
+                        aria-label="編集"
+                      />
+                      <IconButton
+                        icon="Trash"
+                        size="md"
+                        onClick={() => handleDelete(user.id)}
+                        aria-label="削除"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </Stack>
+      </Container>
     </div>
   );
 }
