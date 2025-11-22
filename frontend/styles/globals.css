@@ -255,6 +255,15 @@ select::placeholder {
   background-color: var(--surface);
 }
 .text-on-surface {
+  /* デフォルトは継承にしておき、
+     背景が `--surface` の要素 (または .bg-surface の内部) のときのみ
+     `--on-surface` を適用する。これにより、誤ってページ背景上で白文字になるのを防ぐ。 */
+  color: inherit;
+}
+
+/* `.bg-surface` 自身に付与されている場合と、その内部にある場合の両方をカバー */
+.bg-surface.text-on-surface,
+.bg-surface .text-on-surface {
   color: var(--on-surface);
 }
 .border-surface {
