@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { IconButton } from '../IconButton/IconButton';
 
 export interface SidebarItem {
   title: string;
@@ -130,19 +131,13 @@ export function Sidebar({
         role={isOpen ? 'dialog' : undefined}
         aria-modal={isOpen ? true : undefined}
         tabIndex={-1}
-        className={`fixed top-0 left-0 h-full w-64 bg-surface text-on-surface transform ${
+        className={`fixed top-0 left-0 h-full w-64 bg-background text-foreground shadow-lg transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out z-50`}
       >
         <div className="p-4 flex justify-between items-center border-b border-surface">
           <span className="font-bold text-lg">{title}</span>
-          <button
-            onClick={onClose}
-            className="p-2 hover-bg-surface rounded transition-colors"
-            aria-label="Close menu"
-          >
-            ✕
-          </button>
+          <IconButton onClick={onClose} aria-label="Close menu" icon="X" />
         </div>
         <nav className="flex flex-col space-y-1 p-4">
           {items.map((item) => (

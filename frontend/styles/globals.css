@@ -209,6 +209,11 @@ button:hover {
   background-color: var(--card-surface);
 }
 
+/* Page background utility mapped to theme background variable */
+.bg-background {
+  background-color: var(--background);
+}
+
 /* Badge background utilities to use the tint tokens */
 .bg-badge-primary {
   background-color: var(--badge-primary-bg);
@@ -279,8 +284,33 @@ select::placeholder {
   background-color: transparent;
 }
 
+/* Improve link/button hover contrast for both themes */
+:root[data-theme='light'] a:hover,
+:root[data-theme='light'] a:focus,
+:root[data-theme='light'] button:hover,
+:root[data-theme='light'] button:focus {
+  background-color: rgba(128, 128, 128, 0.12);
+  color: inherit;
+  outline: var(--primary-hover);
+}
+
+:root[data-theme='dark'] a:hover,
+:root[data-theme='dark'] a:focus,
+:root[data-theme='dark'] button:hover,
+:root[data-theme='dark'] button:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
 /* Ensure body respects the CSS variable background if theme provider sets it */
 body {
   background: var(--background);
-  color: var(--foreground);
+  border-radius: 4px;
+}
+
+/* Ensure icon buttons keep full rounding even when global button rules apply */
+.icon-button,
+.icon-button:hover,
+.icon-button:focus {
+  border-radius: 9999px;
 }

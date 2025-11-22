@@ -114,13 +114,11 @@ export default function UsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                       <IconButton
                         icon="Pencil"
-                        size="sm"
                         onClick={() => router.push(`/admin/users/${user.id}`)}
                         aria-label="編集"
                       />
                       <IconButton
                         icon="Trash"
-                        size="sm"
                         onClick={() => handleDelete(user.id)}
                         aria-label="削除"
                       />

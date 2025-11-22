@@ -63,12 +63,7 @@ export function Popup({
         >
           <div className="grid">
             <div className="flex justify-end">
-              <IconButton
-                icon="X"
-                size="sm"
-                onClick={onClose}
-                aria-label="閉じる"
-              />
+              <IconButton icon="X" onClick={onClose} aria-label="閉じる" />
             </div>
             {children}
           </div>

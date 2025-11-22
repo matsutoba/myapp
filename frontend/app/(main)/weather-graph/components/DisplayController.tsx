@@ -37,14 +37,12 @@ export const DisplayController: React.FC<DisplayControllerProps> = ({
         <div className="flex">
           <IconButton
             icon="MapPinned"
-            size="sm"
             onClick={() => onDisplayModeChange('map')}
             active={currentDisplayMode === 'map'}
             aria-label="マップ表示"
           />
           <IconButton
             icon="LayoutDashboard"
-            size="sm"
             onClick={() => onDisplayModeChange('dashboard')}
             active={currentDisplayMode === 'dashboard'}
             aria-label="ダッシュボード表示"
@@ -56,14 +54,12 @@ export const DisplayController: React.FC<DisplayControllerProps> = ({
         <div className="flex items-center justify-center">
           <IconButton
             icon="ChevronLeft"
-            size="sm"
             onClick={handlePrev}
             aria-label="前の日"
           />
           {currentDate.toLocaleDateString()}
           <IconButton
             icon="ChevronRight"
-            size="sm"
             onClick={handleNext}
             aria-label="次の日"
           />
