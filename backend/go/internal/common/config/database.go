@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -16,6 +17,12 @@ func SetupDatabase() *gorm.DB {
 		GetEnv("DB_NAME", "myapp"),
 	)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	log.Printf("DB_USER=%s", GetEnv("DB_USER", "root"))
+	log.Printf("DB_PASSWORD=%s", GetEnv("DB_PASSWORD", "password"))
+	log.Printf("DB_HOST=%s", GetEnv("DB_HOST", "127.0.0.1"))
+	log.Printf("DB_PORT=%s", GetEnv("DB_PORT", "3306"))
+	log.Printf("DB_NAME=%s", GetEnv("DB_NAME", "myapp"))
 
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to database: %v, dsn=%v", err, dsn))
