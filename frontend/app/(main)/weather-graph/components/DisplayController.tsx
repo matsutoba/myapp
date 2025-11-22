@@ -56,12 +56,14 @@ export const DisplayController: React.FC<DisplayControllerProps> = ({
         <div className="flex items-center justify-center">
           <IconButton
             icon="ChevronLeft"
+            size="sm"
             onClick={handlePrev}
             aria-label="前の日"
           />
           {currentDate.toLocaleDateString()}
           <IconButton
             icon="ChevronRight"
+            size="sm"
             onClick={handleNext}
             aria-label="次の日"
           />
