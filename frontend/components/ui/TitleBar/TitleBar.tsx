@@ -27,14 +27,13 @@ export function TitleBar({
   className = '',
 }: TitleBarProps) {
   const { name, role } = user || {};
-  const bgColor = role === adminRole ? 'bg-indigo-900' : 'bg-gray-800';
   const displayName = name || user?.email || 'User';
 
   return (
     <div
       className={`h-10 ${
         role === adminRole
-          ? 'bg-primary text-on-primary'
+          ? 'bg-indigo-900 text-on-primary'
           : 'bg-surface text-on-surface'
       } flex justify-between items-center px-md ${className}`}
     >
@@ -48,10 +47,8 @@ export function TitleBar({
         {onLogout && (
           <IconButton
             icon="LogOut"
-            size="sm"
             onClick={onLogout}
             aria-label="ログアウト"
-            className="text-on-surface hover-bg-surface"
           />
         )}
       </div>

@@ -37,14 +37,12 @@ export const DisplayController: React.FC<DisplayControllerProps> = ({
         <div className="flex">
           <IconButton
             icon="MapPinned"
-            size="sm"
             onClick={() => onDisplayModeChange('map')}
             active={currentDisplayMode === 'map'}
             aria-label="マップ表示"
           />
           <IconButton
             icon="LayoutDashboard"
-            size="sm"
             onClick={() => onDisplayModeChange('dashboard')}
             active={currentDisplayMode === 'dashboard'}
             aria-label="ダッシュボード表示"

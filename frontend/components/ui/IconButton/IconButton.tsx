@@ -25,7 +25,7 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const baseStyles =
-    'rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 inline-flex items-center justify-center';
+    'icon-button rounded-full hover:rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 focus:rounded-full inline-flex items-center justify-center';
 
   const variantStyles: Record<IconButtonVariant, string> = {
     default: active
@@ -36,9 +36,9 @@ export function IconButton({
   };
 
   const sizeStyles: Record<IconButtonSize, string> = {
-    sm: 'p-sm',
-    md: 'p-md',
-    lg: 'p-lg',
+    sm: 'p-xs',
+    md: 'p-sm',
+    lg: 'p-md',
   };
 
   const defaultIconSizes: Record<IconButtonSize, number> = {
