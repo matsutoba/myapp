@@ -1,43 +1,57 @@
 version: "3.9"
 
+# Production-oriented Docker Compose.
+# Notes for Railway:
+# - Railway commonly prefers using a managed database; if you use Railway managed MySQL,
+#   do NOT enable the `db` service here — instead set your Railway project's DATABASE_URL
+#   / MYSQL_* env vars and keep only the `api` service.
+# - This compose file can be used for local "production-like" testing (with volumes),
+#   but for platform deployment prefer building the `api` image via the provided
+#   `backend/docker/go/Dockerfile` (see README or Railway settings).
+
 services:
-  # Go API サービス
-  go:
+  # API service (built from backend/docker/go/Dockerfile)
+  api:
     build:
-      context: ./go
-      dockerfile: Dockerfile
+      context: ../.. # build context should be repository root
+      dockerfile: backend/docker/go/Dockerfile
     environment:
       - GO_ENV=production
-    command: ./main
-    expose:
-      - "8080"
+      # Application reads PORT env; platform (Railway) will set this automatically
+      - PORT=8080
+    # The production Dockerfile provides ENTRYPOINT, so no custom command required
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 
-  # MySQL サービス
+  # Optional: MySQL service for self-hosted production-like stacks or local use
+  # Recommended: **comment out** or remove this service when deploying to Railway
+  # and use Railway's managed MySQL (set MYSQL_* env vars in Railway instead).
   db:
     build:
       context: ./mysql
       dockerfile: Dockerfile
-    container_name: mysql
-    platform: linux/x86_64  # Apple Silicon対応
-    ports:
-      - "3306:3306"
+    platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: Asia/Tokyo
+    # Use a named volume for persistent DB storage (avoid mounting host paths in prod)
     volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/conf.d:/etc/mysql/conf.d
-      - ./mysql/init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d:ro
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    expose:
+      - "3306"
 
-  # PHP サービス（将来的に使用）
+  # Example PHP service (commented out for now)
   # php:
   #   build:
   #     context: ../php
   #     dockerfile: Dockerfile
-  #   container_name: php-app
   #   ports:
   #     - "9000:9000"
   #   volumes:

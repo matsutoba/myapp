@@ -50,6 +50,8 @@ func main() {
 	r := gin.Default()
 	// CORS (must be before defining route groups)
 	r.Use(commonMiddleware.CORSMiddleware())
+	// Optional API key middleware: protects /api routes when API_KEY env is set
+	r.Use(commonMiddleware.APIKeyMiddleware())
 	// ヘルスチェック
 	r.GET("/healthz", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
 
@@ -63,7 +65,13 @@ func main() {
 	/*
 	 * サーバー起動
 	 */
-	log.Print("Starting server on :8080...")
-	r.Run(":8080")
+	port := config.GetEnv("PORT", "8080")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
+	log.Print("Starting server on " + addr + "...")
+	r.Run(addr)
+
 	log.Print("Server started.")
 }

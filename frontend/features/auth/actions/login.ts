@@ -8,10 +8,13 @@ const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
 
 export async function loginAction(formData: LoginRequest) {
   try {
+    const serviceApiKey =
+      process.env.SERVICE_API_KEY || process.env.API_KEY || '';
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(serviceApiKey ? { 'X-API-Key': serviceApiKey } : {}),
       },
       body: JSON.stringify(formData),
     });
@@ -84,11 +87,14 @@ export async function logoutAction() {
   // バックエンドのlogout APIを呼び出してリフレッシュトークンを失効
   if (refreshToken) {
     try {
+      const serviceApiKey =
+        process.env.SERVICE_API_KEY || process.env.API_KEY || '';
       await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${refreshToken}`,
+          ...(serviceApiKey ? { 'X-API-Key': serviceApiKey } : {}),
         },
       });
       // エラーでもCookie削除は続行（ベストエフォート）

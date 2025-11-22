@@ -3,37 +3,33 @@
 # =====================================
 FROM golang:1.25.4 AS builder
 
-# 作業ディレクトリを設定
-WORKDIR /app
+# Build context is repository root; copy backend/go sources
+WORKDIR /src
 
-# Go Modules をコピーして依存関係を解決
-COPY ../../go/go.mod ../../go/go.sum ./
+# Copy module files and download deps
+COPY backend/go/go.mod backend/go/go.sum ./
 RUN go mod download
 
-# ソースコードをコピー
-COPY ../../go .
+# Copy entire backend/go source
+COPY backend/go/ ./
 
-# CGOを無効化して静的バイナリをビルド
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./cmd/api
+# Build static binary for Linux
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o /bin/server ./cmd/server
 
-# =====================================
-# Stage 2: Runtime stage (軽量)
-# =====================================
-# セキュアで軽量なDistrolessベース
-FROM gcr.io/distroless/base-debian12 AS runtime
+### Runtime image (minimal)
+FROM gcr.io/distroless/static-debian12
 
-# 実行ユーザーを作成（rootではない）
-USER nonroot:nonroot
-
+# Set working dir
 WORKDIR /app
 
-# バイナリをコピー
-COPY --from=builder /app/server .
+# Copy binary from builder
+COPY --from=builder /bin/server /app/server
 
-# 環境変数を設定
+# Default PORT (can be overridden by environment)
 ENV PORT=8080
 
+# Expose port
 EXPOSE 8080
 
-# 実行コマンド
-CMD ["./server"]
+# Run
+ENTRYPOINT ["/app/server"]

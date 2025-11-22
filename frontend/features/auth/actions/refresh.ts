@@ -17,6 +17,8 @@ export async function refreshTokensAction(): Promise<{
 
     const apiHost = process.env.API_HOST || 'http://localhost:8080';
 
+    const serviceApiKey =
+      process.env.SERVICE_API_KEY || process.env.API_KEY || '';
     const response = await fetch(`${apiHost}/api/auth/refresh`, {
       method: 'POST',
       headers: {
@@ -24,6 +26,7 @@ export async function refreshTokensAction(): Promise<{
         // httpOnlyのCookieは自動送信されないため、明示的に付与
         // Server ActionsではCookie値を取得できるので安全にヘッダーへ載せる
         Authorization: `Bearer ${refreshToken}`,
+        ...(serviceApiKey ? { 'X-API-Key': serviceApiKey } : {}),
       },
     });
 
