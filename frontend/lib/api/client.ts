@@ -64,6 +64,7 @@ export async function apiServer<T>(
     }
 
     const url = `${API_BASE_URL}${endpoint}`;
+    console.info('API Server Request:', url);
     const response = await fetch(url, {
       ...options,
       headers,
