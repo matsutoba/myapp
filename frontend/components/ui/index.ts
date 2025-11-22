@@ -35,3 +35,6 @@ export { Container } from './Container/Container';
 export { Card } from './Card/Card';
 
 export { Alert } from './Alert/Alert';
+
+export { Spinner } from './Spinner/Spinner';
+export type { SpinnerProps } from './Spinner/Spinner';
