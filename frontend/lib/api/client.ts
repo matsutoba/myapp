@@ -27,6 +27,7 @@ function dispatchGlobalError(error: ApiErrorDetail) {
 
 // 共通ヘルパー関数
 function isApiKeyError(errorData?: ApiErrorResponse): boolean {
+  console.warn('isApiKeyError called with:', errorData);
   return errorData?.error?.message?.toLowerCase().includes('api key') || false;
 }
 
@@ -37,7 +38,7 @@ async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
       .catch(() => undefined);
 
     if (errorData?.error) {
-      console.debug('API Error Response:', errorData);
+      console.warn('API Error Response:', errorData);
       return {
         success: false,
         error: errorData.error,
