@@ -4,10 +4,12 @@ import {
   Badge,
   Button,
   Card,
+  ConfirmModal,
   Container,
   FeatureTitleBar,
   IconButton,
   Stack,
+  SuccessModal,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import type { User } from '@/features/user/types';
@@ -19,6 +21,9 @@ export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -33,11 +38,16 @@ export default function UsersPage() {
     loadUsers();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('本当に削除しますか?')) return;
-    const result = await userActions.deleteUser(id); // エラー時に自動でモーダル表示
+  const handleDeleteClick = (id: number) => {
+    setDeleteTargetId(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteTargetId === null) return;
+    const result = await userActions.deleteUser(deleteTargetId); // エラー時に自動でモーダル表示
     if (result.success) {
-      alert('削除しました');
+      setShowSuccessModal(true);
       loadUsers();
     }
   };
@@ -112,7 +122,7 @@ export default function UsersPage() {
                       />
                       <IconButton
                         icon="Trash"
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDeleteClick(user.id)}
                         aria-label="削除"
                       />
                     </td>
@@ -123,6 +133,28 @@ export default function UsersPage() {
           </Card>
         </Stack>
       </Container>
+
+      {/* 削除確認モーダル */}
+      <ConfirmModal
+        open={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="削除確認"
+        message="本当に削除しますか？"
+        confirmText="削除"
+        cancelText="キャンセル"
+        variant="danger"
+      />
+
+      {/* 成功モーダル */}
+      <SuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message="削除しました"
+      />
     </div>
   );
 }

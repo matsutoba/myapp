@@ -9,6 +9,7 @@ import {
   Input,
   Select,
   Stack,
+  SuccessModal,
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
 import type { CreateUserRequest } from '@/features/user/types';
@@ -25,6 +26,7 @@ export default function NewUserPage() {
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -44,8 +46,7 @@ export default function NewUserPage() {
       const result = await createUser(formData);
 
       if (result.success) {
-        alert('ユーザーを作成しました');
-        router.push('/admin/users');
+        setShowSuccessModal(true);
       } else {
         setError(`ユーザーの作成に失敗しました。`);
       }
@@ -129,6 +130,16 @@ export default function NewUserPage() {
           </form>
         </Card>
       </Container>
+
+      {/* 成功モーダル */}
+      <SuccessModal
+        open={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push('/admin/users');
+        }}
+        message="ユーザーを作成しました"
+      />
     </div>
   );
 }

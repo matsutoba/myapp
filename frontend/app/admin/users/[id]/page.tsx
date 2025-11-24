@@ -9,6 +9,7 @@ import {
   Input,
   Select,
   Stack,
+  SuccessModal,
 } from '@/components/ui';
 import type { UpdateUserRequest } from '@/features/user/types';
 import { userActions } from '@/lib/actions';
@@ -31,6 +32,7 @@ export default function EditUserPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -93,8 +95,7 @@ export default function EditUserPage({
       const result = await userActions.updateUser(userId, updateData);
 
       if (result.success) {
-        alert('ユーザーを更新しました');
-        router.push('/admin/users');
+        setShowSuccessModal(true);
       }
       // エラー時は自動でモーダル表示される
     } catch (err) {
@@ -211,6 +212,16 @@ export default function EditUserPage({
           </form>
         </Card>
       </Container>
+
+      {/* 成功モーダル */}
+      <SuccessModal
+        open={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push('/admin/users');
+        }}
+        message="ユーザーを更新しました"
+      />
     </div>
   );
 }
