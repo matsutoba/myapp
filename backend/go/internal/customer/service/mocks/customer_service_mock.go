@@ -22,6 +22,13 @@ func (m *CustomerService) FindByID(id uint) (*domain.Customer, error) {
 	return customer, args.Error(1)
 }
 
+func (m *CustomerService) GetCustomers(skip int, take int, keyword string) ([]domain.Customer, int64, error) {
+	args := m.Called(skip, take, keyword)
+	customers, _ := args.Get(0).([]domain.Customer)
+	total, _ := args.Get(1).(int64)
+	return customers, total, args.Error(2)
+}
+
 func (m *CustomerService) CreateCustomer(input dto.CreateCustomerRequest) (*domain.Customer, error) {
 	args := m.Called(input)
 	created, _ := args.Get(0).(*domain.Customer)

@@ -1,128 +1,75 @@
-package service_test
+package service
 
 import (
-	"errors"
 	"testing"
 
-	appErrors "github.com/matsubara/myapp/internal/common/errors"
 	"github.com/matsubara/myapp/internal/customer/dto"
-	"github.com/matsubara/myapp/internal/customer/repository/mocks"
-	svc "github.com/matsubara/myapp/internal/customer/service"
+	"github.com/matsubara/myapp/internal/customer/repository"
 	"github.com/matsubara/myapp/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-func setupCustomerService(t *testing.T) (*mocks.CustomerRepository, svc.CustomerService) {
-	mockRepo := new(mocks.CustomerRepository)
-	service := svc.NewCustomerService(mockRepo)
-	t.Cleanup(func() { mockRepo.AssertExpectations(t) })
-	return mockRepo, service
-}
-func TestCustomerService_CreateCustomer(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
+var testDB *gorm.DB
 
-	input := dto.CreateCustomerRequest{
-		Name:    "Taro",
-		Email:   "taro@example.com",
-		Address: "Tokyo",
-		Phone:   "123-456-7890",
+func setupTestDB(t *testing.T) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("failed to open test db: %v", err)
 	}
-
-	// モックの期待値 --- IGNORE ---
-	mockRepo.On("Create", mock.AnythingOfType("domain.Customer")).Return(&domain.Customer{
-		ID:      1,
-		Name:    input.Name,
-		Email:   input.Email,
-		Address: input.Address,
-		Phone:   input.Phone,
-	}, nil)
-
-	customer, err := service.CreateCustomer(input)
-
-	assert.NoError(t, err)
-	assert.Equal(t, input.Email, customer.Email)
-}
-
-func TestCustomerService_GetAllCustomers(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
-
-	mockRepo.On("GetAll").Return([]domain.Customer{
-		{ID: 1, Name: "Taro", Email: "taro@example.com"},
-		{ID: 2, Name: "Jiro", Email: "jiro@example.com"},
-	}, nil)
-
-	customers, err := service.GetAllCustomers()
-
-	assert.NoError(t, err)
-	assert.Len(t, customers, 2)
-}
-
-func TestCustomerService_FindCustomerByID(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
-
-	mockRepo.On("FindByID", uint(1)).Return(&domain.Customer{
-		ID:    1,
-		Name:  "Taro",
-		Email: "taro@example.com",
-	}, nil)
-
-	customer, err := service.FindByID(1)
-
-	assert.NoError(t, err)
-	assert.Equal(t, uint(1), customer.ID)
-}
-
-func TestCustomerService_FindCustomerByID_NotFound(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
-
-	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("customer not found"))
-
-	customer, err := service.FindByID(1)
-
-	assert.Nil(t, customer)
-	assert.Equal(t, appErrors.AppErrCustomerNotFound, err)
-}
-
-func TestCustomerService_UpdateCustomer(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
-
-	existingCustomer := domain.Customer{
-		ID:      1,
-		Name:    "Taro",
-		Email:   "taro@example.com",
-		Address: "Tokyo",
-		Phone:   "123-456-7890",
+	if err := db.AutoMigrate(&domain.User{}, &domain.Customer{}); err != nil {
+		t.Fatalf("auto migrate failed: %v", err)
 	}
-
-	input := dto.UpdateCustomerRequest{
-		Name:    "Taro Yamada",
-		Email:   "update@example.com",
-		Address: "Osaka",
-		Phone:   "987-654-3210",
-	}
-
-	mockRepo.On("FindByID", uint(1)).Return(&existingCustomer, nil)
-	mockRepo.On("Update", mock.AnythingOfType("domain.Customer")).Return(&domain.Customer{
-		ID:      1,
-		Name:    input.Name,
-		Email:   input.Email,
-		Address: input.Address,
-		Phone:   input.Phone,
-	}, nil)
-
-	customer, err := service.UpdateCustomer(1, input)
-
-	assert.NoError(t, err)
-	assert.Equal(t, input.Email, customer.Email)
+	return db
 }
 
-func TestCustomerService_DeleteCustomer(t *testing.T) {
-	mockRepo, service := setupCustomerService(t)
+func TestCustomerService_CRUD(t *testing.T) {
+	db := setupTestDB(t)
+	repo := repository.NewCustomerRepository(db)
+	svc := NewCustomerService(repo)
 
-	mockRepo.On("Delete", uint(1)).Return(nil)
-
-	err := service.DeleteCustomer(1)
-
+	// Create
+	req := dto.CreateCustomerRequest{
+		Name:    "テスト顧客",
+		Email:   "test@example.com",
+		Phone:   "090-0000-0000",
+		Address: "東京都",
+	}
+	created, err := svc.CreateCustomer(req)
 	assert.NoError(t, err)
+	assert.NotNil(t, created)
+	assert.NotZero(t, created.ID)
+
+	// GetAll
+	list, err := svc.GetAllCustomers()
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(list), 1)
+
+	// FindByID
+	found, err := svc.FindByID(created.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, "テスト顧客", found.Name)
+
+	// Update
+	updateReq := dto.UpdateCustomerRequest{
+		Name:    "更新顧客",
+		Email:   "test@example.com",
+		Phone:   "090-0000-0000",
+		Address: "京都府",
+	}
+	_, err = svc.UpdateCustomer(created.ID, updateReq)
+	assert.NoError(t, err)
+
+	updated, err := svc.FindByID(created.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, "更新顧客", updated.Name)
+	assert.Equal(t, "京都府", updated.Address)
+
+	// Delete
+	err = svc.DeleteCustomer(created.ID)
+	assert.NoError(t, err)
+
+	_, err = svc.FindByID(created.ID)
+	assert.Error(t, err)
 }

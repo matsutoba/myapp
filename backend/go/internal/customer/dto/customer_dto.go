@@ -6,32 +6,85 @@ import (
 	"github.com/matsubara/myapp/internal/domain"
 )
 
+// CreateCustomerRequest: 顧客作成リクエスト
 type CreateCustomerRequest struct {
-	Name    string `json:"name" binding:"required"`
-	Email   string `json:"email" binding:"required,email"`
-	Address string `json:"address" binding:"required"`
-	Phone   string `json:"phone" binding:"required"`
+	Name         string     `json:"name" binding:"required"`
+	ContactName  string     `json:"contact_name,omitempty"`
+	Company      string     `json:"company,omitempty"`
+	Email        string     `json:"email" binding:"required,email"`
+	Phone        string     `json:"phone,omitempty"`
+	Address      string     `json:"address,omitempty"`
+	Website      string     `json:"website,omitempty"`
+	Tags         string     `json:"tags,omitempty"`
+	Status       string     `json:"status,omitempty"`
+	OwnerID      *uint      `json:"owner_id,omitempty"`
+	NextActionAt *time.Time `json:"next_action_at,omitempty"`
+	Notes        string     `json:"notes,omitempty"`
 }
 
+// UpdateCustomerRequest: 顧客更新リクエスト
 type UpdateCustomerRequest struct {
-	Name    string `json:"name" binding:"required"`
-	Email   string `json:"email" binding:"required,email"`
-	Address string `json:"address" binding:"required"`
-	Phone   string `json:"phone" binding:"required"`
+	Name         string     `json:"name" binding:"required"`
+	ContactName  string     `json:"contact_name,omitempty"`
+	Company      string     `json:"company,omitempty"`
+	Email        string     `json:"email" binding:"required,email"`
+	Phone        string     `json:"phone,omitempty"`
+	Address      string     `json:"address,omitempty"`
+	Website      string     `json:"website,omitempty"`
+	Tags         string     `json:"tags,omitempty"`
+	Status       string     `json:"status,omitempty"`
+	OwnerID      *uint      `json:"owner_id,omitempty"`
+	NextActionAt *time.Time `json:"next_action_at,omitempty"`
+	Notes        string     `json:"notes,omitempty"`
 }
 
-// CustomerResponse は単一顧客取得時のレスポンス
+// CustomerResponse: API レスポンス用 DTO
 type CustomerResponse struct {
-	ID        uint      `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID              uint       `json:"id"`
+	Name            string     `json:"name"`
+	ContactName     string     `json:"contact_name,omitempty"`
+	Company         string     `json:"company,omitempty"`
+	Email           string     `json:"email,omitempty"`
+	Phone           string     `json:"phone,omitempty"`
+	Address         string     `json:"address,omitempty"`
+	Website         string     `json:"website,omitempty"`
+	Tags            string     `json:"tags,omitempty"`
+	Status          string     `json:"status,omitempty"`
+	OwnerID         *uint      `json:"owner_id,omitempty"`
+	LastContactedAt *time.Time `json:"last_contacted_at,omitempty"`
+	NextActionAt    *time.Time `json:"next_action_at,omitempty"`
+	Notes           string     `json:"notes,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 }
 
-// CustomerListResponse は顧客一覧取得時のレスポンス（簡易版）
+// ToCustomerResponse converts domain.Customer -> CustomerResponse
+func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
+	if c == nil {
+		return nil
+	}
+	return &CustomerResponse{
+		ID:              c.ID,
+		Name:            c.Name,
+		ContactName:     c.ContactName,
+		Company:         c.Company,
+		Email:           c.Email,
+		Phone:           c.Phone,
+		Address:         c.Address,
+		Website:         c.Website,
+		Tags:            c.Tags,
+		Status:          c.Status,
+		OwnerID:         c.OwnerID,
+		LastContactedAt: c.LastContactedAt,
+		NextActionAt:    c.NextActionAt,
+		Notes:           c.Notes,
+		CreatedAt:       c.CreatedAt,
+		UpdatedAt:       c.UpdatedAt,
+	}
+}
+
+// ToCustomerListResponse converts a list of domain.Customer to []*CustomerResponse
+// CustomerListResponse は顧客一覧取得時の簡易レスポンス（テスト互換）
 type CustomerListResponse struct {
 	ID    uint   `json:"id"`
 	Name  string `json:"name"`
@@ -39,32 +92,33 @@ type CustomerListResponse struct {
 	Phone string `json:"phone"`
 }
 
-// ToCustomerResponse はモデルをレスポンスDTOに変換
-func ToCustomerResponse(customer *domain.Customer) *CustomerResponse {
-	if customer == nil {
-		return nil
-	}
-	return &CustomerResponse{
-		ID:        customer.ID,
-		Name:      customer.Name,
-		Email:     customer.Email,
-		Phone:     customer.Phone,
-		Address:   customer.Address,
-		CreatedAt: customer.CreatedAt,
-		UpdatedAt: customer.UpdatedAt,
-	}
-}
-
-// ToCustomerListResponse は複数顧客を一覧レスポンスDTOに変換
-func ToCustomerListResponse(customers []domain.Customer) []CustomerListResponse {
-	result := make([]CustomerListResponse, len(customers))
-	for i, c := range customers {
-		result[i] = CustomerListResponse{
+// ToCustomerListResponse は複数顧客を一覧レスポンスDTOに変換（互換のため []CustomerListResponse を返す）
+func ToCustomerListResponse(list []domain.Customer) []CustomerListResponse {
+	resp := make([]CustomerListResponse, 0, len(list))
+	for _, c := range list {
+		resp = append(resp, CustomerListResponse{
 			ID:    c.ID,
 			Name:  c.Name,
 			Email: c.Email,
 			Phone: c.Phone,
-		}
+		})
 	}
-	return result
+	return resp
+}
+
+// Paged response for customer list
+type CustomerListPagedResponse struct {
+	Items []CustomerListResponse `json:"items"`
+	Total int64                  `json:"total"`
+	Skip  int                    `json:"skip"`
+	Take  int                    `json:"take"`
+}
+
+func ToCustomerListPagedResponse(list []domain.Customer, total int64, skip int, take int) CustomerListPagedResponse {
+	return CustomerListPagedResponse{
+		Items: ToCustomerListResponse(list),
+		Total: total,
+		Skip:  skip,
+		Take:  take,
+	}
 }

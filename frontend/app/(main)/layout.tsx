@@ -30,6 +30,10 @@ export default function MainLayout({
         ]
       : []),
     {
+      title: '顧客管理',
+      href: '/customers',
+    },
+    {
       title: '日本の天気',
       href: '/weather-graph',
     },

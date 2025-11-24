@@ -13,6 +13,7 @@ import (
 type CustomerService interface {
 	GetAllCustomers() ([]domain.Customer, error)
 	FindByID(id uint) (*domain.Customer, error)
+	GetCustomers(skip int, take int, keyword string) ([]domain.Customer, int64, error)
 	CreateCustomer(customer dto.CreateCustomerRequest) (*domain.Customer, error)
 	UpdateCustomer(id uint, customer dto.UpdateCustomerRequest) (*domain.Customer, error)
 	DeleteCustomer(id uint) error
@@ -33,6 +34,10 @@ func (s *customerService) GetAllCustomers() ([]domain.Customer, error) {
 	return s.repo.GetAll()
 }
 
+func (s *customerService) GetCustomers(skip int, take int, keyword string) ([]domain.Customer, int64, error) {
+	return s.repo.GetPaginated(skip, take, keyword)
+}
+
 func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
 	customer, err := s.repo.FindByID(id)
 	if err != nil {
@@ -43,13 +48,29 @@ func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
 
 func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*domain.Customer, error) {
 	newCustomer := domain.Customer{
-		Name:    input.Name,
-		Email:   input.Email,
-		Phone:   input.Phone,
-		Address: input.Address,
+		Name:         input.Name,
+		ContactName:  input.ContactName,
+		Company:      input.Company,
+		Email:        input.Email,
+		Phone:        input.Phone,
+		Address:      input.Address,
+		Website:      input.Website,
+		Tags:         input.Tags,
+		Status:       input.Status,
+		OwnerID:      input.OwnerID,
+		NextActionAt: input.NextActionAt,
+		Notes:        input.Notes,
 	}
 
-	return s.repo.Create(newCustomer)
+	created, err := s.repo.Create(newCustomer)
+	if err != nil {
+		// Translate repository errors to application errors when possible
+		if err == errors.ErrDuplicateEntry {
+			return nil, errors.AppErrCustomerAlreadyExists
+		}
+		return nil, errors.ErrInsertFailed
+	}
+	return created, nil
 }
 
 func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerRequest) (*domain.Customer, error) {
@@ -58,10 +79,19 @@ func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerReques
 		return nil, errors.AppErrCustomerNotFound
 	}
 
+	// map updatable fields
 	existingCustomer.Name = input.Name
+	existingCustomer.ContactName = input.ContactName
+	existingCustomer.Company = input.Company
 	existingCustomer.Email = input.Email
 	existingCustomer.Phone = input.Phone
 	existingCustomer.Address = input.Address
+	existingCustomer.Website = input.Website
+	existingCustomer.Tags = input.Tags
+	existingCustomer.Status = input.Status
+	existingCustomer.OwnerID = input.OwnerID
+	existingCustomer.NextActionAt = input.NextActionAt
+	existingCustomer.Notes = input.Notes
 
 	customer, err := s.repo.Update(*existingCustomer)
 	if err != nil {
