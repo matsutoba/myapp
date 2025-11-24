@@ -64,29 +64,43 @@ export async function apiServer<T>(
     }
 
     const url = `${API_BASE_URL}${endpoint}`;
-    console.info('API Server Request:', url);
     const response = await fetch(url, {
       ...options,
       headers,
     });
 
-    // If unauthorized, try to refresh tokens once (server-side)
+    console.debug('API Server Response:', response);
+
+    // 認証失敗の場合、APIキーエラーかどうかを確認してからリフレッシュを試みる
     if (response.status === 401) {
-      const refreshed = await tryRefreshServerTokens();
-      if (refreshed) {
-        // re-read token and retry once
-        const cookieStore2 = await cookies();
-        const newAccess =
-          cookieStore2.get('accessToken')?.value ||
-          cookieStore2.get('authToken')?.value;
-        if (newAccess) {
-          headers['Authorization'] = `Bearer ${newAccess}`;
+      const clonedResponse = response.clone();
+      const errorData: ApiErrorResponse | undefined = await clonedResponse
+        .json()
+        .catch(() => undefined);
+
+      // APIキーエラーの場合はトークンリフレッシュをスキップする
+      const isApiKeyError = errorData?.error?.message
+        ?.toLowerCase()
+        .includes('api key');
+
+      if (!isApiKeyError) {
+        const refreshed = await tryRefreshServerTokens();
+        if (refreshed) {
+          // 1回だけトークンを再取得してリトライ
+          const cookieStore2 = await cookies();
+          const newAccess =
+            cookieStore2.get('accessToken')?.value ||
+            cookieStore2.get('authToken')?.value;
+          if (newAccess) {
+            headers['Authorization'] = `Bearer ${newAccess}`;
+          }
+          const retryRes = await fetch(url, { ...options, headers });
+          return await handleServerResponse<T>(retryRes);
         }
-        const retryRes = await fetch(url, { ...options, headers });
-        return await handleServerResponse<T>(retryRes);
       }
     }
 
+    // APIのエラー応答があった場合の処理
     if (!response.ok) {
       const errorData: ApiErrorResponse | undefined = await response
         .json()
@@ -262,16 +276,29 @@ export async function apiClient<T>(
       credentials: 'include', // Include cookies for cross-origin requests
     });
 
-    // If unauthorized, try client-side refresh once (uses cookies via credentials: 'include')
+    // If unauthorized, check if it's an API key error before trying to refresh
     if (response.status === 401) {
-      const refreshed = await tryRefreshClientTokens();
-      if (refreshed) {
-        const retryRes = await fetch(url, {
-          ...options,
-          headers,
-          credentials: 'include',
-        });
-        return await handleClientResponse<T>(retryRes);
+      // Check if it's an API key error
+      const clonedResponse = response.clone();
+      const errorData: ApiErrorResponse | undefined = await clonedResponse
+        .json()
+        .catch(() => undefined);
+
+      // Skip token refresh if it's an API key error
+      const isApiKeyError = errorData?.error?.message
+        ?.toLowerCase()
+        .includes('api key');
+
+      if (!isApiKeyError) {
+        const refreshed = await tryRefreshClientTokens();
+        if (refreshed) {
+          const retryRes = await fetch(url, {
+            ...options,
+            headers,
+            credentials: 'include',
+          });
+          return await handleClientResponse<T>(retryRes);
+        }
       }
     }
 
