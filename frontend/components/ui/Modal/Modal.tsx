@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '../Icon/Icon';
 
 export interface ModalProps {
   open: boolean;
@@ -84,19 +85,7 @@ export function Modal({
                 className="text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label="閉じる"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <Icon name="X" size={24} />
               </button>
             )}
           </div>

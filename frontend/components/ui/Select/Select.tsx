@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '../Icon/Icon';
 
 interface SelectOption {
   value: string;
@@ -57,24 +58,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
         {/* Custom dropdown icon placed on the right to avoid touching the edge */}
         <div className="pointer-events-none absolute inset-y-12 right-3 flex items-center">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            focusable="false"
-            className="text-muted"
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Icon name="ChevronDown" size={20} className="text-muted" />
         </div>
         {helperText && !error && (
           <p className="mt-1 text-sm text-muted">{helperText}</p>

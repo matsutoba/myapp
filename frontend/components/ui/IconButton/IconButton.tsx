@@ -1,5 +1,6 @@
 import * as Icons from 'lucide-react';
 import React from 'react';
+import { ICON_SIZES } from '../Icon/tokens';
 
 export type IconButtonVariant = 'default' | 'primary' | 'danger';
 export type IconButtonSize = 'sm' | 'md' | 'lg';
@@ -42,9 +43,9 @@ export function IconButton({
   };
 
   const defaultIconSizes: Record<IconButtonSize, number> = {
-    sm: 16,
-    md: 20,
-    lg: 24,
+    sm: ICON_SIZES.sm,
+    md: ICON_SIZES.md,
+    lg: ICON_SIZES.lg,
   };
 
   const disabledStyles = disabled

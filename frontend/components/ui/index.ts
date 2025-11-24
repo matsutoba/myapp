@@ -11,6 +11,9 @@ export type {
   IconName,
 } from './IconButton/IconButton';
 
+export { Icon } from './Icon/Icon';
+export type { IconProps } from './Icon/Icon';
+
 export { Checkbox } from './Checkbox/Checkbox';
 
 export { Input } from './Input/Input';
@@ -44,3 +47,9 @@ export type { ModalProps } from './Modal/Modal';
 
 export { ErrorModal } from './ErrorModal/ErrorModal';
 export type { ErrorModalProps } from './ErrorModal/ErrorModal';
+
+export { SuccessModal } from './SuccessModal/SuccessModal';
+export type { SuccessModalProps } from './SuccessModal/SuccessModal';
+
+export { ConfirmModal } from './ConfirmModal/ConfirmModal';
+export type { ConfirmModalProps } from './ConfirmModal/ConfirmModal';
