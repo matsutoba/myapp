@@ -11,7 +11,7 @@ import (
 
 func SeedUsers(db *gorm.DB) {
 	// パスワードをハッシュ化
-	hashPassword, nil := security.HashPassword("password")
+	hashPassword, _ := security.HashPassword("password")
 
 	admin := domain.User{
 		Name:     "管理者1",

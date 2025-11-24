@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/matsubara/myapp/internal/auth/repositories"
@@ -33,18 +34,22 @@ func (s *authService) Login(email, password string) (*domain.User, string, strin
 	user, err := s.repo.FindUserByEmail(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("auth: login failed for email=%s: user not found", email)
 			return nil, "", "", commonErrors.ErrUnauthorized
 		}
+		log.Printf("auth: login error for email=%s: %v", email, err)
 		return nil, "", "", err
 	}
 
 	// アクティブユーザーチェック
 	if !user.IsActive {
+		log.Printf("auth: login failed for email=%s: inactive", email)
 		return nil, "", "", commonErrors.ErrUnauthorized
 	}
 
 	// パスワード検証
 	if !security.CheckPasswordHash(password, user.Password) {
+		log.Printf("auth: login failed for email=%s: password mismatch", email)
 		return nil, "", "", commonErrors.ErrUnauthorized
 	}
 
@@ -54,11 +59,13 @@ func (s *authService) Login(email, password string) (*domain.User, string, strin
 	refreshExpHours := config.GetEnvAsInt("REFRESH_TOKEN_TTL_HOURS", 168) // デフォルト7日
 	accessToken, err := security.GenerateToken(user.ID, user.Email, user.Role, secretKey, accessExpHours)
 	if err != nil {
+		log.Printf("auth: failed to generate access token for user=%d email=%s: %v", user.ID, user.Email, err)
 		return nil, "", "", err
 	}
 	// Generate JTI for refresh token and persist
 	jti, err := generateJTI()
 	if err != nil {
+		log.Printf("auth: failed to generate refresh token for user=%d email=%s: %v", user.ID, user.Email, err)
 		return nil, "", "", err
 	}
 	refreshToken, err := security.GenerateRefreshToken(user.ID, user.Email, user.Role, secretKey, refreshExpHours, jti)
@@ -67,13 +74,14 @@ func (s *authService) Login(email, password string) (*domain.User, string, strin
 	}
 	// Save refresh token record (best-effort; if it fails, treat as error because rotation requires persistence)
 	if err := s.repo.CreateRefreshToken(user.ID, jti, time.Now().Add(time.Duration(refreshExpHours)*time.Hour)); err != nil {
+		log.Printf("auth: failed to persist refresh token for user=%d email=%s: %v", user.ID, user.Email, err)
 		return nil, "", "", err
 	}
 
 	// 最終ログイン時刻を更新
 	if err := s.repo.UpdateLastLogin(user.ID); err != nil {
 		// ログイン時刻の更新エラーは致命的ではないのでログのみ
-		// TODO: ロガーを使用してログを出力
+		log.Printf("auth: failed to update last login for user=%d: %v", user.ID, err)
 	}
 
 	return user, accessToken, refreshToken, nil
