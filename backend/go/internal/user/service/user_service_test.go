@@ -171,6 +171,80 @@ func TestUserService_UpdateUser(t *testing.T) {
 	assert.Equal(t, input.Role, user.Role)
 }
 
+func TestUserService_UpdateUser_UpdatesIsActiveWhenProvided(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	existingUser := domain.User{
+		ID:       1,
+		Name:     "Taro",
+		Email:    "taro@example.com",
+		Password: "password",
+		Role:     "user",
+		IsActive: true,
+	}
+
+	isActiveFalse := false
+	input := dto.UpdateUserRequest{
+		Name:     "Taro",
+		Email:    "taro@example.com",
+		Role:     "user",
+		IsActive: &isActiveFalse,
+	}
+
+	mockRepo.On("FindByID", uint(1)).Return(&existingUser, nil)
+	// Expect Update is called with IsActive == false
+	mockRepo.On("Update", mock.MatchedBy(func(u domain.User) bool {
+		return u.ID == 1 && u.IsActive == false
+	})).Return(&domain.User{
+		ID:       1,
+		Name:     input.Name,
+		Email:    input.Email,
+		Role:     input.Role,
+		IsActive: false,
+	}, nil)
+
+	user, err := service.UpdateUser(1, input)
+
+	assert.NoError(t, err)
+	assert.Equal(t, false, user.IsActive)
+}
+
+func TestUserService_UpdateUser_LeavesIsActiveWhenNil(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	existingUser := domain.User{
+		ID:       1,
+		Name:     "Taro",
+		Email:    "taro@example.com",
+		Password: "password",
+		Role:     "user",
+		IsActive: true,
+	}
+
+	input := dto.UpdateUserRequest{
+		Name:  "Taro",
+		Email: "taro@example.com",
+		Role:  "user",
+		// IsActive == nil -> should remain true
+	}
+
+	mockRepo.On("FindByID", uint(1)).Return(&existingUser, nil)
+	mockRepo.On("Update", mock.MatchedBy(func(u domain.User) bool {
+		return u.ID == 1 && u.IsActive == true
+	})).Return(&domain.User{
+		ID:       1,
+		Name:     input.Name,
+		Email:    input.Email,
+		Role:     input.Role,
+		IsActive: true,
+	}, nil)
+
+	user, err := service.UpdateUser(1, input)
+
+	assert.NoError(t, err)
+	assert.Equal(t, true, user.IsActive)
+}
+
 func TestUserService_DeleteUser(t *testing.T) {
 	mockRepo, service := setupUserService(t)
 

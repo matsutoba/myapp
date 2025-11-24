@@ -91,6 +91,10 @@ func (s *userService) UpdateUser(id uint, input dto.UpdateUserRequest) (*domain.
 	existingUser.Email = input.Email
 	existingUser.Role = input.Role
 	existingUser.Password = input.Password
+	// IsActive が指定されていれば更新
+	if input.IsActive != nil {
+		existingUser.IsActive = *input.IsActive
+	}
 
 	user, err := s.repo.Update(*existingUser)
 	if err != nil {

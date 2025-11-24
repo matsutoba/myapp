@@ -14,10 +14,13 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
+	// Update リクエストは部分更新も許可するためすべて省略可能にする
+	Name     string `json:"name" binding:"omitempty"`
+	Email    string `json:"email" binding:"omitempty,email"`
 	Password string `json:"password" binding:"omitempty,min=6"`
-	Role     string `json:"role" binding:"required,oneof=admin user"`
+	Role     string `json:"role" binding:"omitempty,oneof=admin user"`
+	// IsActive は更新時にステータスを明示的に変更したい場合に使う（nilなら変更しない）
+	IsActive *bool `json:"isActive"`
 }
 
 // UserResponse は単一ユーザー取得時のレスポンス

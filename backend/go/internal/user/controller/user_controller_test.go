@@ -286,6 +286,46 @@ func TestUserController_UpdateUser(t *testing.T) {
 	env.MockService.AssertExpectations(t)
 }
 
+func TestUserController_UpdateUser_WithIsActiveField(t *testing.T) {
+	env := SetupTestEnv()
+	env.Router.PUT("/users/:id", env.UserController.UpdateUser)
+
+	// Expect service.UpdateUser called with IsActive == false
+	env.MockService.On("UpdateUser", uint(1), mock.MatchedBy(func(u dto.UpdateUserRequest) bool {
+		return u.IsActive != nil && *u.IsActive == false
+	})).Return(&domain.User{ID: 1}, nil)
+
+	userJSON := `{"isActive":false}`
+	req, _ := http.NewRequest(http.MethodPut, "/users/1", strings.NewReader(userJSON))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	env.Router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+	env.MockService.AssertExpectations(t)
+}
+
+func TestUserController_UpdateUser_WithoutIsActiveField(t *testing.T) {
+	env := SetupTestEnv()
+	env.Router.PUT("/users/:id", env.UserController.UpdateUser)
+
+	// Expect service.UpdateUser called with IsActive == nil
+	env.MockService.On("UpdateUser", uint(1), mock.MatchedBy(func(u dto.UpdateUserRequest) bool {
+		return u.IsActive == nil
+	})).Return(&domain.User{ID: 1}, nil)
+
+	userJSON := `{"name":"Taro Updated","email":"taro.updated@example.com","role":"admin"}`
+	req, _ := http.NewRequest(http.MethodPut, "/users/1", strings.NewReader(userJSON))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	env.Router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+	env.MockService.AssertExpectations(t)
+}
+
 func TestUserController_UpdateUser_InvalidID(t *testing.T) {
 	env := SetupTestEnv()
 	env.Router.PUT("/users/:id", env.UserController.UpdateUser)
