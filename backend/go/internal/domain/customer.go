@@ -1,13 +1,40 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Customer struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID uint `gorm:"primaryKey" json:"id"`
+	// Name: 表示用の顧客名（会社名やフルネームなど表示優先の名前）
+	Name string `json:"name"`
+	// ContactName: 担当者名（顧客窓口のフルネーム）
+	ContactName string `json:"contact_name,omitempty"`
+	// Company: 会社名（法人顧客の場合）
+	Company string `json:"company,omitempty"`
+	// Email: 主要な連絡先メールアドレス
+	Email string `json:"email,omitempty"`
+	// Phone: 主要な電話番号（国番号含めたフォーマットを推奨）
+	Phone string `json:"phone,omitempty"`
+	// Address: 住所（郵送や表示用の自由テキスト）
+	Address string `json:"address,omitempty"`
+	// Website: ウェブサイトのURL
+	Website string `json:"website,omitempty"`
+	// Tags: 検索・分類用のタグをカンマ区切りで保持（小規模用）
+	Tags string `json:"tags,omitempty"` // comma-separated tags
+	// Status: 顧客の状態（例: lead, prospect, customer, churned）
+	Status string `json:"status,omitempty"`
+	// OwnerID: 担当ユーザーのID（usersテーブル参照）
+	OwnerID *uint `json:"owner_id,omitempty"`
+	// LastContactedAt: 最後にコンタクトした日時
+	LastContactedAt *time.Time `json:"last_contacted_at,omitempty"`
+	// NextActionAt: 次に行うアクションの予定日時（フォローリマインド等）
+	NextActionAt *time.Time `json:"next_action_at,omitempty"`
+	// Notes: フリー形式のメモや履歴要約（長文対応）
+	Notes     string         `gorm:"type:text" json:"notes,omitempty"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
