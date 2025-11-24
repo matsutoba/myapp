@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"github.com/matsubara/myapp/internal/user/dto"
 	"github.com/matsubara/myapp/internal/domain"
+	"github.com/matsubara/myapp/internal/user/dto"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -14,6 +14,13 @@ func (m *UserService) GetAllUsers() ([]domain.User, error) {
 	args := m.Called()
 	users, _ := args.Get(0).([]domain.User)
 	return users, args.Error(1)
+}
+
+func (m *UserService) GetUsers(skip int, take int) ([]domain.User, int64, error) {
+	args := m.Called(skip, take)
+	users, _ := args.Get(0).([]domain.User)
+	total, _ := args.Get(1).(int64)
+	return users, total, args.Error(2)
 }
 
 func (m *UserService) FindUserByID(id uint) (*domain.User, error) {

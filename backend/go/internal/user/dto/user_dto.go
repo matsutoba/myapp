@@ -72,3 +72,20 @@ func ToUserListResponse(users []domain.User) []UserListResponse {
 	}
 	return result
 }
+
+// ユーザー一覧のページネーションレスポンス
+type UsersPagedResponse struct {
+	Items []UserListResponse `json:"items"`
+	Total int64              `json:"total"`
+	Skip  int                `json:"skip"`
+	Take  int                `json:"take"`
+}
+
+func ToUserListPagedResponse(users []domain.User, total int64, skip int, take int) UsersPagedResponse {
+	return UsersPagedResponse{
+		Items: ToUserListResponse(users),
+		Total: total,
+		Skip:  skip,
+		Take:  take,
+	}
+}

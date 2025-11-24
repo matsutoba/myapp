@@ -27,12 +27,54 @@ func NewUserController(s service.UserService) *UserController {
 }
 
 func (uc *UserController) GetUsers(c *gin.Context) {
-	users, err := uc.service.GetAllUsers()
+	// ページネーションパラメータがない場合は全件取得
+	if c.Query("page") == "" && c.Query("skip") == "" && c.Query("take") == "" {
+		users, err := uc.service.GetAllUsers()
+		if err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
+		c.JSON(http.StatusOK, dto.ToUserListResponse(users))
+		return
+	}
+
+	// ページネーションパラメータがある場合
+	const defaultTake = 20
+	maxTake := 100
+
+	// takeパラメータの解析
+	takeParam := c.DefaultQuery("take", "")
+	take := defaultTake
+	if takeParam != "" {
+		if t, err := strconv.Atoi(takeParam); err == nil {
+			take = t
+		}
+	}
+	if take <= 0 {
+		take = defaultTake
+	}
+	if take > maxTake {
+		take = maxTake
+	}
+
+	// skip, pageパラメータの解析
+	skip := 0
+	if pageParam := c.DefaultQuery("page", ""); pageParam != "" {
+		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
+			skip = (p - 1) * take
+		}
+	} else if skipParam := c.DefaultQuery("skip", ""); skipParam != "" {
+		if s, err := strconv.Atoi(skipParam); err == nil && s >= 0 {
+			skip = s
+		}
+	}
+
+	users, total, err := uc.service.GetUsers(skip, take)
 	if err != nil {
 		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, dto.ToUserListResponse(users))
+	c.JSON(http.StatusOK, dto.ToUserListPagedResponse(users, total, skip, take))
 }
 
 func (uc *UserController) GetUserByID(c *gin.Context) {

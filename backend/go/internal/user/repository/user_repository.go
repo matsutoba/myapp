@@ -11,6 +11,7 @@ import (
  */
 type UserRepository interface {
 	GetAll() ([]domain.User, error)
+	GetPaginated(skip int, take int) ([]domain.User, int64, error)
 	FindByID(id uint) (*domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	Create(user domain.User) (*domain.User, error)
@@ -33,6 +34,22 @@ func (r *userRepository) GetAll() ([]domain.User, error) {
 	var users []domain.User
 	err := r.db.Find(&users).Error
 	return users, err
+}
+
+func (r *userRepository) GetPaginated(skip int, take int) ([]domain.User, int64, error) {
+	var users []domain.User
+	var total int64
+
+	// 合計件数を先にカウント
+	if err := r.db.Model(&domain.User{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := r.db.Order("id desc").Offset(skip).Limit(take).Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
 }
 
 func (r *userRepository) FindByID(id uint) (*domain.User, error) {

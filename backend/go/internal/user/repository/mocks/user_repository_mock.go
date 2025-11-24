@@ -27,6 +27,13 @@ func (m *UserRepository) GetAll() ([]domain.User, error) {
 	return users, args.Error(1)
 }
 
+func (m *UserRepository) GetPaginated(skip int, take int) ([]domain.User, int64, error) {
+	args := m.Called(skip, take)
+	users, _ := args.Get(0).([]domain.User)
+	total, _ := args.Get(1).(int64)
+	return users, total, args.Error(2)
+}
+
 func (m *UserRepository) FindByID(id uint) (*domain.User, error) {
 	args := m.Called(id)
 	user, _ := args.Get(0).(*domain.User)
