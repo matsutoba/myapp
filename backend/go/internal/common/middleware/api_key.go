@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"crypto/subtle"
-	"log"
 	"net/http"
 	"strings"
 
