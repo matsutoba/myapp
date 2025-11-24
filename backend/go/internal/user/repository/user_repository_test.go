@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/matsubara/myapp/internal/domain"
@@ -105,5 +106,66 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	_, err = repo.FindByEmail("nonexistent@example.com")
 	if err == nil {
 		t.Fatal("expected error for nonexistent email")
+	}
+}
+
+func TestUserRepository_GetPaginated(t *testing.T) {
+	repo := NewUserRepository(testDB)
+
+	// クリーンアップ: delete all existing users
+	users, _ := repo.GetAll()
+	for _, u := range users {
+		_ = repo.Delete(u.ID)
+	}
+
+	// Insert 45 users
+	total := 45
+	for i := 1; i <= total; i++ {
+		u := domain.User{
+			Name:     fmt.Sprintf("User%d", i),
+			Email:    fmt.Sprintf("user%d@example.com", i),
+			Password: "pwd",
+			Role:     "user",
+			IsActive: true,
+		}
+		_, err := repo.Create(u)
+		if err != nil {
+			t.Fatalf("failed to create user %d: %v", i, err)
+		}
+	}
+
+	// page1: skip=0,take=20
+	page1, totalCount, err := repo.GetPaginated(0, 20)
+	if err != nil {
+		t.Fatalf("GetPaginated page1 error: %v", err)
+	}
+	if int(totalCount) != total {
+		t.Fatalf("expected total %d, got %d", total, totalCount)
+	}
+	if len(page1) != 20 {
+		t.Fatalf("expected 20 items for page1, got %d", len(page1))
+	}
+
+	// page2: skip=20,take=20
+	page2, _, err := repo.GetPaginated(20, 20)
+	if err != nil {
+		t.Fatalf("GetPaginated page2 error: %v", err)
+	}
+	if len(page2) != 20 {
+		t.Fatalf("expected 20 items for page2, got %d", len(page2))
+	}
+
+	// page3: skip=40,take=20 -> should have 5
+	page3, _, err := repo.GetPaginated(40, 20)
+	if err != nil {
+		t.Fatalf("GetPaginated page3 error: %v", err)
+	}
+	if len(page3) != 5 {
+		t.Fatalf("expected 5 items for page3, got %d", len(page3))
+	}
+
+	// check ordering: repository orders by id desc
+	if page1[0].ID <= page1[len(page1)-1].ID {
+		t.Fatalf("expected descending order in page1")
 	}
 }

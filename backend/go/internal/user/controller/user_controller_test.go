@@ -87,6 +87,67 @@ func TestUserController_GetUsers_Empty_Returns200(t *testing.T) {
 	env.MockService.AssertExpectations(t)
 }
 
+func TestUserController_GetUsers_Paginated_ByPage(t *testing.T) {
+	env := SetupTestEnv()
+	env.Router.GET("/users", env.UserController.GetUsers)
+
+	// prepare mocked paginated data
+	mockUsers := []domain.User{
+		{ID: 6, Name: "U6", Email: "u6@example.com"},
+		{ID: 5, Name: "U5", Email: "u5@example.com"},
+		{ID: 4, Name: "U4", Email: "u4@example.com"},
+	}
+	// page=2&take=3 => skip = (2-1)*3 = 3
+	env.MockService.On("GetUsers", 3, 3).Return(mockUsers, int64(10), nil)
+
+	req, _ := http.NewRequest(http.MethodGet, "/users?page=2&take=3", nil)
+	w := httptest.NewRecorder()
+
+	env.Router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp dto.UsersPagedResponse
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), resp.Total)
+	assert.Equal(t, 3, resp.Skip)
+	assert.Equal(t, 3, resp.Take)
+	assert.Len(t, resp.Items, 3)
+	assert.Equal(t, uint(6), resp.Items[0].ID)
+
+	env.MockService.AssertExpectations(t)
+}
+
+func TestUserController_GetUsers_Paginated_BySkip(t *testing.T) {
+	env := SetupTestEnv()
+	env.Router.GET("/users", env.UserController.GetUsers)
+
+	mockUsers := []domain.User{
+		{ID: 10, Name: "U10"},
+		{ID: 9, Name: "U9"},
+	}
+	// skip=8,take=2
+	env.MockService.On("GetUsers", 8, 2).Return(mockUsers, int64(12), nil)
+
+	req, _ := http.NewRequest(http.MethodGet, "/users?skip=8&take=2", nil)
+	w := httptest.NewRecorder()
+
+	env.Router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp dto.UsersPagedResponse
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(12), resp.Total)
+	assert.Equal(t, 8, resp.Skip)
+	assert.Equal(t, 2, resp.Take)
+	assert.Len(t, resp.Items, 2)
+
+	env.MockService.AssertExpectations(t)
+}
+
 func TestUserController_GetUserByID(t *testing.T) {
 	env := SetupTestEnv()
 	env.Router.GET("/users/:id", env.UserController.GetUserByID)

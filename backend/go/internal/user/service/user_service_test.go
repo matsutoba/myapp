@@ -57,6 +57,32 @@ func TestUserService_GetAllUsers(t *testing.T) {
 	assert.Len(t, users, 2)
 }
 
+func TestUserService_GetUsers_Pagination(t *testing.T) {
+	mockRepo, service := setupUserService(t)
+
+	// prepare mocked data
+	usersPage := []domain.User{
+		{ID: 5, Name: "U5"},
+		{ID: 4, Name: "U4"},
+		{ID: 3, Name: "U3"},
+	}
+	total := int64(25)
+
+	// expect repository to be called with skip=0,take=3
+	mockRepo.On("GetPaginated", 0, 3).Return(usersPage, total, nil)
+
+	gotUsers, gotTotal, err := service.GetUsers(0, 3)
+
+	assert.NoError(t, err)
+	assert.Equal(t, total, gotTotal)
+	assert.Equal(t, len(usersPage), len(gotUsers))
+	// ensure returned slice matches
+	for i := range usersPage {
+		assert.Equal(t, usersPage[i].ID, gotUsers[i].ID)
+		assert.Equal(t, usersPage[i].Name, gotUsers[i].Name)
+	}
+}
+
 func TestUserService_FindUserByID(t *testing.T) {
 	mockRepo, service := setupUserService(t)
 
