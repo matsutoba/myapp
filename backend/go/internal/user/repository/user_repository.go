@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/matsubara/myapp/internal/common/errors"
 	"github.com/matsubara/myapp/internal/domain"
 	"gorm.io/gorm"
@@ -45,8 +47,9 @@ func (r *userRepository) GetPaginated(skip int, take int, keyword string) ([]dom
 
 	// 検索語が指定されている場合は name/email の部分一致でフィルタ
 	if keyword != "" {
-		like := "%" + keyword + "%"
-		db = db.Where("name LIKE ? OR email LIKE ?", like, like)
+		like := "%" + strings.ToLower(keyword) + "%"
+		// 大文字小文字を無視するためにLOWER()で比較（DB側関数を利用しつつ、パラメータは小文字化）
+		db = db.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
 	}
 
 	// 合計件数を先にカウント
@@ -57,8 +60,8 @@ func (r *userRepository) GetPaginated(skip int, take int, keyword string) ([]dom
 	// データ取得（id desc）
 	q := r.db.Model(&domain.User{})
 	if keyword != "" {
-		like := "%" + keyword + "%"
-		q = q.Where("name LIKE ? OR email LIKE ?", like, like)
+		like := "%" + strings.ToLower(keyword) + "%"
+		q = q.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
 	}
 
 	if err := q.Order("id desc").Offset(skip).Limit(take).Find(&users).Error; err != nil {
