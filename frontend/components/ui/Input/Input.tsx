@@ -5,17 +5,38 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   helperText?: string;
   required?: boolean;
+  /** 右端に表示する要素（例：検索ボタン） */
+  trailing?: React.ReactNode;
+  /** Enter キーで値を渡すハンドラ */
+  onEnter?: (value: string) => void;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, error, helperText, required, className = '', id, ...props },
+    {
+      label,
+      error,
+      helperText,
+      required,
+      className = '',
+      id,
+      trailing,
+      onEnter,
+      ...props
+    },
     ref,
   ) => {
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
+    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+      if (e.key === 'Enter') {
+        onEnter?.((e.target as HTMLInputElement).value);
+      }
+      if (props.onKeyDown) props.onKeyDown(e);
+    };
+
     return (
-      <div className="mb-4">
+      <div className={`mb-4 ${className}`}>
         {label && (
           <label
             htmlFor={inputId}
@@ -25,14 +46,25 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {required && <span className="text-on-danger ml-1">*</span>}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`w-full px-3 py-2 border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus-ring-primary disabled:bg-card disabled:cursor-not-allowed ${
-            error ? 'border-danger' : 'border-surface'
-          } ${className}`}
-          {...props}
-        />
+
+        <div className="relative">
+          <input
+            ref={ref}
+            id={inputId}
+            className={`w-full pr-10 px-3 py-2 border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus-ring-primary disabled:bg-card disabled:cursor-not-allowed ${
+              error ? 'border-danger' : 'border-surface'
+            }`}
+            {...props}
+            onKeyDown={handleKeyDown}
+          />
+
+          {trailing && (
+            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+              {trailing}
+            </div>
+          )}
+        </div>
+
         {helperText && !error && (
           <p className="mt-1 text-sm text-muted">{helperText}</p>
         )}

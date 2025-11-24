@@ -21,4 +21,6 @@ export interface UpdateUserRequest {
   email?: string;
   password?: string;
   role?: string;
+  // isActive を指定するとステータスが更新される（未指定なら変更しない）
+  isActive?: boolean | null;
 }

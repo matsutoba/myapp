@@ -8,35 +8,69 @@ import {
   Container,
   FeatureTitleBar,
   IconButton,
+  Input,
+  Pagination,
   Stack,
   useToast,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import type { User } from '@/features/user/types';
 import { userActions } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const searchParams = useSearchParams();
 
-  const loadUsers = async () => {
+  const loadUsers = async (page?: number) => {
     setLoading(true);
-    const result = await userActions.getUsers(); // エラー時に自動でモーダル表示
+    const p = page && page > 0 ? page : Number(searchParams.get('page') || 1);
+    const keyword = searchParams.get('keyword') || undefined;
+    const result = await userActions.getUsers({ page: p, keyword }); // エラー時に自動でモーダル表示
+
     if (result.success && result.data) {
-      setUsers(result.data);
+      const data = result.data as any;
+      if (Array.isArray(data)) {
+        setUsers(data);
+        setTotalPages(1);
+      } else if (data && data.items) {
+        setUsers(data.items);
+        const take = data.take || 20;
+        setTotalPages(Math.max(1, Math.ceil((data.total || 0) / take)));
+      } else {
+        setUsers([]);
+        setTotalPages(1);
+      }
     }
+
     setLoading(false);
   };
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    const p = Number(searchParams.get('page') || 1);
+    // 初期検索語をステートに反映
+    setSearchTerm(searchParams.get('keyword') || '');
+    loadUsers(p);
+  }, [searchParams]);
+
+  const handleSearch = (term?: string) => {
+    const kw = typeof term === 'string' ? term : searchTerm;
+    const pageQuery = `?${
+      kw ? `page=1&keyword=${encodeURIComponent(kw)}` : ''
+    }`;
+    // if kw empty, navigate to base users path
+    if (kw)
+      router.push(`/admin/users?page=1&keyword=${encodeURIComponent(kw)}`);
+    else router.push(`/admin/users`);
+  };
 
   const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
@@ -65,6 +99,23 @@ export default function UsersPage() {
       <Container>
         <Stack spacing="lg">
           <Stack direction="horizontal" justify="between" align="center">
+            <div className="flex items-center space-x-2">
+              <div className="w-72">
+                <Input
+                  placeholder="検索 (名前 or メール)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onEnter={() => handleSearch()}
+                  trailing={
+                    <IconButton
+                      icon="Search"
+                      onClick={() => handleSearch()}
+                      aria-label="検索"
+                    />
+                  }
+                />
+              </div>
+            </div>
             <Button size="sm" onClick={() => router.push('/admin/users/new')}>
               新規作成
             </Button>
@@ -136,6 +187,16 @@ export default function UsersPage() {
               </tbody>
             </table>
           </Card>
+          <div className="px-4 py-4 flex justify-center">
+            <Pagination
+              page={Number(searchParams.get('page') || 1)}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                const pageQuery = p > 1 ? `?page=${p}` : '';
+                router.push(`/admin/users${pageQuery}`);
+              }}
+            />
+          </div>
         </Stack>
       </Container>
 

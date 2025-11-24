@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/matsubara/myapp/internal/common/errors"
 	"github.com/matsubara/myapp/internal/domain"
 	"gorm.io/gorm"
@@ -11,6 +13,7 @@ import (
  */
 type UserRepository interface {
 	GetAll() ([]domain.User, error)
+	GetPaginated(skip int, take int, keyword string) ([]domain.User, int64, error)
 	FindByID(id uint) (*domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	Create(user domain.User) (*domain.User, error)
@@ -33,6 +36,39 @@ func (r *userRepository) GetAll() ([]domain.User, error) {
 	var users []domain.User
 	err := r.db.Find(&users).Error
 	return users, err
+}
+
+func (r *userRepository) GetPaginated(skip int, take int, keyword string) ([]domain.User, int64, error) {
+	var users []domain.User
+	var total int64
+
+	// 基本クエリ
+	db := r.db.Model(&domain.User{})
+
+	// 検索語が指定されている場合は name/email の部分一致でフィルタ
+	if keyword != "" {
+		like := "%" + strings.ToLower(keyword) + "%"
+		// 大文字小文字を無視するためにLOWER()で比較（DB側関数を利用しつつ、パラメータは小文字化）
+		db = db.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
+	}
+
+	// 合計件数を先にカウント
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// データ取得（id desc）
+	q := r.db.Model(&domain.User{})
+	if keyword != "" {
+		like := "%" + strings.ToLower(keyword) + "%"
+		q = q.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
+	}
+
+	if err := q.Order("id desc").Offset(skip).Limit(take).Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
 }
 
 func (r *userRepository) FindByID(id uint) (*domain.User, error) {

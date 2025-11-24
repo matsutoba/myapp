@@ -53,6 +53,7 @@ export default function EditUserPage({
           email: result.data.email,
           password: '',
           role: result.data.role || 'user',
+          isActive: result.data.isActive,
         });
       }
       // エラー時は自動でモーダル表示される
@@ -67,9 +68,15 @@ export default function EditUserPage({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
+    const name = e.target.name;
+    let value: any = e.target.value;
+    if (name === 'isActive') {
+      // Select の値は文字列なので boolean に変換
+      value = value === 'true';
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -90,6 +97,10 @@ export default function EditUserPage({
 
       if (formData.password) {
         updateData.password = formData.password;
+      }
+      // isActive が明示的にセットされている場合だけ追加
+      if (typeof formData.isActive !== 'undefined') {
+        updateData.isActive = formData.isActive;
       }
 
       const result = await userActions.updateUser(userId, updateData);
@@ -199,6 +210,23 @@ export default function EditUserPage({
                 options={[
                   { value: 'user', label: '一般ユーザー' },
                   { value: 'admin', label: '管理者' },
+                ]}
+              />
+
+              <Select
+                id="isActive"
+                name="isActive"
+                label="ステータス"
+                required
+                value={
+                  typeof formData.isActive === 'boolean'
+                    ? String(formData.isActive)
+                    : 'true'
+                }
+                onChange={handleChange}
+                options={[
+                  { value: 'true', label: '有効' },
+                  { value: 'false', label: '無効' },
                 ]}
               />
 
