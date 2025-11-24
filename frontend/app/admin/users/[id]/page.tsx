@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  Alert,
   Button,
   Card,
   Container,
   FeatureTitleBar,
   Input,
+  Notification,
   Select,
   Stack,
   SuccessModal,
@@ -126,7 +126,7 @@ export default function EditUserPage({
         <Container size="sm">
           <Card>
             <Stack spacing="md">
-              <Alert variant="error">{error}</Alert>
+              <Notification variant="error">{error}</Notification>
               <Button
                 onClick={() => router.push('/admin/users')}
                 variant="secondary"
@@ -147,7 +147,7 @@ export default function EditUserPage({
         <Card>
           <form onSubmit={handleSubmit}>
             <Stack spacing="md">
-              {error && <Alert variant="error">{error}</Alert>}
+              {error && <Notification variant="error">{error}</Notification>}
 
               <Input
                 type="text"

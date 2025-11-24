@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  Alert,
   Button,
   Card,
   Container,
   FeatureTitleBar,
   Input,
+  Notification,
   Select,
   Stack,
   SuccessModal,
@@ -64,7 +64,7 @@ export default function NewUserPage() {
         <Card>
           <form onSubmit={handleSubmit}>
             <Stack spacing="md">
-              {error && <Alert variant="error">{error}</Alert>}
+              {error && <Notification variant="error">{error}</Notification>}
 
               <Input
                 type="text"

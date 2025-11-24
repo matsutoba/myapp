@@ -37,7 +37,8 @@ export { Container } from './Container/Container';
 
 export { Card } from './Card/Card';
 
-export { Alert } from './Alert/Alert';
+export { Notification } from './Notification/Notification';
+export type { NotificationProps } from './Notification/Notification';
 
 export { Spinner } from './Spinner/Spinner';
 export type { SpinnerProps } from './Spinner/Spinner';
