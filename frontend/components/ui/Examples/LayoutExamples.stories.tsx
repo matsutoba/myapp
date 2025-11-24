@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Alert } from '../Alert/Alert';
 import { Button } from '../Button/Button';
 import { Card } from '../Card/Card';
 import { Container } from '../Container/Container';
 import { Input } from '../Input/Input';
+import { Notification } from '../Notification/Notification';
 import { Select } from '../Select/Select';
 import { Stack } from '../Stack/Stack';
 
@@ -61,9 +61,9 @@ export const UserCreateForm: Story = {
       <Container size="sm">
         <Card>
           <Stack spacing="md">
-            <Alert variant="info">
+            <Notification variant="info">
               新しいユーザーを作成します。必要な情報を入力してください。
-            </Alert>
+            </Notification>
 
             <Input label="名前" required placeholder="山田太郎" />
 
@@ -274,14 +274,14 @@ export const ErrorState: Story = {
       <Container size="sm">
         <Card>
           <Stack spacing="md">
-            <Alert variant="error">
+            <Notification variant="error">
               ユーザーの作成に失敗しました。以下の点をご確認ください：
               <ul className="list-disc ml-5 mt-2">
                 <li>メールアドレスが正しい形式であること</li>
                 <li>パスワードが6文字以上であること</li>
                 <li>既に同じメールアドレスが登録されていないこと</li>
               </ul>
-            </Alert>
+            </Notification>
 
             <Input label="名前" required value="山田太郎" />
 

@@ -1,14 +1,15 @@
 'use client';
 
 import {
-  Alert,
   Button,
   Card,
   Container,
   FeatureTitleBar,
   Input,
+  Notification,
   Select,
   Stack,
+  useToast,
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
 import type { CreateUserRequest } from '@/features/user/types';
@@ -25,6 +26,7 @@ export default function NewUserPage() {
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -44,10 +46,15 @@ export default function NewUserPage() {
       const result = await createUser(formData);
 
       if (result.success) {
-        alert('ユーザーを作成しました');
+        showToast({
+          title: 'ユーザーを作成しました',
+          message: '',
+          variant: 'success',
+          duration: 4000,
+        });
         router.push('/admin/users');
       } else {
-        setError(`ユーザーの作成に失敗しました。(${result.error?.message})`);
+        setError(`ユーザーの作成に失敗しました。`);
       }
     } catch (err) {
       setError('予期しないエラーが発生しました');
@@ -63,7 +70,7 @@ export default function NewUserPage() {
         <Card>
           <form onSubmit={handleSubmit}>
             <Stack spacing="md">
-              {error && <Alert variant="error">{error}</Alert>}
+              {error && <Notification variant="error">{error}</Notification>}
 
               <Input
                 type="text"

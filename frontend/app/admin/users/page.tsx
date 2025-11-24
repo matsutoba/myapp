@@ -4,15 +4,16 @@ import {
   Badge,
   Button,
   Card,
+  ConfirmModal,
   Container,
   FeatureTitleBar,
   IconButton,
   Stack,
+  useToast,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
-import { getUsers } from '@/features/user/actions/getUsers';
-import { deleteUser } from '@/features/user/actions/updateUser';
 import type { User } from '@/features/user/types';
+import { userActions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -20,15 +21,15 @@ export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const { showToast } = useToast();
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const loadUsers = async () => {
     setLoading(true);
-    const result = await getUsers();
+    const result = await userActions.getUsers(); // エラー時に自動でモーダル表示
     if (result.success && result.data) {
       setUsers(result.data);
-    } else {
-      setError(result.error?.message || 'ユーザーの取得に失敗しました');
     }
     setLoading(false);
   };
@@ -37,19 +38,26 @@ export default function UsersPage() {
     loadUsers();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('本当に削除しますか？')) return;
-    const result = await deleteUser(id);
+  const handleDeleteClick = (id: number) => {
+    setDeleteTargetId(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteTargetId === null) return;
+    const result = await userActions.deleteUser(deleteTargetId); // エラー時に自動でモーダル表示
     if (result.success) {
-      alert('削除しました');
+      showToast({
+        title: '削除しました',
+        message: 'ユーザーを削除しました',
+        variant: 'success',
+        duration: 4000,
+      });
       loadUsers();
-    } else {
-      alert(`削除失敗: ${result.error?.message || '不明なエラー'}`);
     }
   };
 
   if (loading) return <div>読み込み中...</div>;
-  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div>
@@ -119,7 +127,7 @@ export default function UsersPage() {
                       />
                       <IconButton
                         icon="Trash"
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDeleteClick(user.id)}
                         aria-label="削除"
                       />
                     </td>
@@ -130,6 +138,21 @@ export default function UsersPage() {
           </Card>
         </Stack>
       </Container>
+
+      {/* 削除確認モーダル */}
+      <ConfirmModal
+        open={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="削除確認"
+        message="本当に削除しますか？"
+        confirmText="削除"
+        cancelText="キャンセル"
+        variant="danger"
+      />
     </div>
   );
 }
