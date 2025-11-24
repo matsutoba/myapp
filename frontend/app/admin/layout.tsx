@@ -16,6 +16,10 @@ const menuItems: SidebarItem[] = [
     href: '/admin',
   },
   {
+    title: '顧客管理',
+    href: '/customers',
+  },
+  {
     title: '日本の天気',
     href: '/weather-graph',
   },
