@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matsubara/myapp/internal/common/errors"
+	"github.com/matsubara/myapp/internal/common/security"
 )
 
 /*
@@ -22,7 +24,10 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// userをコンテキストから取得
 		userContext, exists := c.Get("user")
+		log.Default().Println("RBAC Middleware - User Context:", userContext)
+
 		if !exists {
+			log.Default().Println("RBAC Middleware - No user context found")
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": gin.H{
 					"code":    errors.ErrForbiddenNoUserContext.Code,
@@ -32,9 +37,10 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 			return
 		}
 
-		// type assertion to map[string]interface{} to access claims
-		claimsMap, ok := userContext.(map[string]interface{})
+		// type assertion to *security.Claims
+		claims, ok := userContext.(*security.Claims)
 		if !ok {
+			log.Default().Println("RBAC Middleware - Invalid user context type")
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": gin.H{
 					"code":    errors.ErrForbiddenInvalidUserContext.Code,
@@ -44,8 +50,9 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 			return
 		}
 
-		userRole, ok := claimsMap["role"].(string)
-		if !ok {
+		userRole := claims.Role
+		if userRole == "" {
+			log.Default().Println("RBAC Middleware - User role not found in context")
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": gin.H{
 					"code":    errors.ErrForbiddenInvalidUserContext.Code,
@@ -63,6 +70,7 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 			}
 		}
 
+		log.Default().Println("RBAC Middleware - Insufficient permissions for role:", userRole)
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 			"error": gin.H{
 				"code":    errors.ErrForbiddenInsufficientPerms.Code,
