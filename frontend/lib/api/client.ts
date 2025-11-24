@@ -17,6 +17,41 @@ import { cookies } from 'next/headers';
 
 const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
 
+// 共通ヘルパー関数
+function isApiKeyError(errorData?: ApiErrorResponse): boolean {
+  return errorData?.error?.message?.toLowerCase().includes('api key') || false;
+}
+
+async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+  if (!response.ok) {
+    const errorData: ApiErrorResponse | undefined = await response
+      .json()
+      .catch(() => undefined);
+
+    if (errorData?.error) {
+      return {
+        success: false,
+        error: errorData.error,
+      };
+    }
+
+    return {
+      success: false,
+      error: {
+        code: response.status,
+        message: response.statusText || `HTTP ${response.status}`,
+      },
+    };
+  }
+
+  if (response.status === 204) {
+    return { success: true, data: undefined as T };
+  }
+
+  const data = await response.json();
+  return { success: true, data };
+}
+
 export interface ApiErrorDetail {
   code: number;
   message: string;
@@ -51,14 +86,14 @@ export async function apiServer<T>(
       ...(options?.headers as Record<string, string>),
     };
 
-    // Attach service API key for server-side requests when configured
+    // サーバーサイドリクエスト用のAPI keyを設定（環境変数で設定されている場合）
     const serviceApiKey =
       process.env.SERVICE_API_KEY || process.env.API_KEY || '';
     if (serviceApiKey) {
       headers['X-API-Key'] = serviceApiKey;
     }
 
-    // Add Authorization header if token exists
+    // トークンが存在する場合、Authorizationヘッダーを追加
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -71,22 +106,16 @@ export async function apiServer<T>(
 
     console.debug('API Server Response:', response);
 
-    // 認証失敗の場合、APIキーエラーかどうかを確認してからリフレッシュを試みる
+    // 401エラー時、APIキーエラーでなければトークンリフレッシュを試行
     if (response.status === 401) {
       const clonedResponse = response.clone();
       const errorData: ApiErrorResponse | undefined = await clonedResponse
         .json()
         .catch(() => undefined);
 
-      // APIキーエラーの場合はトークンリフレッシュをスキップする
-      const isApiKeyError = errorData?.error?.message
-        ?.toLowerCase()
-        .includes('api key');
-
-      if (!isApiKeyError) {
+      if (!isApiKeyError(errorData)) {
         const refreshed = await tryRefreshServerTokens();
         if (refreshed) {
-          // 1回だけトークンを再取得してリトライ
           const cookieStore2 = await cookies();
           const newAccess =
             cookieStore2.get('accessToken')?.value ||
@@ -95,46 +124,12 @@ export async function apiServer<T>(
             headers['Authorization'] = `Bearer ${newAccess}`;
           }
           const retryRes = await fetch(url, { ...options, headers });
-          return await handleServerResponse<T>(retryRes);
+          return await handleResponse<T>(retryRes);
         }
       }
     }
 
-    // APIのエラー応答があった場合の処理
-    if (!response.ok) {
-      const errorData: ApiErrorResponse | undefined = await response
-        .json()
-        .catch(() => undefined);
-
-      if (errorData?.error) {
-        return {
-          success: false,
-          error: errorData.error,
-        };
-      }
-
-      return {
-        success: false,
-        error: {
-          code: response.status,
-          message: response.statusText || `HTTP ${response.status}`,
-        },
-      };
-    }
-
-    // 204 No Content の場合はボディが空なのでJSONパースをスキップ
-    if (response.status === 204) {
-      return {
-        success: true,
-        data: undefined as T,
-      };
-    }
-
-    const data = await response.json();
-    return {
-      success: true,
-      data,
-    };
+    return await handleResponse<T>(response);
   } catch (error) {
     console.error('API Server Error:', error);
     return {
@@ -147,40 +142,9 @@ export async function apiServer<T>(
   }
 }
 
-async function handleServerResponse<T>(
-  response: Response,
-): Promise<ApiResponse<T>> {
-  if (!response.ok) {
-    const errorData: ApiErrorResponse | undefined = await response
-      .json()
-      .catch(() => undefined);
-
-    if (errorData?.error) {
-      return {
-        success: false,
-        error: errorData.error,
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        code: response.status,
-        message: response.statusText || `HTTP ${response.status}`,
-      },
-    };
-  }
-
-  if (response.status === 204) {
-    return { success: true, data: undefined as any };
-  }
-
-  const data = await response.json();
-  return { success: true, data };
-}
-
-// Try to refresh tokens server-side by reading refreshToken cookie and
-// calling the refresh endpoint. Returns true if refreshed and cookies updated.
+// サーバーサイドでトークンをリフレッシュする
+// refreshTokenクッキーを読み取り、リフレッシュエンドポイントを呼び出す
+// リフレッシュが成功してクッキーが更新された場合はtrueを返す
 async function tryRefreshServerTokens(): Promise<boolean> {
   try {
     const cookieStore = await cookies();
@@ -262,8 +226,8 @@ export async function apiClient<T>(
   options?: RequestInit,
 ): Promise<ApiResponse<T>> {
   try {
-    // In client-side, cookies are handled automatically by browser
-    // if credentials: 'include' is set (for cross-origin)
+    // クライアントサイドでは、credentials: 'include'を設定することで
+    // ブラウザが自動的にクッキーを処理する（クロスオリジンリクエストの場合）
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options?.headers as Record<string, string>),
@@ -273,23 +237,17 @@ export async function apiClient<T>(
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Include cookies for cross-origin requests
+      credentials: 'include', // クロスオリジンリクエストでクッキーを含める
     });
 
-    // If unauthorized, check if it's an API key error before trying to refresh
+    // 401エラー時、APIキーエラーでなければトークンリフレッシュを試行
     if (response.status === 401) {
-      // Check if it's an API key error
       const clonedResponse = response.clone();
       const errorData: ApiErrorResponse | undefined = await clonedResponse
         .json()
         .catch(() => undefined);
 
-      // Skip token refresh if it's an API key error
-      const isApiKeyError = errorData?.error?.message
-        ?.toLowerCase()
-        .includes('api key');
-
-      if (!isApiKeyError) {
+      if (!isApiKeyError(errorData)) {
         const refreshed = await tryRefreshClientTokens();
         if (refreshed) {
           const retryRes = await fetch(url, {
@@ -297,45 +255,12 @@ export async function apiClient<T>(
             headers,
             credentials: 'include',
           });
-          return await handleClientResponse<T>(retryRes);
+          return await handleResponse<T>(retryRes);
         }
       }
     }
 
-    if (!response.ok) {
-      const errorData: ApiErrorResponse | undefined = await response
-        .json()
-        .catch(() => undefined);
-
-      if (errorData?.error) {
-        return {
-          success: false,
-          error: errorData.error,
-        };
-      }
-
-      return {
-        success: false,
-        error: {
-          code: response.status,
-          message: response.statusText || `HTTP ${response.status}`,
-        },
-      };
-    }
-
-    // 204 No Content の場合はボディが空なのでJSONパースをスキップ
-    if (response.status === 204) {
-      return {
-        success: true,
-        data: undefined as T,
-      };
-    }
-
-    const data = await response.json();
-    return {
-      success: true,
-      data,
-    };
+    return await handleResponse<T>(response);
   } catch (error) {
     console.error('API Client Error:', error);
     return {
@@ -348,40 +273,9 @@ export async function apiClient<T>(
   }
 }
 
-async function handleClientResponse<T>(
-  response: Response,
-): Promise<ApiResponse<T>> {
-  if (!response.ok) {
-    const errorData: ApiErrorResponse | undefined = await response
-      .json()
-      .catch(() => undefined);
-
-    if (errorData?.error) {
-      return {
-        success: false,
-        error: errorData.error,
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        code: response.status,
-        message: response.statusText || `HTTP ${response.status}`,
-      },
-    };
-  }
-
-  if (response.status === 204) {
-    return { success: true, data: undefined as any };
-  }
-
-  const data = await response.json();
-  return { success: true, data };
-}
-
-// Try to refresh tokens from the client by calling the refresh endpoint
-// with credentials: 'include' so that HttpOnly refresh cookie is sent.
+// クライアントサイドでトークンをリフレッシュする
+// credentials: 'include'を指定してリフレッシュエンドポイントを呼び出し、
+// HttpOnlyのrefreshクッキーが送信されるようにする
 async function tryRefreshClientTokens(): Promise<boolean> {
   try {
     const apiHost = process.env.API_HOST || 'http://localhost:8080';
@@ -392,12 +286,12 @@ async function tryRefreshClientTokens(): Promise<boolean> {
     });
     if (!resp.ok) return false;
 
-    // If the refresh endpoint returns new tokens and sets cookies, we consider it successful.
-    // Some backends return JSON with tokens; others set cookies. We accept both.
+    // リフレッシュエンドポイントが新しいトークンを返してクッキーを設定すれば成功とみなす
+    // バックエンドによってはJSONでトークンを返す場合と、クッキーを設定する場合がある。両方に対応
     const data = await resp.json().catch(() => undefined);
     if (data && (data.token || data.accessToken || data.refreshToken)) {
-      // If backend returned tokens in body, nothing to do here because cookies may be HttpOnly;
-      // client cannot set HttpOnly cookies—so backend should also set cookies when appropriate.
+      // バックエンドがボディでトークンを返した場合、クッキーがHttpOnlyの可能性があるためここでは何もしない
+      // クライアントはHttpOnlyクッキーを設定できないため、バックエンド側で適切にクッキーを設定する必要がある
     }
     return true;
   } catch (e) {
