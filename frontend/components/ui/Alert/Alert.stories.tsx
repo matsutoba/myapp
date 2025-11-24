@@ -55,7 +55,7 @@ export const AllVariants: Story = {
       </Notification>
       <Notification variant="error">
         これはエラーメッセージです。操作が失敗したことを示します。
-      </Alert>
+      </Notification>
     </div>
   ),
 };
@@ -69,7 +69,7 @@ export const WithLongMessage: Story = {
         <li>パスワードが6文字以上であること</li>
         <li>既に同じメールアドレスが登録されていないこと</li>
       </ul>
-    </Alert>
+    </Notification>
   ),
 };
 
