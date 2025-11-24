@@ -8,35 +8,53 @@ import {
   Container,
   FeatureTitleBar,
   IconButton,
+  Pagination,
   Stack,
   useToast,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import type { User } from '@/features/user/types';
 import { userActions } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const searchParams = useSearchParams();
 
-  const loadUsers = async () => {
+  const loadUsers = async (page?: number) => {
     setLoading(true);
-    const result = await userActions.getUsers(); // エラー時に自動でモーダル表示
+    const p = page && page > 0 ? page : Number(searchParams.get('page') || 1);
+    const result = await userActions.getUsers({ page: p }); // エラー時に自動でモーダル表示
+
     if (result.success && result.data) {
-      setUsers(result.data);
+      const data = result.data as any;
+      if (Array.isArray(data)) {
+        setUsers(data);
+        setTotalPages(1);
+      } else if (data && data.items) {
+        setUsers(data.items);
+        const take = data.take || 20;
+        setTotalPages(Math.max(1, Math.ceil((data.total || 0) / take)));
+      } else {
+        setUsers([]);
+        setTotalPages(1);
+      }
     }
+
     setLoading(false);
   };
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    const p = Number(searchParams.get('page') || 1);
+    loadUsers(p);
+  }, [searchParams]);
 
   const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
@@ -136,6 +154,16 @@ export default function UsersPage() {
               </tbody>
             </table>
           </Card>
+          <div className="px-4 py-4 flex justify-center">
+            <Pagination
+              page={Number(searchParams.get('page') || 1)}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                const pageQuery = p > 1 ? `?page=${p}` : '';
+                router.push(`/admin/users${pageQuery}`);
+              }}
+            />
+          </div>
         </Stack>
       </Container>
 

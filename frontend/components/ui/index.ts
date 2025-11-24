@@ -55,4 +55,5 @@ export type { SuccessModalProps } from './SuccessModal/SuccessModal';
 export { ConfirmModal } from './ConfirmModal/ConfirmModal';
 export type { ConfirmModalProps } from './ConfirmModal/ConfirmModal';
 
+export { Pagination } from './Pagination/Pagination';
 export { ToastProvider, useToast } from './Toast/ToastContext';
