@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/matsubara/myapp/internal/common/security"
+	"github.com/matsubara/myapp/internal/common/errors"
 )
 
 /*
@@ -21,27 +21,54 @@ import (
 func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// userをコンテキストから取得
-		userClaims, exists := c.Get("user")
+		userContext, exists := c.Get("user")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden: no user context"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrForbiddenNoUserContext.Code,
+					"message": errors.ErrForbiddenNoUserContext.Message,
+				},
+			})
 			return
 		}
 
-		claims, ok := userClaims.(*security.Claims)
+		// type assertion to map[string]interface{} to access claims
+		claimsMap, ok := userContext.(map[string]interface{})
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden: invalid user context"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrForbiddenInvalidUserContext.Code,
+					"message": errors.ErrForbiddenInvalidUserContext.Message,
+				},
+			})
+			return
+		}
+
+		userRole, ok := claimsMap["role"].(string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrForbiddenInvalidUserContext.Code,
+					"message": errors.ErrForbiddenInvalidUserContext.Message,
+				},
+			})
 			return
 		}
 
 		// ロールの確認
 		for _, role := range allowedRoles {
-			if claims.Role == role {
+			if userRole == role {
 				c.Next()
 				return
 			}
 		}
 
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient permissions"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+			"error": gin.H{
+				"code":    errors.ErrForbiddenInsufficientPerms.Code,
+				"message": errors.ErrForbiddenInsufficientPerms.Message,
+			},
+		})
 	}
 }
 

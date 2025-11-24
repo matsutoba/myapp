@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/matsubara/myapp/internal/common/config"
+	"github.com/matsubara/myapp/internal/common/errors"
 	"github.com/matsubara/myapp/internal/common/security"
 )
 
@@ -26,14 +27,24 @@ func AuthMiddleware() gin.HandlerFunc {
 			}
 		}
 		if tokenString == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrMissingToken.Code,
+					"message": errors.ErrMissingToken.Message,
+				},
+			})
 			return
 		}
 		// トークン検証
 		secretKey := config.GetEnv("JWT_SECRET_KEY", "your-secret-key")
 		claims, err := security.ValidateToken(tokenString, secretKey)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrInvalidToken.Code,
+					"message": errors.ErrInvalidToken.Message,
+				},
+			})
 			return
 		}
 		// ユーザー情報をコンテキストにセット

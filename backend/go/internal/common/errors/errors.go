@@ -32,9 +32,16 @@ var (
 	ErrInvalidInput  = NewAppError(2001, "invalid input")
 	ErrBindingFailed = NewAppError(2002, "binding failed")
 
-	// Authentication Errors
-	ErrUnauthorized = NewAppError(3001, "invalid email or password")
-	ErrInvalidToken = NewAppError(3002, "invalid token")
+	// Authentication Errors (3xxx)
+	ErrUnauthorized  = NewAppError(3001, "invalid email or password")
+	ErrInvalidToken  = NewAppError(3002, "invalid or expired token")
+	ErrInvalidAPIKey = NewAppError(3003, "invalid api key")
+	ErrMissingToken  = NewAppError(3004, "missing token")
+
+	// Authorization Errors (4xxx)
+	ErrForbiddenNoUserContext      = NewAppError(4001, "forbidden: no user context")
+	ErrForbiddenInvalidUserContext = NewAppError(4002, "forbidden: invalid user context")
+	ErrForbiddenInsufficientPerms  = NewAppError(4003, "forbidden: insufficient permissions")
 
 	// Application Errors (users)
 	AppErrUserAlreadyExists = NewAppError(10001, "user already exists")

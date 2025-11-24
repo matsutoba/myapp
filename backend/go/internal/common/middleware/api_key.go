@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"crypto/subtle"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matsubara/myapp/internal/common/config"
+	"github.com/matsubara/myapp/internal/common/errors"
 )
 
 // APIKeyMiddleware はシンプルな API キー認証を提供します。
@@ -38,7 +40,12 @@ func APIKeyMiddleware() gin.HandlerFunc {
 		}
 
 		if key == "" || subtle.ConstantTimeCompare([]byte(key), []byte(apiKey)) != 1 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid api key"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    errors.ErrInvalidAPIKey.Code,
+					"message": errors.ErrInvalidAPIKey.Message,
+				},
+			})
 			return
 		}
 
