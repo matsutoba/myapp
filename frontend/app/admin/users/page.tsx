@@ -9,7 +9,7 @@ import {
   FeatureTitleBar,
   IconButton,
   Stack,
-  SuccessModal,
+  useToast,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import type { User } from '@/features/user/types';
@@ -22,7 +22,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const loadUsers = async () => {
@@ -47,7 +47,12 @@ export default function UsersPage() {
     if (deleteTargetId === null) return;
     const result = await userActions.deleteUser(deleteTargetId); // エラー時に自動でモーダル表示
     if (result.success) {
-      setShowSuccessModal(true);
+      showToast({
+        title: '削除しました',
+        message: 'ユーザーを削除しました',
+        variant: 'success',
+        duration: 4000,
+      });
       loadUsers();
     }
   };
@@ -147,13 +152,6 @@ export default function UsersPage() {
         confirmText="削除"
         cancelText="キャンセル"
         variant="danger"
-      />
-
-      {/* 成功モーダル */}
-      <SuccessModal
-        open={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        message="削除しました"
       />
     </div>
   );

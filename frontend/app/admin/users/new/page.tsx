@@ -9,7 +9,7 @@ import {
   Notification,
   Select,
   Stack,
-  SuccessModal,
+  useToast,
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
 import type { CreateUserRequest } from '@/features/user/types';
@@ -26,7 +26,7 @@ export default function NewUserPage() {
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const { showToast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -46,7 +46,13 @@ export default function NewUserPage() {
       const result = await createUser(formData);
 
       if (result.success) {
-        setShowSuccessModal(true);
+        showToast({
+          title: 'ユーザーを作成しました',
+          message: '',
+          variant: 'success',
+          duration: 4000,
+        });
+        router.push('/admin/users');
       } else {
         setError(`ユーザーの作成に失敗しました。`);
       }
@@ -130,16 +136,6 @@ export default function NewUserPage() {
           </form>
         </Card>
       </Container>
-
-      {/* 成功モーダル */}
-      <SuccessModal
-        open={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          router.push('/admin/users');
-        }}
-        message="ユーザーを作成しました"
-      />
     </div>
   );
 }

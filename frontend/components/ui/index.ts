@@ -54,3 +54,5 @@ export type { SuccessModalProps } from './SuccessModal/SuccessModal';
 
 export { ConfirmModal } from './ConfirmModal/ConfirmModal';
 export type { ConfirmModalProps } from './ConfirmModal/ConfirmModal';
+
+export { ToastProvider, useToast } from './Toast/ToastContext';
