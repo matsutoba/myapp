@@ -105,3 +105,20 @@ func ToCustomerListResponse(list []domain.Customer) []CustomerListResponse {
 	}
 	return resp
 }
+
+// Paged response for customer list
+type CustomerListPagedResponse struct {
+	Items []CustomerListResponse `json:"items"`
+	Total int64                  `json:"total"`
+	Skip  int                    `json:"skip"`
+	Take  int                    `json:"take"`
+}
+
+func ToCustomerListPagedResponse(list []domain.Customer, total int64, skip int, take int) CustomerListPagedResponse {
+	return CustomerListPagedResponse{
+		Items: ToCustomerListResponse(list),
+		Total: total,
+		Skip:  skip,
+		Take:  take,
+	}
+}

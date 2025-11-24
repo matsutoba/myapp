@@ -27,12 +27,65 @@ func NewCustomerController(s service.CustomerService) *CustomerController {
 }
 
 func (cc *CustomerController) GetCustomers(c *gin.Context) {
-	customers, err := cc.service.GetAllCustomers()
+	// ページネーション/検索対応
+	if c.Query("page") == "" && c.Query("skip") == "" && c.Query("take") == "" {
+		// キーワード検索がなければ全件
+		keyword := c.Query("keyword")
+		if keyword == "" {
+			customers, err := cc.service.GetAllCustomers()
+			if err != nil {
+				errors.WriteError(c, http.StatusInternalServerError, err)
+				return
+			}
+			c.JSON(http.StatusOK, dto.ToCustomerListResponse(customers))
+			return
+		}
+
+		// キーワードあり：検索（全件取得ではなく検索結果）
+		customers, _, err := cc.service.GetCustomers(0, 1000, keyword)
+		if err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
+		c.JSON(http.StatusOK, dto.ToCustomerListResponse(customers))
+		return
+	}
+
+	const defaultTake = 20
+	maxTake := 100
+
+	takeParam := c.DefaultQuery("take", "")
+	take := defaultTake
+	if takeParam != "" {
+		if t, err := strconv.Atoi(takeParam); err == nil {
+			take = t
+		}
+	}
+	if take <= 0 {
+		take = defaultTake
+	}
+	if take > maxTake {
+		take = maxTake
+	}
+
+	skip := 0
+	if pageParam := c.DefaultQuery("page", ""); pageParam != "" {
+		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
+			skip = (p - 1) * take
+		}
+	} else if skipParam := c.DefaultQuery("skip", ""); skipParam != "" {
+		if s, err := strconv.Atoi(skipParam); err == nil && s >= 0 {
+			skip = s
+		}
+	}
+
+	keyword := c.Query("keyword")
+	customers, total, err := cc.service.GetCustomers(skip, take, keyword)
 	if err != nil {
 		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, dto.ToCustomerListResponse(customers))
+	c.JSON(http.StatusOK, dto.ToCustomerListPagedResponse(customers, total, skip, take))
 }
 
 func (cc *CustomerController) GetCustomerByID(c *gin.Context) {

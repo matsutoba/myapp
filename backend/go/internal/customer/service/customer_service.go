@@ -13,6 +13,7 @@ import (
 type CustomerService interface {
 	GetAllCustomers() ([]domain.Customer, error)
 	FindByID(id uint) (*domain.Customer, error)
+	GetCustomers(skip int, take int, keyword string) ([]domain.Customer, int64, error)
 	CreateCustomer(customer dto.CreateCustomerRequest) (*domain.Customer, error)
 	UpdateCustomer(id uint, customer dto.UpdateCustomerRequest) (*domain.Customer, error)
 	DeleteCustomer(id uint) error
@@ -31,6 +32,10 @@ func NewCustomerService(r repository.CustomerRepository) CustomerService {
 
 func (s *customerService) GetAllCustomers() ([]domain.Customer, error) {
 	return s.repo.GetAll()
+}
+
+func (s *customerService) GetCustomers(skip int, take int, keyword string) ([]domain.Customer, int64, error) {
+	return s.repo.GetPaginated(skip, take, keyword)
 }
 
 func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
