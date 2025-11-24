@@ -14,17 +14,24 @@ func SeedUsers(db *gorm.DB) {
 	hashPassword, nil := security.HashPassword("password")
 
 	admin := domain.User{
-		Name:     "管理者",
+		Name:     "管理者1",
 		Email:    "admin@example.com",
 		Password: hashPassword,
 		Role:     "admin",
 	}
 
-	users := []domain.User{admin}
+	admin2 := domain.User{
+		Name:     "管理者2",
+		Email:    "user1@example.com",
+		Password: hashPassword,
+		Role:     "admin",
+	}
+
+	users := []domain.User{admin, admin2}
 
 	// userをlength個生成
 	const length = 100
-	for i := 1; i <= length; i++ {
+	for i := 2; i <= length; i++ {
 		u := domain.User{
 			Name:     fmt.Sprintf("ユーザー%d", i),
 			Email:    fmt.Sprintf("user%d@example.com", i),
