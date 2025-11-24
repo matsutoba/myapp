@@ -16,6 +16,7 @@ export async function getUsers(opts?: {
   page?: number;
   skip?: number;
   take?: number;
+  keyword?: string;
 }) {
   const params = new URLSearchParams();
   if (opts?.page && opts.page > 0) {
@@ -23,6 +24,9 @@ export async function getUsers(opts?: {
   } else if (typeof opts?.skip === 'number' || typeof opts?.take === 'number') {
     if (typeof opts.skip === 'number') params.set('skip', String(opts.skip));
     if (typeof opts.take === 'number') params.set('take', String(opts.take));
+  }
+  if (opts?.keyword) {
+    params.set('keyword', opts.keyword);
   }
 
   const query = params.toString() ? `?${params.toString()}` : '';

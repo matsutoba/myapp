@@ -8,6 +8,7 @@ import {
   Container,
   FeatureTitleBar,
   IconButton,
+  Input,
   Pagination,
   Stack,
   useToast,
@@ -23,6 +24,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
@@ -31,7 +33,8 @@ export default function UsersPage() {
   const loadUsers = async (page?: number) => {
     setLoading(true);
     const p = page && page > 0 ? page : Number(searchParams.get('page') || 1);
-    const result = await userActions.getUsers({ page: p }); // エラー時に自動でモーダル表示
+    const keyword = searchParams.get('keyword') || undefined;
+    const result = await userActions.getUsers({ page: p, keyword }); // エラー時に自動でモーダル表示
 
     if (result.success && result.data) {
       const data = result.data as any;
@@ -53,8 +56,21 @@ export default function UsersPage() {
 
   useEffect(() => {
     const p = Number(searchParams.get('page') || 1);
+    // 初期検索語をステートに反映
+    setSearchTerm(searchParams.get('keyword') || '');
     loadUsers(p);
   }, [searchParams]);
+
+  const handleSearch = (term?: string) => {
+    const kw = typeof term === 'string' ? term : searchTerm;
+    const pageQuery = `?${
+      kw ? `page=1&keyword=${encodeURIComponent(kw)}` : ''
+    }`;
+    // if kw empty, navigate to base users path
+    if (kw)
+      router.push(`/admin/users?page=1&keyword=${encodeURIComponent(kw)}`);
+    else router.push(`/admin/users`);
+  };
 
   const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
@@ -83,6 +99,23 @@ export default function UsersPage() {
       <Container>
         <Stack spacing="lg">
           <Stack direction="horizontal" justify="between" align="center">
+            <div className="flex items-center space-x-2">
+              <div className="w-72">
+                <Input
+                  placeholder="検索 (名前 or メール)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onEnter={() => handleSearch()}
+                  trailing={
+                    <IconButton
+                      icon="Search"
+                      onClick={() => handleSearch()}
+                      aria-label="検索"
+                    />
+                  }
+                />
+              </div>
+            </div>
             <Button size="sm" onClick={() => router.push('/admin/users/new')}>
               新規作成
             </Button>

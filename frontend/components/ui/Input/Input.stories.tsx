@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
+import { IconButton } from '../IconButton/IconButton';
 import { Input } from './Input';
 
 const meta: Meta<typeof Input> = {
@@ -110,4 +112,32 @@ export const FormExample: Story = {
       />
     </div>
   ),
+};
+
+export const WithTrailing: Story = {
+  render: () => {
+    function Wrapper() {
+      const [value, setValue] = useState('');
+      return (
+        <div className="p-8">
+          <Input
+            label="検索"
+            value={value}
+            onChange={(e) => setValue((e.target as HTMLInputElement).value)}
+            placeholder="ユーザー名 または email を検索"
+            trailing={
+              <IconButton
+                icon="Search"
+                size="md"
+                onClick={() => console.log('search click', value)}
+              />
+            }
+            onEnter={(v) => console.log('enter:', v)}
+          />
+        </div>
+      );
+    }
+
+    return <Wrapper />;
+  },
 };
