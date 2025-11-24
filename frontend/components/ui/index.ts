@@ -38,3 +38,9 @@ export { Alert } from './Alert/Alert';
 
 export { Spinner } from './Spinner/Spinner';
 export type { SpinnerProps } from './Spinner/Spinner';
+
+export { Modal } from './Modal/Modal';
+export type { ModalProps } from './Modal/Modal';
+
+export { ErrorModal } from './ErrorModal/ErrorModal';
+export type { ErrorModalProps } from './ErrorModal/ErrorModal';

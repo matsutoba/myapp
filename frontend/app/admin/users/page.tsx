@@ -10,9 +10,8 @@ import {
   Stack,
 } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
-import { getUsers } from '@/features/user/actions/getUsers';
-import { deleteUser } from '@/features/user/actions/updateUser';
 import type { User } from '@/features/user/types';
+import { userActions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -20,15 +19,12 @@ export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   const loadUsers = async () => {
     setLoading(true);
-    const result = await getUsers();
+    const result = await userActions.getUsers(); // エラー時に自動でモーダル表示
     if (result.success && result.data) {
       setUsers(result.data);
-    } else {
-      setError(result.error?.message || 'ユーザーの取得に失敗しました');
     }
     setLoading(false);
   };
@@ -38,18 +34,15 @@ export default function UsersPage() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm('本当に削除しますか？')) return;
-    const result = await deleteUser(id);
+    if (!confirm('本当に削除しますか?')) return;
+    const result = await userActions.deleteUser(id); // エラー時に自動でモーダル表示
     if (result.success) {
       alert('削除しました');
       loadUsers();
-    } else {
-      alert(`削除失敗: ${result.error?.message || '不明なエラー'}`);
     }
   };
 
   if (loading) return <div>読み込み中...</div>;
-  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div>

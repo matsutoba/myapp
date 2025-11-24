@@ -47,7 +47,7 @@ export default function NewUserPage() {
         alert('ユーザーを作成しました');
         router.push('/admin/users');
       } else {
-        setError(`ユーザーの作成に失敗しました。(${result.error?.message})`);
+        setError(`ユーザーの作成に失敗しました。`);
       }
     } catch (err) {
       setError('予期しないエラーが発生しました');

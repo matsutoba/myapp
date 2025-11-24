@@ -1,4 +1,5 @@
 import { ThemeProvider } from '../components/ui/theme/ThemeProvider';
+import { ErrorProvider } from '../lib/contexts/ErrorContext';
 import '../styles/globals.css';
 
 export default function RootLayout({
@@ -10,8 +11,10 @@ export default function RootLayout({
     <html lang="ja">
       <body className="flex flex-col h-screen">
         <ThemeProvider>
-          {/* ThemeToggle uses useTheme, so must be inside ThemeProvider */}
-          {children}
+          <ErrorProvider>
+            {/* ThemeToggle uses useTheme, so must be inside ThemeProvider */}
+            {children}
+          </ErrorProvider>
         </ThemeProvider>
       </body>
     </html>

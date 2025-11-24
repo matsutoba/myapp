@@ -13,9 +13,17 @@
   - サーバーサイドでAPIを呼び出す場合は `apiServer` 関数を使用します（サーバーアクションやサーバーコンポーネント用）。
   - クライアントサイドでAPIを呼び出す場合は `apiClient` 関数を使用します（クライアントコンポーネント用）。
 */
+import { API_ERROR_EVENT } from '@/lib/contexts/ErrorContext';
 import { cookies } from 'next/headers';
 
 const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
+
+// グローバルエラーイベントを発行（クライアントサイドのみ）
+function dispatchGlobalError(error: ApiErrorDetail) {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(API_ERROR_EVENT, { detail: error }));
+  }
+}
 
 // 共通ヘルパー関数
 function isApiKeyError(errorData?: ApiErrorResponse): boolean {
@@ -65,6 +73,11 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: ApiErrorDetail;
+}
+
+export interface ApiClientOptions extends RequestInit {
+  /** エラー時に自動的にグローバルエラーモーダルを表示するか（デフォルト: false） */
+  autoShowError?: boolean;
 }
 
 /*
@@ -223,19 +236,21 @@ async function tryRefreshServerTokens(): Promise<boolean> {
 */
 export async function apiClient<T>(
   endpoint: string,
-  options?: RequestInit,
+  options?: ApiClientOptions,
 ): Promise<ApiResponse<T>> {
+  const { autoShowError = false, ...fetchOptions } = options || {};
+
   try {
     // クライアントサイドでは、credentials: 'include'を設定することで
     // ブラウザが自動的にクッキーを処理する（クロスオリジンリクエストの場合）
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(options?.headers as Record<string, string>),
+      ...(fetchOptions?.headers as Record<string, string>),
     };
 
     const url = `${API_BASE_URL}${endpoint}`;
     const response = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       headers,
       credentials: 'include', // クロスオリジンリクエストでクッキーを含める
     });
@@ -251,24 +266,45 @@ export async function apiClient<T>(
         const refreshed = await tryRefreshClientTokens();
         if (refreshed) {
           const retryRes = await fetch(url, {
-            ...options,
+            ...fetchOptions,
             headers,
             credentials: 'include',
           });
-          return await handleResponse<T>(retryRes);
+          const result = await handleResponse<T>(retryRes);
+
+          // エラー時に自動表示
+          if (!result.success && autoShowError && result.error) {
+            dispatchGlobalError(result.error);
+          }
+
+          return result;
         }
       }
     }
 
-    return await handleResponse<T>(response);
+    const result = await handleResponse<T>(response);
+
+    // エラー時に自動表示
+    if (!result.success && autoShowError && result.error) {
+      dispatchGlobalError(result.error);
+    }
+
+    return result;
   } catch (error) {
     console.error('API Client Error:', error);
+    const errorDetail: ApiErrorDetail = {
+      code: 0,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    };
+
+    // エラー時に自動表示
+    if (autoShowError) {
+      dispatchGlobalError(errorDetail);
+    }
+
     return {
       success: false,
-      error: {
-        code: 0,
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
+      error: errorDetail,
     };
   }
 }

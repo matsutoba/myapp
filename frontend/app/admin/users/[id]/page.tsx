@@ -10,9 +10,8 @@ import {
   Select,
   Stack,
 } from '@/components/ui';
-import { getUserById } from '@/features/user/actions/getUsers';
-import { updateUser } from '@/features/user/actions/updateUser';
 import type { UpdateUserRequest } from '@/features/user/types';
+import { userActions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -44,7 +43,7 @@ export default function EditUserPage({
   const loadUser = async (id: number) => {
     setLoading(true);
     try {
-      const result = await getUserById(id);
+      const result = await userActions.getUserById(id);
 
       if (result.success && result.data) {
         setFormData({
@@ -53,11 +52,11 @@ export default function EditUserPage({
           password: '',
           role: result.data.role || 'user',
         });
-      } else {
-        setError(result.error?.message || 'ユーザーの取得に失敗しました');
       }
+      // エラー時は自動でモーダル表示される
     } catch (err) {
-      setError('予期しないエラーが発生しました');
+      // 予期しないエラーのみ処理
+      console.error('Unexpected error:', err);
     } finally {
       setLoading(false);
     }
@@ -91,16 +90,16 @@ export default function EditUserPage({
         updateData.password = formData.password;
       }
 
-      const result = await updateUser(userId, updateData);
+      const result = await userActions.updateUser(userId, updateData);
 
       if (result.success) {
         alert('ユーザーを更新しました');
         router.push('/admin/users');
-      } else {
-        setError(`ユーザーの更新に失敗しました。(${result.error?.message})`);
       }
+      // エラー時は自動でモーダル表示される
     } catch (err) {
-      setError('予期しないエラーが発生しました');
+      // 予期しないエラーのみ処理
+      console.error('Unexpected error:', err);
     } finally {
       setIsSubmitting(false);
     }
