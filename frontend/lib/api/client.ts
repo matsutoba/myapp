@@ -37,6 +37,7 @@ async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
       .catch(() => undefined);
 
     if (errorData?.error) {
+      console.debug('API Error Response:', errorData);
       return {
         success: false,
         error: errorData.error,
