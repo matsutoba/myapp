@@ -10,7 +10,7 @@ ENV LANG=C.UTF-8
 COPY backend/docker/mysql/conf.d/my.cnf /etc/mysql/conf.d/my.cnf
 
 # 初期化スクリプトをコピー
-COPY backend/docker/mysql/init /docker-entrypoint-initdb.d
+# COPY backend/docker/mysql/init /docker-entrypoint-initdb.d
 
 # mysqlユーザーがアクセスできるように権限を調整
 RUN chown -R mysql:mysql /etc/mysql/conf.d /docker-entrypoint-initdb.d
