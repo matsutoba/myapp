@@ -13,7 +13,7 @@ import (
  */
 type UserService interface {
 	GetAllUsers() ([]domain.User, error)
-	GetUsers(skip int, take int) ([]domain.User, int64, error)
+	GetUsers(skip int, take int, keyword string) ([]domain.User, int64, error)
 	FindUserByID(id uint) (*domain.User, error)
 	FindUserByEmail(email string) (*domain.User, error)
 	CreateUser(user dto.CreateUserRequest) (*domain.User, error)
@@ -36,8 +36,8 @@ func (s *userService) GetAllUsers() ([]domain.User, error) {
 	return s.repo.GetAll()
 }
 
-func (s *userService) GetUsers(skip int, take int) ([]domain.User, int64, error) {
-	return s.repo.GetPaginated(skip, take)
+func (s *userService) GetUsers(skip int, take int, keyword string) ([]domain.User, int64, error) {
+	return s.repo.GetPaginated(skip, take, keyword)
 }
 
 func (s *userService) FindUserByID(id uint) (*domain.User, error) {

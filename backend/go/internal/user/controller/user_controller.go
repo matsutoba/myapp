@@ -27,9 +27,22 @@ func NewUserController(s service.UserService) *UserController {
 }
 
 func (uc *UserController) GetUsers(c *gin.Context) {
-	// ページネーションパラメータがない場合は全件取得
+	// ページネーションパラメータがない場合
 	if c.Query("page") == "" && c.Query("skip") == "" && c.Query("take") == "" {
-		users, err := uc.service.GetAllUsers()
+		// キーワード検索があれば検索（全件取得ではなくフィルタ済み一覧を返す）
+		keyword := c.Query("keyword")
+		if keyword == "" {
+			users, err := uc.service.GetAllUsers()
+			if err != nil {
+				errors.WriteError(c, http.StatusInternalServerError, err)
+				return
+			}
+			c.JSON(http.StatusOK, dto.ToUserListResponse(users))
+			return
+		}
+
+		// キーワードあり：検索（全件ではなく検索結果を返す）
+		users, _, err := uc.service.GetUsers(0, 1000, keyword)
 		if err != nil {
 			errors.WriteError(c, http.StatusInternalServerError, err)
 			return
@@ -69,7 +82,8 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 		}
 	}
 
-	users, total, err := uc.service.GetUsers(skip, take)
+	keyword := c.Query("keyword")
+	users, total, err := uc.service.GetUsers(skip, take, keyword)
 	if err != nil {
 		errors.WriteError(c, http.StatusInternalServerError, err)
 		return

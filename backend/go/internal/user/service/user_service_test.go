@@ -69,9 +69,9 @@ func TestUserService_GetUsers_Pagination(t *testing.T) {
 	total := int64(25)
 
 	// expect repository to be called with skip=0,take=3
-	mockRepo.On("GetPaginated", 0, 3).Return(usersPage, total, nil)
+	mockRepo.On("GetPaginated", 0, 3, "").Return(usersPage, total, nil)
 
-	gotUsers, gotTotal, err := service.GetUsers(0, 3)
+	gotUsers, gotTotal, err := service.GetUsers(0, 3, "")
 
 	assert.NoError(t, err)
 	assert.Equal(t, total, gotTotal)

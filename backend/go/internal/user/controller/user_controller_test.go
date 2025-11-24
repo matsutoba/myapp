@@ -98,7 +98,7 @@ func TestUserController_GetUsers_Paginated_ByPage(t *testing.T) {
 		{ID: 4, Name: "U4", Email: "u4@example.com"},
 	}
 	// page=2&take=3 => skip = (2-1)*3 = 3
-	env.MockService.On("GetUsers", 3, 3).Return(mockUsers, int64(10), nil)
+	env.MockService.On("GetUsers", 3, 3, "").Return(mockUsers, int64(10), nil)
 
 	req, _ := http.NewRequest(http.MethodGet, "/users?page=2&take=3", nil)
 	w := httptest.NewRecorder()
@@ -128,7 +128,7 @@ func TestUserController_GetUsers_Paginated_BySkip(t *testing.T) {
 		{ID: 9, Name: "U9"},
 	}
 	// skip=8,take=2
-	env.MockService.On("GetUsers", 8, 2).Return(mockUsers, int64(12), nil)
+	env.MockService.On("GetUsers", 8, 2, "").Return(mockUsers, int64(12), nil)
 
 	req, _ := http.NewRequest(http.MethodGet, "/users?skip=8&take=2", nil)
 	w := httptest.NewRecorder()

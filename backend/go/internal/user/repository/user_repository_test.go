@@ -135,7 +135,7 @@ func TestUserRepository_GetPaginated(t *testing.T) {
 	}
 
 	// page1: skip=0,take=20
-	page1, totalCount, err := repo.GetPaginated(0, 20)
+	page1, totalCount, err := repo.GetPaginated(0, 20, "")
 	if err != nil {
 		t.Fatalf("GetPaginated page1 error: %v", err)
 	}
@@ -147,7 +147,7 @@ func TestUserRepository_GetPaginated(t *testing.T) {
 	}
 
 	// page2: skip=20,take=20
-	page2, _, err := repo.GetPaginated(20, 20)
+	page2, _, err := repo.GetPaginated(20, 20, "")
 	if err != nil {
 		t.Fatalf("GetPaginated page2 error: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestUserRepository_GetPaginated(t *testing.T) {
 	}
 
 	// page3: skip=40,take=20 -> should have 5
-	page3, _, err := repo.GetPaginated(40, 20)
+	page3, _, err := repo.GetPaginated(40, 20, "")
 	if err != nil {
 		t.Fatalf("GetPaginated page3 error: %v", err)
 	}
