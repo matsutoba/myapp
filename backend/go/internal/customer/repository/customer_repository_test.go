@@ -13,10 +13,10 @@ func TestCustomerRepository_CRUD(t *testing.T) {
 	// Create
 	// ======================
 	customer := domain.Customer{
-		Name:    "Acme Corp",
-		Email:   "customer1@example.com",
-		Address: "123 Main St",
-		Phone:   "555-1234",
+		ContactName: "Acme Corp",
+		Email:       "customer1@example.com",
+		Address:     "123 Main St",
+		Phone:       "555-1234",
 	}
 
 	created, err := repo.Create(customer)
@@ -52,7 +52,7 @@ func TestCustomerRepository_CRUD(t *testing.T) {
 	// ======================
 	// Update
 	// ======================
-	found.Name = "Acme Corporation"
+	found.ContactName = "Acme Corporation"
 	_, err = repo.Update(*found)
 	if err != nil {
 		t.Fatalf("Update failed: %v", err)
@@ -62,8 +62,8 @@ func TestCustomerRepository_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FindByID after update failed: %v", err)
 	}
-	if updated.Name != "Acme Corporation" {
-		t.Fatalf("expected Name to be 'Acme Corporation', got %s", updated.Name)
+	if updated.ContactName != "Acme Corporation" {
+		t.Fatalf("expected ContactName to be 'Acme Corporation', got %s", updated.ContactName)
 	}
 
 	// ======================

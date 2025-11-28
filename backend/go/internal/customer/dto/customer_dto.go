@@ -8,8 +8,7 @@ import (
 
 // CreateCustomerRequest: 顧客作成リクエスト
 type CreateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required,max=100"`
-	ContactName  string     `json:"contact_name,omitempty"`
+	ContactName  string     `json:"contact_name" binding:"required,max=100"`
 	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
 	Email        string     `json:"email" binding:"required,email,max=100"`
 	Phone        string     `json:"phone,omitempty"`
@@ -24,7 +23,6 @@ type CreateCustomerRequest struct {
 
 // UpdateCustomerRequest: 顧客更新リクエスト
 type UpdateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required,max=100"`
 	ContactName  string     `json:"contact_name,omitempty"`
 	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
 	Email        string     `json:"email" binding:"required,email,max=100"`
@@ -41,7 +39,6 @@ type UpdateCustomerRequest struct {
 // CustomerResponse: API レスポンス用 DTO
 type CustomerResponse struct {
 	ID              uint       `json:"id"`
-	Name            string     `json:"name"`
 	ContactName     string     `json:"contact_name,omitempty"`
 	Company         string     `json:"company,omitempty"`
 	Email           string     `json:"email,omitempty"`
@@ -65,7 +62,6 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 	}
 	return &CustomerResponse{
 		ID:              c.ID,
-		Name:            c.Name,
 		ContactName:     c.ContactName,
 		Company:         c.Company,
 		Email:           c.Email,
@@ -86,10 +82,10 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 // ToCustomerListResponse converts a list of domain.Customer to []*CustomerResponse
 // CustomerListResponse は顧客一覧取得時の簡易レスポンス（テスト互換）
 type CustomerListResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Phone string `json:"phone"`
+	ID          uint   `json:"id"`
+	ContactName string `json:"contact_name"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
 }
 
 // ToCustomerListResponse は複数顧客を一覧レスポンスDTOに変換（互換のため []CustomerListResponse を返す）
@@ -97,10 +93,10 @@ func ToCustomerListResponse(list []domain.Customer) []CustomerListResponse {
 	resp := make([]CustomerListResponse, 0, len(list))
 	for _, c := range list {
 		resp = append(resp, CustomerListResponse{
-			ID:    c.ID,
-			Name:  c.Name,
-			Email: c.Email,
-			Phone: c.Phone,
+			ID:          c.ID,
+			ContactName: c.ContactName,
+			Email:       c.Email,
+			Phone:       c.Phone,
 		})
 	}
 	return resp

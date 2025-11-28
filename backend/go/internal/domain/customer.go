@@ -8,8 +8,6 @@ import (
 
 type Customer struct {
 	ID uint `gorm:"primaryKey" json:"id"`
-	// Name: 表示用の顧客名（会社名やフルネームなど表示優先の名前）
-	Name string `json:"name"`
 	// ContactName: 担当者名（顧客窓口のフルネーム）
 	ContactName string `json:"contact_name,omitempty"`
 	// Company: 会社名（法人顧客の場合）

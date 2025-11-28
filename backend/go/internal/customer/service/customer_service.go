@@ -48,7 +48,6 @@ func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
 
 func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*domain.Customer, error) {
 	newCustomer := domain.Customer{
-		Name:         input.Name,
 		ContactName:  input.ContactName,
 		Company:      input.Company,
 		Email:        input.Email,
@@ -80,7 +79,6 @@ func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerReques
 	}
 
 	// map updatable fields
-	existingCustomer.Name = input.Name
 	existingCustomer.ContactName = input.ContactName
 	existingCustomer.Company = input.Company
 	existingCustomer.Email = input.Email
