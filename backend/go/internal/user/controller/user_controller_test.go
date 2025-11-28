@@ -45,7 +45,8 @@ func TestUserController_GetUsers(t *testing.T) {
 		{ID: 1, Name: "Taro", Email: "taro@example.com"},
 		{ID: 2, Name: "Jiro", Email: "jiro@example.com"},
 	}
-	env.MockService.On("GetAllUsers").Return(mockUsers, nil)
+	// Controller now always calls GetUsers(skip,take,keyword)
+	env.MockService.On("GetUsers", 0, 20, "").Return(mockUsers, int64(len(mockUsers)), nil)
 
 	// HTTP リクエストを作成
 	req, _ := http.NewRequest(http.MethodGet, "/users", nil)
@@ -54,15 +55,15 @@ func TestUserController_GetUsers(t *testing.T) {
 	// リクエストを処理
 	env.Router.ServeHTTP(w, req)
 
-	// レスポンスの検証
+	// レスポンスの検証 (paged response)
 	assert.Equal(t, http.StatusOK, w.Code)
-	var resp []dto.UserListResponse
+	var resp dto.UsersPagedResponse
 	err := json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.NoError(t, err)
-	assert.Len(t, resp, 2)
-	assert.Equal(t, uint(1), resp[0].ID)
-	assert.Equal(t, "Taro", resp[0].Name)
-	assert.Equal(t, "taro@example.com", resp[0].Email)
+	assert.Len(t, resp.Items, 2)
+	assert.Equal(t, uint(1), resp.Items[0].ID)
+	assert.Equal(t, "Taro", resp.Items[0].Name)
+	assert.Equal(t, "taro@example.com", resp.Items[0].Email)
 
 	// モック呼び出しの検証
 	env.MockService.AssertExpectations(t)
@@ -72,17 +73,17 @@ func TestUserController_GetUsers_Empty_Returns200(t *testing.T) {
 	env := SetupTestEnv()
 	env.Router.GET("/users", env.UserController.GetUsers)
 
-	env.MockService.On("GetAllUsers").Return([]domain.User{}, nil)
+	env.MockService.On("GetUsers", 0, 20, "").Return([]domain.User{}, int64(0), nil)
 
 	req, _ := http.NewRequest(http.MethodGet, "/users", nil)
 	w := httptest.NewRecorder()
 	env.Router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	var resp []dto.UserListResponse
+	var resp dto.UsersPagedResponse
 	err := json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.NoError(t, err)
-	assert.Len(t, resp, 0)
+	assert.Len(t, resp.Items, 0)
 
 	env.MockService.AssertExpectations(t)
 }
@@ -100,7 +101,8 @@ func TestUserController_GetUsers_Paginated_ByPage(t *testing.T) {
 	// page=2&take=3 => skip = (2-1)*3 = 3
 	env.MockService.On("GetUsers", 3, 3, "").Return(mockUsers, int64(10), nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/users?page=2&take=3", nil)
+	// Controller now expects skip/take. page=2 with take=3 => skip = (2-1)*3 = 3
+	req, _ := http.NewRequest(http.MethodGet, "/users?skip=3&take=3", nil)
 	w := httptest.NewRecorder()
 
 	env.Router.ServeHTTP(w, req)

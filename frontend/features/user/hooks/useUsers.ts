@@ -11,13 +11,16 @@ export type UseUsersOptions = {
   keyword?: string;
 };
 
-export function useUsers(opts?: UseUsersOptions) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+export function useUsers(
+  opts?: UseUsersOptions,
+  initial?: { users?: User[]; total?: number; take?: number; skip?: number },
+) {
+  const [users, setUsers] = useState<User[]>(initial?.users ?? []);
+  const [loading, setLoading] = useState<boolean>(initial ? false : true);
   const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState<number | null>(null);
-  const [take, setTake] = useState<number | null>(null);
-  const [skip, setSkip] = useState<number | null>(null);
+  const [total, setTotal] = useState<number | null>(initial?.total ?? null);
+  const [take, setTake] = useState<number | null>(initial?.take ?? null);
+  const [skip, setSkip] = useState<number | null>(initial?.skip ?? null);
 
   const mountedRef = useRef(true);
 
@@ -59,11 +62,13 @@ export function useUsers(opts?: UseUsersOptions) {
 
   useEffect(() => {
     mountedRef.current = true;
-    fetchUsers();
+    if (!initial) {
+      void fetchUsers();
+    }
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchUsers]);
+  }, [fetchUsers, initial]);
 
   return {
     users,
