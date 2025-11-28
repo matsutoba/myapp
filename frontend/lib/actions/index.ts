@@ -30,9 +30,18 @@ import * as userUpdateActions from '@/features/user/actions/updateUser';
 
 /**
  * 複数のactionsモジュールを1つのオブジェクトにマージ
+ * 型を保持するため、戻り値の型をマージしたモジュールの交差型にキャストする
  */
-function mergeActions<T extends Record<string, any>[]>(...modules: T) {
-  return Object.assign({}, ...modules);
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
+
+function mergeActions<Modules extends Record<string, any>[]>(
+  ...modules: Modules
+): UnionToIntersection<Modules[number]> {
+  return Object.assign({}, ...modules) as UnionToIntersection<Modules[number]>;
 }
 
 /**

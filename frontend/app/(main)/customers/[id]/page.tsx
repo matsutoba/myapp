@@ -15,6 +15,8 @@ import {
   CustomerForm,
   customerFormSchema,
 } from '@/features/customer/validation';
+import { useUsers } from '@/features/user/hooks/useUsers';
+import type { User } from '@/features/user/types';
 import { actions } from '@/lib/actions';
 import getErrorMessage from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +34,7 @@ export default function EditCustomerPage({
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { users } = useUsers({ take: 1000 });
   const { showToast } = useToast();
 
   const {
@@ -78,7 +81,7 @@ export default function EditCustomerPage({
                 .map((s) => s.trim())
                 .filter(Boolean)
             : Array.isArray(tagsField)
-            ? (tagsField as string[])
+            ? tagsField
             : [];
 
         reset({
@@ -90,7 +93,7 @@ export default function EditCustomerPage({
           website: res.data.website ?? '',
           tagsStr: parsedTags.join(', '),
           status: res.data.status ?? '',
-          ownerId: res.data.ownerId ?? null,
+          ownerId: res.data.ownerId != null ? String(res.data.ownerId) : null,
           lastContactedAt: res.data.lastContactedAt
             ? String(res.data.lastContactedAt)
             : '',
@@ -124,7 +127,7 @@ export default function EditCustomerPage({
             .filter(Boolean)
         : [],
       status: data.status || '',
-      ownerId: data.ownerId ?? undefined,
+      ownerId: data.ownerId == null ? undefined : data.ownerId,
       lastContactedAt:
         data.lastContactedAt && data.lastContactedAt !== ''
           ? new Date(data.lastContactedAt).toISOString()
@@ -134,7 +137,7 @@ export default function EditCustomerPage({
           ? new Date(data.nextActionAt).toISOString()
           : undefined,
       notes: data.notes || '',
-    } as unknown as UpdateCustomerRequest;
+    };
 
     try {
       const result = await actions.customer.updateCustomer(customerId, payload);
@@ -247,13 +250,20 @@ export default function EditCustomerPage({
                 <option value="prospect">Prospect</option>
               </select>
 
-              <Input
-                type="number"
-                id="ownerId"
-                label="担当者ID"
+              <label className="block text-sm font-medium text-gray-700">
+                担当者
+              </label>
+              <select
                 {...register('ownerId')}
-                placeholder="1"
-              />
+                className="mt-1 block w-full border rounded-md px-2 py-1"
+              >
+                <option value="">-- 未選択 --</option>
+                {users.map((u: User) => (
+                  <option key={u.id} value={String(u.id)}>
+                    {u.name} ({u.email})
+                  </option>
+                ))}
+              </select>
 
               <label className="block text-sm font-medium text-gray-700">
                 最終コンタクト日時

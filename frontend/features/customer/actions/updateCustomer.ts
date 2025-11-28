@@ -8,7 +8,7 @@ export async function updateCustomer(id: number, data: UpdateCustomerRequest) {
   const payload = {
     ...data,
     tags: Array.isArray(data.tags) ? data.tags.join(',') : data.tags,
-  } as unknown as UpdateCustomerRequest;
+  };
   return apiServer<Customer>(`/api/customers/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),

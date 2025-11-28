@@ -6,7 +6,7 @@ export interface Customer {
   address: string;
   company?: string | null;
   website?: string | null;
-  tags?: string[];
+  tags?: string | string[] | null;
   status?: string | null;
   ownerId?: number | null;
   lastContactedAt?: string | null;
@@ -23,7 +23,7 @@ export interface CreateCustomerRequest {
   address: string;
   company?: string | null;
   website?: string | null;
-  tags?: string[];
+  tags?: string | string[] | null;
   status?: string | null;
   ownerId?: number | null;
   lastContactedAt?: string | null;
@@ -38,7 +38,7 @@ export interface UpdateCustomerRequest {
   address?: string;
   company?: string | null;
   website?: string | null;
-  tags?: string[];
+  tags?: string | string[] | null;
   status?: string | null;
   ownerId?: number | null;
   lastContactedAt?: string | null;

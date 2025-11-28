@@ -8,7 +8,7 @@ export async function createCustomer(data: CreateCustomerRequest) {
   const payload = {
     ...data,
     tags: Array.isArray(data.tags) ? data.tags.join(',') : data.tags,
-  } as unknown as CreateCustomerRequest;
+  };
   return apiServer<Customer>('/api/customers', {
     method: 'POST',
     body: JSON.stringify(payload),
