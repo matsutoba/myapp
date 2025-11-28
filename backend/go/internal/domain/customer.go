@@ -9,7 +9,7 @@ import (
 type Customer struct {
 	ID uint `gorm:"primaryKey" json:"id"`
 	// ContactName: 担当者名（顧客窓口のフルネーム）
-	ContactName string `json:"contact_name,omitempty"`
+	ContactName string `json:"contactName,omitempty"`
 	// Company: 会社名（法人顧客の場合）
 	Company string `json:"company,omitempty"`
 	// Email: 主要な連絡先メールアドレス
@@ -25,14 +25,14 @@ type Customer struct {
 	// Status: 顧客の状態（例: lead, prospect, customer, churned）
 	Status string `json:"status,omitempty"`
 	// OwnerID: 担当ユーザーのID（usersテーブル参照）
-	OwnerID *uint `json:"owner_id,omitempty"`
+	OwnerID *uint `json:"ownerId,omitempty"`
 	// LastContactedAt: 最後にコンタクトした日時
-	LastContactedAt *time.Time `json:"last_contacted_at,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
 	// NextActionAt: 次に行うアクションの予定日時（フォローリマインド等）
-	NextActionAt *time.Time `json:"next_action_at,omitempty"`
+	NextActionAt *time.Time `json:"nextActionAt,omitempty"`
 	// Notes: フリー形式のメモや履歴要約（長文対応）
 	Notes     string         `gorm:"type:text" json:"notes,omitempty"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt,omitempty"`
 }

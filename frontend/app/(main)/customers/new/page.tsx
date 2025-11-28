@@ -29,7 +29,7 @@ export default function NewCustomerPage() {
   } = useForm<any>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      name: '',
+      contactName: '',
       email: '',
       phone: '',
       address: '',
@@ -46,7 +46,7 @@ export default function NewCustomerPage() {
 
   const onSubmit = async (data: any) => {
     const payload: CreateCustomerRequest = {
-      contact_name: data.name,
+      contactName: data.contactName,
       email: data.email,
       phone: data.phone || '',
       address: data.address || '',
@@ -97,11 +97,11 @@ export default function NewCustomerPage() {
 
               <Input
                 type="text"
-                id="name"
-                label="名前"
-                {...register('name')}
-                placeholder="顧客名"
-                error={getErrorMessage(errors.name)}
+                id="contactName"
+                label="担当者名"
+                {...register('contactName')}
+                placeholder="担当者名"
+                error={getErrorMessage(errors.contactName)}
               />
 
               <Input

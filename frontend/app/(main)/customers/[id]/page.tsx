@@ -42,7 +42,7 @@ export default function EditCustomerPage({
   } = useForm({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      contact_name: '',
+      contactName: '',
       email: '',
       phone: '',
       address: '',
@@ -82,7 +82,7 @@ export default function EditCustomerPage({
             : [];
 
         reset({
-          contact_name: res.data.contact_name || '',
+          contactName: res.data.contactName || '',
           email: res.data.email || '',
           phone: res.data.phone || '',
           address: res.data.address || '',
@@ -111,7 +111,7 @@ export default function EditCustomerPage({
     if (!customerId) return;
     setError('');
     const payload: UpdateCustomerRequest = {
-      contact_name: data.contact_name,
+      contactName: data.contactName,
       email: data.email,
       phone: data.phone || '',
       address: data.address || '',
@@ -124,8 +124,8 @@ export default function EditCustomerPage({
             .filter(Boolean)
         : [],
       status: data.status || '',
-      owner_id: data.ownerId ?? undefined,
-      next_action_at: data.nextActionAt ?? undefined,
+      ownerId: data.ownerId ?? undefined,
+      nextActionAt: data.nextActionAt ?? undefined,
       notes: data.notes || '',
     } as unknown as UpdateCustomerRequest;
 
@@ -171,11 +171,11 @@ export default function EditCustomerPage({
 
               <Input
                 type="text"
-                id="contact_name"
-                label="名前"
-                {...register('contact_name')}
-                placeholder="顧客名"
-                error={getErrorMessage(errors.contact_name)}
+                id="contactName"
+                label="担当者名"
+                {...register('contactName')}
+                placeholder="担当者名"
+                error={getErrorMessage(errors.contactName)}
               />
 
               <Input

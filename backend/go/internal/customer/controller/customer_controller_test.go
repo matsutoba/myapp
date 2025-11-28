@@ -142,7 +142,7 @@ func TestCustomerController_CreateCustomer(t *testing.T) {
 	newCustomer := &domain.Customer{ID: 10, ContactName: "New Co.", Email: "new@example.com", Phone: "090-0000-0000", Address: "Nagoya"}
 	env.MockService.On("CreateCustomer", mock.AnythingOfType("dto.CreateCustomerRequest")).Return(newCustomer, nil)
 
-	body := `{"contact_name":"New Co.","email":"new@example.com","address":"Nagoya","phone":"090-0000-0000"}`
+	body := `{"contactName":"New Co.","email":"new@example.com","address":"Nagoya","phone":"090-0000-0000"}`
 	req, _ := http.NewRequest(http.MethodPost, "/customers", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
@@ -165,7 +165,7 @@ func TestCustomerController_CreateCustomer_Conflict_Returns409(t *testing.T) {
 
 	env.MockService.On("CreateCustomer", mock.AnythingOfType("dto.CreateCustomerRequest")).Return((*domain.Customer)(nil), commonerrors.AppErrCustomerAlreadyExists)
 
-	body := `{"contact_name":"Acme Inc.","email":"contact@acme.example","address":"Tokyo","phone":"000-1111"}`
+	body := `{"contactName":"Acme Inc.","email":"contact@acme.example","address":"Tokyo","phone":"000-1111"}`
 	req, _ := http.NewRequest(http.MethodPost, "/customers", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
@@ -182,7 +182,7 @@ func TestCustomerController_UpdateCustomer(t *testing.T) {
 	updated := &domain.Customer{ID: 1, ContactName: "Acme K.K.", Email: "contact@acme.example", Phone: "000-9999", Address: "Tokyo"}
 	env.MockService.On("UpdateCustomer", uint(1), mock.AnythingOfType("dto.UpdateCustomerRequest")).Return(updated, nil)
 
-	body := `{"contact_name":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
+	body := `{"contactName":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
 	req, _ := http.NewRequest(http.MethodPut, "/customers/1", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
@@ -196,7 +196,7 @@ func TestCustomerController_UpdateCustomer_InvalidID(t *testing.T) {
 	env := SetupCustomerTestEnv()
 	env.Router.PUT("/customers/:id", env.CustomerController.UpdateCustomer)
 
-	body := `{"contact_name":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
+	body := `{"contactName":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
 	req, _ := http.NewRequest(http.MethodPut, "/customers/invalid", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
@@ -228,7 +228,7 @@ func TestCustomerController_UpdateCustomer_NotFound_Returns404(t *testing.T) {
 
 	env.MockService.On("UpdateCustomer", uint(404), mock.AnythingOfType("dto.UpdateCustomerRequest")).Return(nil, commonerrors.AppErrCustomerNotFound)
 
-	body := `{"name":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
+	body := `{"contactName":"Acme K.K.","email":"contact@acme.example","address":"Tokyo","phone":"000-9999"}`
 	req, _ := http.NewRequest(http.MethodPut, "/customers/404", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()

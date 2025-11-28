@@ -144,7 +144,7 @@ export default function CustomersPage() {
                       {c.company}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {c.contact_name}
+                      {c.contactName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {c.email}
