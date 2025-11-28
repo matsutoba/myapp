@@ -12,6 +12,8 @@ import {
 } from '@/components/ui';
 import type { CreateCustomerRequest } from '@/features/customer/types';
 import { customerFormSchema } from '@/features/customer/validation';
+import { useUsers } from '@/features/user/hooks/useUsers';
+import type { User } from '@/features/user/types';
 import { actions } from '@/lib/actions';
 import getErrorMessage from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,6 +46,8 @@ export default function NewCustomerPage() {
     },
   });
 
+  const { users } = useUsers({ take: 1000 });
+
   const onSubmit = async (data: any) => {
     const payload: CreateCustomerRequest = {
       contactName: data.contactName,
@@ -59,10 +63,7 @@ export default function NewCustomerPage() {
             .filter(Boolean)
         : [],
       status: data.status || undefined,
-      ownerId:
-        data.ownerId == null || data.ownerId === ''
-          ? undefined
-          : Number(data.ownerId),
+      ownerId: data.ownerId == null ? undefined : data.ownerId,
       lastContactedAt:
         data.lastContactedAt && data.lastContactedAt !== ''
           ? new Date(data.lastContactedAt).toISOString()
@@ -72,7 +73,7 @@ export default function NewCustomerPage() {
           ? new Date(data.nextActionAt).toISOString()
           : undefined,
       notes: data.notes || '',
-    } as unknown as CreateCustomerRequest;
+    };
 
     const result = await actions.customer.createCustomer(payload);
     if (result.success) {
@@ -165,13 +166,20 @@ export default function NewCustomerPage() {
                 <option value="prospect">Prospect</option>
               </select>
 
-              <Input
-                type="number"
-                id="ownerId"
-                label="担当者ID"
+              <label className="block text-sm font-medium text-gray-700">
+                担当者
+              </label>
+              <select
                 {...register('ownerId')}
-                placeholder="1"
-              />
+                className="mt-1 block w-full border rounded-md px-2 py-1"
+              >
+                <option value="">-- 未選択 --</option>
+                {users.map((u: User) => (
+                  <option key={u.id} value={String(u.id)}>
+                    {u.name} ({u.email})
+                  </option>
+                ))}
+              </select>
 
               <label className="block text-sm font-medium text-gray-700">
                 最終コンタクト日時

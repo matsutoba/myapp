@@ -5,15 +5,22 @@ import { API_ERROR_EVENT } from '@/lib/contexts/ErrorContext';
  * この関数でラップされたServer Actionsは、クライアント側で呼び出された際に
  * エラーが発生すると自動的にグローバルエラーモーダルを表示する
  */
-export function createAutoErrorProxy<T extends Record<string, any>>(
+export function createAutoErrorProxy<
+  T extends Record<string, (...args: any[]) => Promise<any>>,
+>(
   actions: T,
-): T {
-  const proxy: any = {};
+): {
+  [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
+} {
+  const proxy: Partial<{
+    [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
+  }> = {};
 
   for (const [key, action] of Object.entries(actions)) {
     if (typeof action === 'function') {
-      proxy[key] = async (...args: any[]) => {
-        const result = await action(...args);
+      // オリジナルのパラメータと戻り値の型を割り当て時にキャストで保持
+      (proxy as any)[key] = async (...args: any[]) => {
+        const result = await (action as any)(...args);
 
         // ApiResponseの形式をチェック
         if (
@@ -35,5 +42,7 @@ export function createAutoErrorProxy<T extends Record<string, any>>(
     }
   }
 
-  return proxy as T;
+  return proxy as {
+    [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
+  };
 }
