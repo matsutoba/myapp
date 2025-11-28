@@ -37,18 +37,10 @@ export default function UsersPage() {
     const result = await userActions.getUsers({ page: p, keyword }); // エラー時に自動でモーダル表示
 
     if (result.success && result.data) {
-      const data = result.data as any;
-      if (Array.isArray(data)) {
-        setUsers(data);
-        setTotalPages(1);
-      } else if (data && data.items) {
-        setUsers(data.items);
-        const take = data.take || 20;
-        setTotalPages(Math.max(1, Math.ceil((data.total || 0) / take)));
-      } else {
-        setUsers([]);
-        setTotalPages(1);
-      }
+      const data = result.data;
+      setUsers(data.items ?? []);
+      const take = data.take || 20;
+      setTotalPages(Math.max(1, Math.ceil((data.total || 0) / take)));
     }
 
     setLoading(false);

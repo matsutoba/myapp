@@ -22,12 +22,7 @@ export function useUsers(opts?: UseUsersOptions) {
         skip: opts?.skip,
       });
       if (!mountedRef.current) return;
-      const items: User[] =
-        res.success && res.data
-          ? Array.isArray(res.data)
-            ? res.data
-            : res.data.items ?? []
-          : [];
+      const items: User[] = res.success && res.data ? res.data.items ?? [] : [];
       setUsers(items);
     } catch (e) {
       console.error(e);

@@ -10,7 +10,7 @@ export type UsersPagedResponse = {
   take: number;
 };
 
-type UsersResponse = User[] | UsersPagedResponse;
+type UsersResponse = UsersPagedResponse;
 
 export async function getUsers(opts?: {
   page?: number;
