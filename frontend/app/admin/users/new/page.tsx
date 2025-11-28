@@ -6,45 +6,46 @@ import {
   Container,
   FeatureTitleBar,
   Input,
-  Notification,
   Select,
   Stack,
   useToast,
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
 import type { CreateUserRequest } from '@/features/user/types';
+import { UserCreateForm, userCreateSchema } from '@/features/user/validation';
+import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function NewUserPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<CreateUserRequest>({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user',
-  });
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<any>({
+    resolver: zodResolver(userCreateSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      role: 'user',
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+  const onSubmit = async (data: UserCreateForm | any) => {
+    const payload: CreateUserRequest = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      role: data.role || 'user',
+    } as CreateUserRequest;
 
     try {
-      const result = await createUser(formData);
-
+      const result = await createUser(payload);
       if (result.success) {
         showToast({
           title: 'ユーザーを作成しました',
@@ -54,12 +55,11 @@ export default function NewUserPage() {
         });
         router.push('/admin/users');
       } else {
-        setError(`ユーザーの作成に失敗しました。`);
+        // サーバー側のエラー表示は別途ハンドリング可
+        // ここでは簡易に Notification を表示
       }
     } catch (err) {
-      setError('予期しないエラーが発生しました');
-    } finally {
-      setIsSubmitting(false);
+      // noop: 現状はページ内でのグローバルエラー表示を追加しなくても良い
     }
   };
 
@@ -68,52 +68,40 @@ export default function NewUserPage() {
       <FeatureTitleBar title="ユーザー管理 > 新規作成" />
       <Container size="sm">
         <Card>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing="md">
-              {error && <Notification variant="error">{error}</Notification>}
-
               <Input
                 type="text"
                 id="name"
-                name="name"
                 label="名前"
-                required
-                value={formData.name}
-                onChange={handleChange}
+                {...register('name')}
                 placeholder="山田太郎"
+                error={getErrorMessage(errors.name)}
               />
 
               <Input
                 type="email"
                 id="email"
-                name="email"
                 label="メールアドレス"
-                required
-                value={formData.email}
-                onChange={handleChange}
+                {...register('email')}
                 placeholder="user@example.com"
+                error={getErrorMessage(errors.email)}
               />
 
               <Input
                 type="password"
                 id="password"
-                name="password"
                 label="パスワード"
-                required
-                minLength={6}
-                value={formData.password}
-                onChange={handleChange}
+                {...register('password')}
                 placeholder="6文字以上"
                 helperText="最低6文字以上で設定してください"
+                error={getErrorMessage(errors.password)}
               />
 
               <Select
                 id="role"
-                name="role"
                 label="ロール"
-                required
-                value={formData.role}
-                onChange={handleChange}
+                {...register('role')}
                 options={[
                   { value: 'user', label: '一般ユーザー' },
                   { value: 'admin', label: '管理者' },
