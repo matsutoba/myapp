@@ -63,7 +63,14 @@ export default function NewCustomerPage() {
         data.ownerId == null || data.ownerId === ''
           ? undefined
           : Number(data.ownerId),
-      nextActionAt: data.nextActionAt ?? undefined,
+      lastContactedAt:
+        data.lastContactedAt && data.lastContactedAt !== ''
+          ? new Date(data.lastContactedAt).toISOString()
+          : undefined,
+      nextActionAt:
+        data.nextActionAt && data.nextActionAt !== ''
+          ? new Date(data.nextActionAt).toISOString()
+          : undefined,
       notes: data.notes || '',
     } as unknown as CreateCustomerRequest;
 
@@ -97,6 +104,14 @@ export default function NewCustomerPage() {
 
               <Input
                 type="text"
+                id="company"
+                label="会社名"
+                {...register('company')}
+                placeholder="会社名"
+              />
+
+              <Input
+                type="text"
                 id="contactName"
                 label="担当者名"
                 {...register('contactName')}
@@ -119,14 +134,6 @@ export default function NewCustomerPage() {
                 label="電話番号"
                 {...register('phone')}
                 placeholder="090-0000-0000"
-              />
-
-              <Input
-                type="text"
-                id="company"
-                label="会社名"
-                {...register('company')}
-                placeholder="会社名"
               />
 
               <Input

@@ -48,17 +48,18 @@ func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
 
 func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*domain.Customer, error) {
 	newCustomer := domain.Customer{
-		ContactName:  input.ContactName,
-		Company:      input.Company,
-		Email:        input.Email,
-		Phone:        input.Phone,
-		Address:      input.Address,
-		Website:      input.Website,
-		Tags:         input.Tags,
-		Status:       input.Status,
-		OwnerID:      input.OwnerID,
-		NextActionAt: input.NextActionAt,
-		Notes:        input.Notes,
+		ContactName:     input.ContactName,
+		Company:         input.Company,
+		Email:           input.Email,
+		Phone:           input.Phone,
+		Address:         input.Address,
+		Website:         input.Website,
+		Tags:            input.Tags,
+		Status:          input.Status,
+		OwnerID:         input.OwnerID,
+		LastContactedAt: input.LastContactedAt,
+		NextActionAt:    input.NextActionAt,
+		Notes:           input.Notes,
 	}
 
 	created, err := s.repo.Create(newCustomer)
@@ -88,6 +89,7 @@ func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerReques
 	existingCustomer.Tags = input.Tags
 	existingCustomer.Status = input.Status
 	existingCustomer.OwnerID = input.OwnerID
+	existingCustomer.LastContactedAt = input.LastContactedAt
 	existingCustomer.NextActionAt = input.NextActionAt
 	existingCustomer.Notes = input.Notes
 

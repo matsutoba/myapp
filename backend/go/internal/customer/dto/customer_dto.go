@@ -8,32 +8,34 @@ import (
 
 // CreateCustomerRequest: 顧客作成リクエスト
 type CreateCustomerRequest struct {
-	ContactName  string     `json:"contactName" binding:"required,max=100"`
-	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
-	Email        string     `json:"email" binding:"required,email,max=100"`
-	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty" binding:"omitempty,max=255"`
-	Website      string     `json:"website,omitempty" binding:"omitempty,max=255"`
-	Tags         string     `json:"tags,omitempty" binding:"omitempty,max=255"`
-	Status       string     `json:"status,omitempty"`
-	OwnerID      *uint      `json:"ownerId,omitempty"`
-	NextActionAt *time.Time `json:"nextActionAt,omitempty"`
-	Notes        string     `json:"notes,omitempty"`
+	ContactName     string     `json:"contactName" binding:"required,max=100"`
+	Company         string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email           string     `json:"email" binding:"required,email,max=100"`
+	Phone           string     `json:"phone,omitempty"`
+	Address         string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website         string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags            string     `json:"tags,omitempty" binding:"omitempty,max=255"`
+	Status          string     `json:"status,omitempty"`
+	OwnerID         *uint      `json:"ownerId,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
+	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
+	Notes           string     `json:"notes,omitempty"`
 }
 
 // UpdateCustomerRequest: 顧客更新リクエスト
 type UpdateCustomerRequest struct {
-	ContactName  string     `json:"contactName,omitempty"`
-	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
-	Email        string     `json:"email" binding:"required,email,max=100"`
-	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty" binding:"omitempty,max=255"`
-	Website      string     `json:"website,omitempty" binding:"omitempty,max=255"`
-	Tags         string     `json:"tags,omitempty" binding:"omitempty,max=255"`
-	Status       string     `json:"status,omitempty"`
-	OwnerID      *uint      `json:"ownerId,omitempty"`
-	NextActionAt *time.Time `json:"nextActionAt,omitempty"`
-	Notes        string     `json:"notes,omitempty" binding:"omitempty,max=500"`
+	ContactName     string     `json:"contactName,omitempty"`
+	Company         string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email           string     `json:"email" binding:"required,email,max=100"`
+	Phone           string     `json:"phone,omitempty"`
+	Address         string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website         string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags            string     `json:"tags,omitempty" binding:"omitempty,max=255"`
+	Status          string     `json:"status,omitempty"`
+	OwnerID         *uint      `json:"ownerId,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
+	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
+	Notes           string     `json:"notes,omitempty" binding:"omitempty,max=500"`
 }
 
 // CustomerResponse: API レスポンス用 DTO

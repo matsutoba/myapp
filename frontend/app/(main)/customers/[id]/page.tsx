@@ -125,7 +125,14 @@ export default function EditCustomerPage({
         : [],
       status: data.status || '',
       ownerId: data.ownerId ?? undefined,
-      nextActionAt: data.nextActionAt ?? undefined,
+      lastContactedAt:
+        data.lastContactedAt && data.lastContactedAt !== ''
+          ? new Date(data.lastContactedAt).toISOString()
+          : undefined,
+      nextActionAt:
+        data.nextActionAt && data.nextActionAt !== ''
+          ? new Date(data.nextActionAt).toISOString()
+          : undefined,
       notes: data.notes || '',
     } as unknown as UpdateCustomerRequest;
 
@@ -171,6 +178,14 @@ export default function EditCustomerPage({
 
               <Input
                 type="text"
+                id="company"
+                label="会社名"
+                {...register('company')}
+                placeholder="会社名"
+              />
+
+              <Input
+                type="text"
                 id="contactName"
                 label="担当者名"
                 {...register('contactName')}
@@ -201,14 +216,6 @@ export default function EditCustomerPage({
                 label="住所"
                 {...register('address')}
                 placeholder="東京都"
-              />
-
-              <Input
-                type="text"
-                id="company"
-                label="会社名"
-                {...register('company')}
-                placeholder="会社名"
               />
 
               <Input
