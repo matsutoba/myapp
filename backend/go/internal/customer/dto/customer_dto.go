@@ -8,14 +8,14 @@ import (
 
 // CreateCustomerRequest: 顧客作成リクエスト
 type CreateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required"`
+	Name         string     `json:"name" binding:"required,max=100"`
 	ContactName  string     `json:"contact_name,omitempty"`
-	Company      string     `json:"company,omitempty"`
-	Email        string     `json:"email" binding:"required,email"`
+	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email        string     `json:"email" binding:"required,email,max=100"`
 	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty"`
-	Website      string     `json:"website,omitempty"`
-	Tags         string     `json:"tags,omitempty"`
+	Address      string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website      string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags         string     `json:"tags,omitempty" binding:"omitempty,max=255"`
 	Status       string     `json:"status,omitempty"`
 	OwnerID      *uint      `json:"owner_id,omitempty"`
 	NextActionAt *time.Time `json:"next_action_at,omitempty"`
@@ -24,18 +24,18 @@ type CreateCustomerRequest struct {
 
 // UpdateCustomerRequest: 顧客更新リクエスト
 type UpdateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required"`
+	Name         string     `json:"name" binding:"required,max=100"`
 	ContactName  string     `json:"contact_name,omitempty"`
-	Company      string     `json:"company,omitempty"`
-	Email        string     `json:"email" binding:"required,email"`
+	Company      string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email        string     `json:"email" binding:"required,email,max=100"`
 	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty"`
-	Website      string     `json:"website,omitempty"`
-	Tags         string     `json:"tags,omitempty"`
+	Address      string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website      string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags         string     `json:"tags,omitempty" binding:"omitempty,max=255"`
 	Status       string     `json:"status,omitempty"`
 	OwnerID      *uint      `json:"owner_id,omitempty"`
 	NextActionAt *time.Time `json:"next_action_at,omitempty"`
-	Notes        string     `json:"notes,omitempty"`
+	Notes        string     `json:"notes,omitempty" binding:"omitempty,max=500"`
 }
 
 // CustomerResponse: API レスポンス用 DTO

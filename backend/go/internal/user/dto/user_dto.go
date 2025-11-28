@@ -7,17 +7,17 @@ import (
 )
 
 type CreateUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Name     string `json:"name" binding:"required,max=100"`
+	Email    string `json:"email" binding:"required,email,max=100"`
+	Password string `json:"password" binding:"required,min=8"`
 	Role     string `json:"role" binding:"required,oneof=admin user"`
 }
 
 type UpdateUserRequest struct {
 	// Update リクエストは部分更新も許可するためすべて省略可能にする
-	Name     string `json:"name" binding:"omitempty"`
-	Email    string `json:"email" binding:"omitempty,email"`
-	Password string `json:"password" binding:"omitempty,min=6"`
+	Name     string `json:"name" binding:"omitempty,max=100"`
+	Email    string `json:"email" binding:"omitempty,email,max=100"`
+	Password string `json:"password" binding:"omitempty,min=8"`
 	Role     string `json:"role" binding:"omitempty,oneof=admin user"`
 	// IsActive は更新時にステータスを明示的に変更したい場合に使う（nilなら変更しない）
 	IsActive *bool `json:"isActive"`
