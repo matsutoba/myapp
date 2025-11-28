@@ -46,7 +46,7 @@ export default function NewCustomerPage() {
 
   const onSubmit = async (data: any) => {
     const payload: CreateCustomerRequest = {
-      name: data.name,
+      contact_name: data.name,
       email: data.email,
       phone: data.phone || '',
       address: data.address || '',

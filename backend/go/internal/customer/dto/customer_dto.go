@@ -83,6 +83,7 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 // CustomerListResponse は顧客一覧取得時の簡易レスポンス（テスト互換）
 type CustomerListResponse struct {
 	ID          uint   `json:"id"`
+	Company     string `json:"company"`
 	ContactName string `json:"contact_name"`
 	Email       string `json:"email"`
 	Phone       string `json:"phone"`
@@ -94,6 +95,7 @@ func ToCustomerListResponse(list []domain.Customer) []CustomerListResponse {
 	for _, c := range list {
 		resp = append(resp, CustomerListResponse{
 			ID:          c.ID,
+			Company:     c.Company,
 			ContactName: c.ContactName,
 			Email:       c.Email,
 			Phone:       c.Phone,

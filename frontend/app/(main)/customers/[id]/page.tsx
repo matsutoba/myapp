@@ -42,7 +42,7 @@ export default function EditCustomerPage({
   } = useForm({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      name: '',
+      contact_name: '',
       email: '',
       phone: '',
       address: '',
@@ -82,7 +82,7 @@ export default function EditCustomerPage({
             : [];
 
         reset({
-          name: res.data.name || '',
+          contact_name: res.data.contact_name || '',
           email: res.data.email || '',
           phone: res.data.phone || '',
           address: res.data.address || '',
@@ -111,8 +111,7 @@ export default function EditCustomerPage({
     if (!customerId) return;
     setError('');
     const payload: UpdateCustomerRequest = {
-      name: data.name,
-      contact_name: undefined,
+      contact_name: data.contact_name,
       email: data.email,
       phone: data.phone || '',
       address: data.address || '',
@@ -172,11 +171,11 @@ export default function EditCustomerPage({
 
               <Input
                 type="text"
-                id="name"
+                id="contact_name"
                 label="名前"
-                {...register('name')}
+                {...register('contact_name')}
                 placeholder="顧客名"
-                error={getErrorMessage(errors.name)}
+                error={getErrorMessage(errors.contact_name)}
               />
 
               <Input
