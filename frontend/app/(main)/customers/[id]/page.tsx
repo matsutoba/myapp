@@ -11,9 +11,17 @@ import {
   useToast,
 } from '@/components/ui';
 import type { UpdateCustomerRequest } from '@/features/customer/types';
+import {
+  CustomerForm,
+  customerFormSchema,
+} from '@/features/customer/validation';
 import { actions } from '@/lib/actions';
+import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 export default function EditCustomerPage({
   params,
@@ -22,24 +30,32 @@ export default function EditCustomerPage({
 }) {
   const router = useRouter();
   const [customerId, setCustomerId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<UpdateCustomerRequest>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    company: null,
-    website: null,
-    tags: [],
-    status: null,
-    ownerId: null,
-    lastContactedAt: null,
-    nextActionAt: null,
-    notes: null,
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(customerFormSchema),
+    defaultValues: {
+      contactName: '',
+      email: '',
+      phone: '',
+      address: '',
+      company: '',
+      website: '',
+      tagsStr: '',
+      status: '',
+      ownerId: null,
+      lastContactedAt: '',
+      nextActionAt: '',
+      notes: '',
+    },
+  });
 
   useEffect(() => {
     params.then((resolved) => {
@@ -54,7 +70,6 @@ export default function EditCustomerPage({
     try {
       const res = await actions.customer.getCustomerById(id);
       if (res.success && res.data) {
-        // backend returns tags as comma-separated string; normalize to string[]
         const tagsField = res.data.tags;
         const parsedTags =
           typeof tagsField === 'string'
@@ -66,19 +81,23 @@ export default function EditCustomerPage({
             ? (tagsField as string[])
             : [];
 
-        setFormData({
-          name: res.data.name || '',
+        reset({
+          contactName: res.data.contactName || '',
           email: res.data.email || '',
           phone: res.data.phone || '',
           address: res.data.address || '',
-          company: res.data.company ?? null,
-          website: res.data.website ?? null,
-          tags: parsedTags,
-          status: res.data.status ?? null,
+          company: res.data.company ?? '',
+          website: res.data.website ?? '',
+          tagsStr: parsedTags.join(', '),
+          status: res.data.status ?? '',
           ownerId: res.data.ownerId ?? null,
-          lastContactedAt: res.data.lastContactedAt ?? null,
-          nextActionAt: res.data.nextActionAt ?? null,
-          notes: res.data.notes ?? null,
+          lastContactedAt: res.data.lastContactedAt
+            ? String(res.data.lastContactedAt)
+            : '',
+          nextActionAt: res.data.nextActionAt
+            ? String(res.data.nextActionAt)
+            : '',
+          notes: res.data.notes ?? '',
         });
       }
     } catch (e) {
@@ -88,38 +107,37 @@ export default function EditCustomerPage({
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const target = e.target as HTMLInputElement;
-    const { name, value } = target;
-    if (name === 'tags') {
-      const arr = value
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-      setFormData({ ...formData, tags: arr });
-      return;
-    }
-    if (name === 'ownerId') {
-      setFormData({ ...formData, ownerId: value ? parseInt(value, 10) : null });
-      return;
-    }
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<CustomerForm> = async (data) => {
     if (!customerId) return;
     setError('');
-    setIsSubmitting(true);
+    const payload: UpdateCustomerRequest = {
+      contactName: data.contactName,
+      email: data.email,
+      phone: data.phone || '',
+      address: data.address || '',
+      company: data.company || '',
+      website: data.website || '',
+      tags: data.tagsStr
+        ? data.tagsStr
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+      status: data.status || '',
+      ownerId: data.ownerId ?? undefined,
+      lastContactedAt:
+        data.lastContactedAt && data.lastContactedAt !== ''
+          ? new Date(data.lastContactedAt).toISOString()
+          : undefined,
+      nextActionAt:
+        data.nextActionAt && data.nextActionAt !== ''
+          ? new Date(data.nextActionAt).toISOString()
+          : undefined,
+      notes: data.notes || '',
+    } as unknown as UpdateCustomerRequest;
+
     try {
-      const result = await actions.customer.updateCustomer(
-        customerId,
-        formData,
-      );
+      const result = await actions.customer.updateCustomer(customerId, payload);
       if (result.success) {
         showToast({
           title: '顧客を更新しました',
@@ -133,8 +151,6 @@ export default function EditCustomerPage({
       }
     } catch (err) {
       setError('予期しないエラーが発生しました');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -156,79 +172,65 @@ export default function EditCustomerPage({
       <FeatureTitleBar title="顧客管理 > 編集" />
       <Container size="sm">
         <Card>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing="md">
               {error && <Notification variant="error">{error}</Notification>}
 
               <Input
                 type="text"
-                id="name"
-                name="name"
-                label="名前"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="顧客名"
+                id="company"
+                label="会社名"
+                {...register('company')}
+                placeholder="会社名"
+              />
+
+              <Input
+                type="text"
+                id="contactName"
+                label="担当者名"
+                {...register('contactName')}
+                placeholder="担当者名"
+                error={getErrorMessage(errors.contactName)}
               />
 
               <Input
                 type="email"
                 id="email"
-                name="email"
                 label="メールアドレス"
-                required
-                value={formData.email}
-                onChange={handleChange}
+                {...register('email')}
                 placeholder="user@example.com"
+                error={getErrorMessage(errors.email)}
               />
 
               <Input
                 type="text"
                 id="phone"
-                name="phone"
                 label="電話番号"
-                value={formData.phone}
-                onChange={handleChange}
+                {...register('phone')}
                 placeholder="090-0000-0000"
               />
 
               <Input
                 type="text"
                 id="address"
-                name="address"
                 label="住所"
-                value={formData.address}
-                onChange={handleChange}
+                {...register('address')}
                 placeholder="東京都"
-              />
-
-              <Input
-                type="text"
-                id="company"
-                name="company"
-                label="会社名"
-                value={formData.company ?? ''}
-                onChange={handleChange}
-                placeholder="会社名"
               />
 
               <Input
                 type="url"
                 id="website"
-                name="website"
                 label="Website"
-                value={formData.website ?? ''}
-                onChange={handleChange}
+                {...register('website')}
                 placeholder="https://example.com"
               />
 
               <Input
                 type="text"
-                id="tags"
-                name="tags"
+                id="tagsStr"
                 label="Tags (comma separated)"
-                value={(formData.tags || []).join(', ')}
-                onChange={handleChange}
+                {...register('tagsStr')}
                 placeholder="vip,lead"
               />
 
@@ -236,9 +238,7 @@ export default function EditCustomerPage({
                 ステータス
               </label>
               <select
-                name="status"
-                value={formData.status ?? ''}
-                onChange={handleChange}
+                {...register('status')}
                 className="mt-1 block w-full border rounded-md px-2 py-1"
               >
                 <option value="">--</option>
@@ -250,10 +250,8 @@ export default function EditCustomerPage({
               <Input
                 type="number"
                 id="ownerId"
-                name="ownerId"
                 label="担当者ID"
-                value={formData.ownerId ?? ''}
-                onChange={handleChange}
+                {...register('ownerId')}
                 placeholder="1"
               />
 
@@ -263,9 +261,7 @@ export default function EditCustomerPage({
               <Input
                 type="datetime-local"
                 id="lastContactedAt"
-                name="lastContactedAt"
-                value={formData.lastContactedAt ?? ''}
-                onChange={handleChange}
+                {...register('lastContactedAt')}
               />
 
               <label className="block text-sm font-medium text-gray-700">
@@ -274,18 +270,14 @@ export default function EditCustomerPage({
               <Input
                 type="datetime-local"
                 id="nextActionAt"
-                name="nextActionAt"
-                value={formData.nextActionAt ?? ''}
-                onChange={handleChange}
+                {...register('nextActionAt')}
               />
 
               <label className="block text-sm font-medium text-gray-700">
                 メモ
               </label>
               <textarea
-                name="notes"
-                value={formData.notes ?? ''}
-                onChange={handleChange}
+                {...register('notes')}
                 className="block w-full rounded border px-2 py-1"
               />
 

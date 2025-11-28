@@ -44,7 +44,7 @@ func (r *customerRepository) GetPaginated(skip int, take int, keyword string) ([
 	db := r.db.Model(&domain.Customer{})
 	if keyword != "" {
 		like := "%" + strings.ToLower(keyword) + "%"
-		db = db.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
+		db = db.Where("LOWER(contact_name) LIKE ? OR LOWER(email) LIKE ?", like, like)
 	}
 
 	if err := db.Count(&total).Error; err != nil {
@@ -54,7 +54,7 @@ func (r *customerRepository) GetPaginated(skip int, take int, keyword string) ([
 	q := r.db.Model(&domain.Customer{})
 	if keyword != "" {
 		like := "%" + strings.ToLower(keyword) + "%"
-		q = q.Where("LOWER(name) LIKE ? OR LOWER(email) LIKE ?", like, like)
+		q = q.Where("LOWER(contact_name) LIKE ? OR LOWER(email) LIKE ?", like, like)
 	}
 
 	if err := q.Order("id desc").Offset(skip).Limit(take).Find(&customers).Error; err != nil {

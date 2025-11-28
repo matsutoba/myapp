@@ -8,41 +8,39 @@ import (
 
 // CreateCustomerRequest: 顧客作成リクエスト
 type CreateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required"`
-	ContactName  string     `json:"contact_name,omitempty"`
-	Company      string     `json:"company,omitempty"`
-	Email        string     `json:"email" binding:"required,email"`
-	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty"`
-	Website      string     `json:"website,omitempty"`
-	Tags         string     `json:"tags,omitempty"`
-	Status       string     `json:"status,omitempty"`
-	OwnerID      *uint      `json:"owner_id,omitempty"`
-	NextActionAt *time.Time `json:"next_action_at,omitempty"`
-	Notes        string     `json:"notes,omitempty"`
+	ContactName     string     `json:"contactName" binding:"required,max=100"`
+	Company         string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email           string     `json:"email" binding:"required,email,max=100"`
+	Phone           string     `json:"phone,omitempty"`
+	Address         string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website         string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags            string     `json:"tags,omitempty" binding:"omitempty,max=255"`
+	Status          string     `json:"status,omitempty"`
+	OwnerID         *uint      `json:"ownerId,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
+	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
+	Notes           string     `json:"notes,omitempty"`
 }
 
 // UpdateCustomerRequest: 顧客更新リクエスト
 type UpdateCustomerRequest struct {
-	Name         string     `json:"name" binding:"required"`
-	ContactName  string     `json:"contact_name,omitempty"`
-	Company      string     `json:"company,omitempty"`
-	Email        string     `json:"email" binding:"required,email"`
-	Phone        string     `json:"phone,omitempty"`
-	Address      string     `json:"address,omitempty"`
-	Website      string     `json:"website,omitempty"`
-	Tags         string     `json:"tags,omitempty"`
-	Status       string     `json:"status,omitempty"`
-	OwnerID      *uint      `json:"owner_id,omitempty"`
-	NextActionAt *time.Time `json:"next_action_at,omitempty"`
-	Notes        string     `json:"notes,omitempty"`
+	ContactName     string     `json:"contactName,omitempty"`
+	Company         string     `json:"company,omitempty" binding:"omitempty,max=255"`
+	Email           string     `json:"email" binding:"required,email,max=100"`
+	Phone           string     `json:"phone,omitempty"`
+	Address         string     `json:"address,omitempty" binding:"omitempty,max=255"`
+	Website         string     `json:"website,omitempty" binding:"omitempty,max=255"`
+	Tags            string     `json:"tags,omitempty" binding:"omitempty,max=255"`
+	Status          string     `json:"status,omitempty"`
+	OwnerID         *uint      `json:"ownerId,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
+	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
+	Notes           string     `json:"notes,omitempty" binding:"omitempty,max=500"`
 }
 
 // CustomerResponse: API レスポンス用 DTO
 type CustomerResponse struct {
 	ID              uint       `json:"id"`
-	Name            string     `json:"name"`
-	ContactName     string     `json:"contact_name,omitempty"`
 	Company         string     `json:"company,omitempty"`
 	Email           string     `json:"email,omitempty"`
 	Phone           string     `json:"phone,omitempty"`
@@ -50,12 +48,13 @@ type CustomerResponse struct {
 	Website         string     `json:"website,omitempty"`
 	Tags            string     `json:"tags,omitempty"`
 	Status          string     `json:"status,omitempty"`
-	OwnerID         *uint      `json:"owner_id,omitempty"`
-	LastContactedAt *time.Time `json:"last_contacted_at,omitempty"`
-	NextActionAt    *time.Time `json:"next_action_at,omitempty"`
+	ContactName     string     `json:"contactName,omitempty"`
+	OwnerID         *uint      `json:"ownerId,omitempty"`
+	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
+	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
 	Notes           string     `json:"notes,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	CreatedAt       time.Time  `json:"createdAt"`
+	UpdatedAt       time.Time  `json:"updatedAt"`
 }
 
 // ToCustomerResponse converts domain.Customer -> CustomerResponse
@@ -65,7 +64,6 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 	}
 	return &CustomerResponse{
 		ID:              c.ID,
-		Name:            c.Name,
 		ContactName:     c.ContactName,
 		Company:         c.Company,
 		Email:           c.Email,
@@ -86,10 +84,11 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 // ToCustomerListResponse converts a list of domain.Customer to []*CustomerResponse
 // CustomerListResponse は顧客一覧取得時の簡易レスポンス（テスト互換）
 type CustomerListResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Phone string `json:"phone"`
+	ID          uint   `json:"id"`
+	Company     string `json:"company"`
+	ContactName string `json:"contactName"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
 }
 
 // ToCustomerListResponse は複数顧客を一覧レスポンスDTOに変換（互換のため []CustomerListResponse を返す）
@@ -97,10 +96,11 @@ func ToCustomerListResponse(list []domain.Customer) []CustomerListResponse {
 	resp := make([]CustomerListResponse, 0, len(list))
 	for _, c := range list {
 		resp = append(resp, CustomerListResponse{
-			ID:    c.ID,
-			Name:  c.Name,
-			Email: c.Email,
-			Phone: c.Phone,
+			ID:          c.ID,
+			Company:     c.Company,
+			ContactName: c.ContactName,
+			Email:       c.Email,
+			Phone:       c.Phone,
 		})
 	}
 	return resp

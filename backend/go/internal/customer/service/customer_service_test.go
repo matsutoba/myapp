@@ -31,10 +31,10 @@ func TestCustomerService_CRUD(t *testing.T) {
 
 	// Create
 	req := dto.CreateCustomerRequest{
-		Name:    "テスト顧客",
-		Email:   "test@example.com",
-		Phone:   "090-0000-0000",
-		Address: "東京都",
+		ContactName: "テスト顧客",
+		Email:       "test@example.com",
+		Phone:       "090-0000-0000",
+		Address:     "東京都",
 	}
 	created, err := svc.CreateCustomer(req)
 	assert.NoError(t, err)
@@ -49,21 +49,21 @@ func TestCustomerService_CRUD(t *testing.T) {
 	// FindByID
 	found, err := svc.FindByID(created.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, "テスト顧客", found.Name)
+	assert.Equal(t, "テスト顧客", found.ContactName)
 
 	// Update
 	updateReq := dto.UpdateCustomerRequest{
-		Name:    "更新顧客",
-		Email:   "test@example.com",
-		Phone:   "090-0000-0000",
-		Address: "京都府",
+		ContactName: "更新顧客",
+		Email:       "test@example.com",
+		Phone:       "090-0000-0000",
+		Address:     "京都府",
 	}
 	_, err = svc.UpdateCustomer(created.ID, updateReq)
 	assert.NoError(t, err)
 
 	updated, err := svc.FindByID(created.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, "更新顧客", updated.Name)
+	assert.Equal(t, "更新顧客", updated.ContactName)
 	assert.Equal(t, "京都府", updated.Address)
 
 	// Delete
