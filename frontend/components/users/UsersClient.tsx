@@ -55,8 +55,6 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
   const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-  // table styling is provided by shared Table components
-
   useEffect(() => {
     setSearchTerm(keywordFromUrl ?? opts?.keyword ?? '');
   }, [keywordFromUrl, opts?.keyword]);
