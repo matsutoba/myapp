@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Badge,
   Button,
   Card,
   ConfirmModal,
@@ -11,13 +10,25 @@ import {
   Input,
   Pagination,
   Stack,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
   useToast,
 } from '@/components/ui';
-import { PAGINATION_DEFAULT_TAKE, USER_ROLES } from '@/constants';
+import { PAGINATION_DEFAULT_TAKE } from '@/constants';
 import { useUsers, UseUsersOptions } from '@/features/user/hooks/useUsers';
 import { userActions } from '@/lib/actions';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createUserColumns } from './userTableColumns';
 
 export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
   const router = useRouter();
@@ -44,9 +55,7 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
   const { showToast } = useToast();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-  const thClass =
-    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase';
-  const tdClass = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+  // table styling is provided by shared Table components
 
   useEffect(() => {
     setSearchTerm(keywordFromUrl ?? opts?.keyword ?? '');
@@ -95,8 +104,6 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
     }
   };
 
-  if (loading) return <div>読み込み中...</div>;
-
   const takeVal = Number(
     searchParams.get('take') || take || PAGINATION_DEFAULT_TAKE,
   );
@@ -113,6 +120,19 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
       newSkip > 0 ? `?skip=${newSkip}&take=${takeVal}` : `?take=${takeVal}`;
     router.push(`/admin/users${pageQuery}`);
   };
+
+  const columns = React.useMemo(
+    () => createUserColumns({ router, onDelete: handleDeleteClick }),
+    [router, handleDeleteClick],
+  );
+
+  const table = useReactTable({
+    data: users,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  if (loading) return <div>読み込み中...</div>;
 
   return (
     <div>
@@ -142,53 +162,38 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
             </Button>
           </Stack>
           <Card padding="none" className="overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className={thClass}>ID</th>
-                  <th className={thClass}>名前</th>
-                  <th className={thClass}>メール</th>
-                  <th className={thClass}>ロール</th>
-                  <th className={thClass}>ステータス</th>
-                  <th className={thClass}>操作</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td className={tdClass}>{user.id}</td>
-                    <td className={tdClass}>{user.name}</td>
-                    <td className={tdClass}>{user.email}</td>
-                    <td className={tdClass}>
-                      <Badge
-                        variant={
-                          user.role === USER_ROLES.ADMIN ? 'admin' : 'user'
-                        }
-                      >
-                        {user.role}
-                      </Badge>
-                    </td>
-                    <td className={tdClass}>
-                      <Badge variant={user.isActive ? 'success' : 'danger'}>
-                        {user.isActive ? '有効' : '無効'}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                      <IconButton
-                        icon="Pencil"
-                        onClick={() => router.push(`/admin/users/${user.id}`)}
-                        aria-label="編集"
-                      />
-                      <IconButton
-                        icon="Trash"
-                        onClick={() => handleDeleteClick(user.id)}
-                        aria-label="削除"
-                      />
-                    </td>
-                  </tr>
+            <Table>
+              <Thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <Tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <Th key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </Th>
+                    ))}
+                  </Tr>
                 ))}
-              </tbody>
-            </table>
+              </Thead>
+              <Tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <Tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <Td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </Td>
+                    ))}
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
           </Card>
           <div className="px-4 py-4 flex justify-center">
             <Pagination

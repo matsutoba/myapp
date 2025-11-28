@@ -56,4 +56,13 @@ export { ConfirmModal } from './ConfirmModal/ConfirmModal';
 export type { ConfirmModalProps } from './ConfirmModal/ConfirmModal';
 
 export { Pagination } from './Pagination/Pagination';
+export {
+  default as Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  Table as _Table,
+} from './Table/Table';
 export { ToastProvider, useToast } from './Toast/ToastContext';
