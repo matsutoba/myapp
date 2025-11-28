@@ -2,15 +2,15 @@ import { Badge, IconButton } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
 import { ColumnDef } from '@tanstack/react-table';
 
-type CreateUserColumnsArgs = {
+type CreateUserListTableColumnsArgs = {
   router: any;
   onDelete: (id: number) => void;
 };
 
-export function createUserColumns({
+export function createUserListTableColumns({
   router,
   onDelete,
-}: CreateUserColumnsArgs): ColumnDef<any>[] {
+}: CreateUserListTableColumnsArgs): ColumnDef<any>[] {
   return [
     { accessorKey: 'id', header: 'ID' },
     { accessorKey: 'name', header: '名前' },
@@ -54,4 +54,4 @@ export function createUserColumns({
   ];
 }
 
-export default createUserColumns;
+export default createUserListTableColumns;

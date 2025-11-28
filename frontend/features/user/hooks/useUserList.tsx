@@ -8,7 +8,7 @@ import usePagination from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function useUsersClient(opts?: UseUsersOptions) {
+export default function useUserList(opts?: UseUsersOptions) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

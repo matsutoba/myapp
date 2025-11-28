@@ -1,5 +1,5 @@
-import UsersClient from '@/components/users/UsersClient';
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
+import UserList from '@/features/user/components/UserList';
 
 interface UsersPageProps {
   params?: { skip?: string; take?: string; keyword?: string };
@@ -12,5 +12,5 @@ export default async function UsersPage({ params }: UsersPageProps) {
   const keyword = sp?.keyword || undefined;
   const opts = { skip, take, keyword };
 
-  return <UsersClient opts={opts} />;
+  return <UserList opts={opts} />;
 }

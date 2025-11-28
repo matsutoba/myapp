@@ -10,14 +10,14 @@ import {
   Pagination,
   Stack,
 } from '@/components/ui';
+import UserListTable from '@/features/user/components/UserListTable';
+import { createUserListTableColumns } from '@/features/user/components/userListTableColumns';
+import useUserList from '@/features/user/hooks/useUserList';
 import { UseUsersOptions } from '@/features/user/hooks/useUsers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';
-import UserListTable from './UserListTable';
-import useUsersClient from './useUsersClient';
-import { createUserColumns } from './userTableColumns';
 
-export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
+export default function UserList({ opts }: { opts?: UseUsersOptions }) {
   const {
     router,
     users,
@@ -34,10 +34,10 @@ export default function UsersClient({ opts }: { opts?: UseUsersOptions }) {
     currentPage,
     totalPages,
     handlePageChange,
-  } = useUsersClient(opts);
+  } = useUserList(opts);
 
   const columns = React.useMemo(
-    () => createUserColumns({ router, onDelete: handleDeleteClick }),
+    () => createUserListTableColumns({ router, onDelete: handleDeleteClick }),
     [router, handleDeleteClick],
   );
 

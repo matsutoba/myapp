@@ -51,7 +51,7 @@ export default function UserListTable({
         </Table>
       </Card>
 
-      {/* Pagination is rendered by the parent (UsersClient) */}
+      {/* Pagination is rendered by the parent (UsersList) */}
     </>
   );
 }
