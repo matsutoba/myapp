@@ -5,11 +5,10 @@ import {
   ConfirmModal,
   Container,
   FeatureTitleBar,
-  IconButton,
-  Input,
   Pagination,
   Spinner,
   Stack,
+  TextField,
 } from '@/components/ui';
 import CustomerListTable from '@/features/customer/components/list/CustomerListTable';
 import { createCustomerListTableColumns } from '@/features/customer/components/list/customerListTableColumns';
@@ -59,18 +58,15 @@ export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
           <Stack direction="horizontal" justify="between" align="center">
             <div className="flex items-center space-x-2">
               <div className="w-72">
-                <Input
+                <TextField
                   placeholder="検索 (会社名 or メール)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onEnter={() => handleSearch()}
-                  trailing={
-                    <IconButton
-                      icon="Search"
-                      onClick={() => handleSearch()}
-                      aria-label="検索"
-                    />
-                  }
+                  onClear={() => {
+                    setSearchTerm('');
+                    handleSearch('');
+                  }}
                 />
               </div>
             </div>

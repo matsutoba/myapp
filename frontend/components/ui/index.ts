@@ -18,6 +18,8 @@ export { Checkbox } from './Checkbox/Checkbox';
 
 export { Input } from './Input/Input';
 
+export { TextField } from './TextField/TextField';
+
 export { Select } from './Select/Select';
 
 export { Sidebar, type SidebarItem } from './Sidebar/Sidebar';
