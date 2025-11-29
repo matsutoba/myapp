@@ -6,11 +6,10 @@ import { useEffect, useState } from 'react';
 
 type FormData = UpdateUserRequest & { isActive?: boolean | null };
 
-export default function useUserEdit(userIdProp: number) {
+export default function useUserEdit(userId: number) {
   const router = useRouter();
   const { showToast } = useToast();
 
-  const [userId, setUserId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -22,9 +21,9 @@ export default function useUserEdit(userIdProp: number) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    loadUser(userIdProp);
+    loadUser(userId);
     setLoading(false);
-  }, [userIdProp]);
+  }, [userId]);
 
   const loadUser = async (id: number) => {
     setLoading(true);

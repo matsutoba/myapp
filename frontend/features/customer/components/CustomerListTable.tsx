@@ -5,9 +5,6 @@ import { flexRender, type Table as TanTable } from '@tanstack/react-table';
 
 type Props = {
   table: TanTable<any>;
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
 };
 
 export default function CustomerListTable({ table }: Props) {

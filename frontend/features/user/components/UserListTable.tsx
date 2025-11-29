@@ -10,12 +10,7 @@ type Props = {
   onPageChange: (page: number) => void;
 };
 
-export default function UserListTable({
-  table,
-  currentPage,
-  totalPages,
-  onPageChange,
-}: Props) {
+export default function UserListTable({ table }: Props) {
   return (
     <>
       <Card padding="none" className="overflow-hidden">
@@ -50,8 +45,6 @@ export default function UserListTable({
           </Tbody>
         </Table>
       </Card>
-
-      {/* Pagination is rendered by the parent (UsersList) */}
     </>
   );
 }
