@@ -38,7 +38,8 @@ export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
   } = useCustomerList(opts);
 
   const columns = React.useMemo(
-    () => createCustomerListTableColumns({ router, onDelete: handleDeleteClick }),
+    () =>
+      createCustomerListTableColumns({ router, onDelete: handleDeleteClick }),
     [router, handleDeleteClick],
   );
 
