@@ -8,6 +8,7 @@ import {
   IconButton,
   Input,
   Pagination,
+  Spinner,
   Stack,
 } from '@/components/ui';
 import CustomerListTable from '@/features/customer/components/CustomerListTable';
@@ -48,7 +49,7 @@ export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <Spinner mask open />;
 
   return (
     <div>

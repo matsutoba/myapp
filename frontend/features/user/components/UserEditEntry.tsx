@@ -1,9 +1,8 @@
 'use client';
 
+import { Spinner } from '@/components/ui';
 import useUserEdit from '@/features/user/hooks/useUserEdit';
 import { useParams } from 'next/navigation';
-import ErrorView from './ErrorView';
-import LoadingView from './LoadingView';
 import UserEditForm from './UserEditForm';
 import UserEditLayout from './UserEditLayout';
 
@@ -22,14 +21,10 @@ export default function UserEditEntry() {
     loading,
     error,
     isSubmitting,
-    goToList,
     goBack,
   } = useUserEdit(userId);
 
-  if (loading) return <LoadingView />;
-
-  if (error && !formData.email)
-    return <ErrorView error={error} onBack={goToList} />;
+  if (loading) return <Spinner mask open />;
 
   return (
     <UserEditLayout>

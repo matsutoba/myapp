@@ -8,6 +8,7 @@ import {
   IconButton,
   Input,
   Pagination,
+  Spinner,
   Stack,
 } from '@/components/ui';
 import UserListTable from '@/features/user/components/UserListTable';
@@ -47,7 +48,7 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <Spinner mask open />;
 
   return (
     <div>
