@@ -12,7 +12,6 @@ export function createUserListTableColumns({
   onDelete,
 }: CreateUserListTableColumnsArgs): ColumnDef<any>[] {
   return [
-    { accessorKey: 'id', header: 'ID' },
     { accessorKey: 'name', header: '名前' },
     { accessorKey: 'email', header: 'メール' },
     {

@@ -11,7 +11,6 @@ export function createCustomerListTableColumns({
   onDelete,
 }: CreateCustomerListTableColumnsArgs): ColumnDef<any>[] {
   return [
-    { accessorKey: 'id', header: 'ID' },
     { accessorKey: 'company', header: '会社名' },
     { accessorKey: 'contactName', header: '担当者' },
     { accessorKey: 'email', header: 'メール' },
