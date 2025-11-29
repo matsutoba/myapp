@@ -11,17 +11,17 @@ import {
   Spinner,
   Stack,
 } from '@/components/ui';
-import UserListTable from '@/features/user/components/UserListTable';
-import { createUserListTableColumns } from '@/features/user/components/userListTableColumns';
-import useUserList from '@/features/user/hooks/useUserList';
-import { UseUsersOptions } from '@/features/user/hooks/useUsers';
+import CustomerListTable from '@/features/customer/components/list/CustomerListTable';
+import { createCustomerListTableColumns } from '@/features/customer/components/list/customerListTableColumns';
+import useCustomerList from '@/features/customer/hooks/useCustomerList';
+import { UseCustomersOptions } from '@/features/customer/hooks/useCustomers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';
 
-export default function UserList({ opts }: { opts?: UseUsersOptions }) {
+export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
   const {
     router,
-    users,
+    customers,
     loading,
     showConfirmModal,
     setShowConfirmModal,
@@ -35,15 +35,15 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
     currentPage,
     totalPages,
     handlePageChange,
-  } = useUserList(opts);
+  } = useCustomerList(opts);
 
   const columns = React.useMemo(
-    () => createUserListTableColumns({ router, onDelete: handleDeleteClick }),
+    () => createCustomerListTableColumns({ router, onDelete: handleDeleteClick }),
     [router, handleDeleteClick],
   );
 
   const table = useReactTable({
-    data: users,
+    data: customers,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -52,14 +52,14 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
 
   return (
     <div>
-      <FeatureTitleBar title="ユーザー管理" />
+      <FeatureTitleBar title="顧客管理" />
       <Container>
         <Stack spacing="lg">
           <Stack direction="horizontal" justify="between" align="center">
             <div className="flex items-center space-x-2">
               <div className="w-72">
                 <Input
-                  placeholder="検索 (名前 or メール)"
+                  placeholder="検索 (会社名 or メール)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onEnter={() => handleSearch()}
@@ -73,12 +73,12 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
                 />
               </div>
             </div>
-            <Button size="sm" onClick={() => router.push('/admin/users/new')}>
+            <Button size="sm" onClick={() => router.push('/customers/new')}>
               新規作成
             </Button>
           </Stack>
 
-          <UserListTable
+          <CustomerListTable
             table={table}
             currentPage={currentPage}
             totalPages={totalPages}

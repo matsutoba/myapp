@@ -1,4 +1,4 @@
-import CustomerEditEntry from '@/features/customer/components/CustomerEditEntry';
+import CustomerEditEntry from '@/features/customer/components/edit/CustomerEditEntry';
 
 export default function EditCustomerPage() {
   return <CustomerEditEntry />;

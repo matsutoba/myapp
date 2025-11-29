@@ -1,5 +1,5 @@
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
-import CustomerList from '@/features/customer/components/CustomerList';
+import CustomerList from '@/features/customer/components/list/CustomerList';
 
 interface CustomersPageProps {
   params?: { skip?: string; take?: string; keyword?: string };

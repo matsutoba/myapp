@@ -1,5 +1,5 @@
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
-import UserList from '@/features/user/components/UserList';
+import UserList from '@/features/user/components/list/UserList';
 
 interface UsersPageProps {
   params?: { skip?: string; take?: string; keyword?: string };
