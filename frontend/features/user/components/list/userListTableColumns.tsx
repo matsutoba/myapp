@@ -39,12 +39,12 @@ export function createUserListTableColumns({
         <div className="inline-flex items-center space-x-2">
           <IconButton
             icon="Pencil"
-            onClick={() => router.push(`/admin/users/${row.getValue('id')}`)}
+            onClick={() => router.push(`/admin/users/${row.original.id}`)}
             aria-label="編集"
           />
           <IconButton
             icon="Trash"
-            onClick={() => onDelete(Number(row.getValue('id')))}
+            onClick={() => onDelete(Number(row.original.id))}
             aria-label="削除"
           />
         </div>
