@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import TextField from '../TextField/TextField';
 import { Popup } from './Popup';
 
 const meta: Meta<typeof Popup> = {
@@ -72,11 +73,7 @@ export const Medium: Story = {
             <h3 className="font-bold mb-2">Medium サイズ</h3>
             <p className="text-sm mb-4">標準サイズのポップアップです</p>
             <div className="space-y-2">
-              <input
-                type="text"
-                className="w-full border rounded p-2"
-                placeholder="入力例"
-              />
+              <TextField className="w-full" placeholder="入力例" />
               <button className="w-full px-4 py-2 bg-blue-600 text-white rounded">
                 決定
               </button>
@@ -165,11 +162,7 @@ export const WithForm: Story = {
                 <label className="block text-sm font-semibold mb-1">
                   タイトル
                 </label>
-                <input
-                  type="text"
-                  className="w-full border rounded p-2"
-                  placeholder="タイトルを入力"
-                />
+                <TextField className="w-full" placeholder="タイトルを入力" />
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-1">説明</label>

@@ -1,4 +1,11 @@
-import { Button, Input, Notification, Select, Stack } from '@/components/ui';
+import {
+  Button,
+  Input,
+  Notification,
+  Select,
+  Stack,
+  TextField,
+} from '@/components/ui';
 import type { UpdateUserRequest } from '@/features/user/types';
 import React from 'react';
 
@@ -26,8 +33,7 @@ export default function UserEditForm({
       <Stack spacing="md">
         {error && <Notification variant="error">{error}</Notification>}
 
-        <Input
-          type="text"
+        <TextField
           id="name"
           name="name"
           label="名前"

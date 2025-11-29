@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import TextField from '../TextField/TextField';
 import { Card } from './Card';
 
 const meta: Meta<typeof Card> = {
@@ -95,15 +96,15 @@ export const WithForm: Story = {
       <form className="space-y-4">
         <div>
           <label className="block font-semibold mb-1">メールアドレス</label>
-          <input
+          <TextField
+            className="w-full"
             type="email"
-            className="w-full border rounded p-2"
             placeholder="user@example.com"
           />
         </div>
         <div>
           <label className="block font-semibold mb-1">パスワード</label>
-          <input type="password" className="w-full border rounded p-2" />
+          <TextField className="w-full" type="password" placeholder="" />
         </div>
         <button className="w-full px-4 py-2 bg-blue-600 text-white rounded">
           ログイン

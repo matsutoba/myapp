@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Notification } from '../Notification/Notification';
+import TextField from '../TextField/TextField';
 
 const meta: Meta<typeof Notification> = {
   title: 'Layout/Notification',
@@ -82,11 +83,11 @@ export const InForm: Story = {
         </Notification>
         <div>
           <label className="block font-semibold mb-1">メールアドレス</label>
-          <input type="email" className="w-full border rounded p-2" />
+          <TextField className="w-full" type="email" placeholder="" />
         </div>
         <div>
           <label className="block font-semibold mb-1">パスワード</label>
-          <input type="password" className="w-full border rounded p-2" />
+          <TextField className="w-full" type="password" placeholder="" />
         </div>
         <button className="w-full px-4 py-2 bg-blue-600 text-white rounded">
           ログイン

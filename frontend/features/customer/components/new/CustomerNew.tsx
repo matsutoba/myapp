@@ -8,6 +8,7 @@ import {
   Input,
   Notification,
   Stack,
+  TextField,
   useToast,
 } from '@/components/ui';
 import type { CreateCustomerRequest } from '@/features/customer/types';
@@ -102,24 +103,22 @@ export default function CustomerNew() {
                 </Notification>
               )}
 
-              <Input
-                type="text"
+              <TextField
                 id="company"
                 label="会社名"
-                {...register('company')}
                 placeholder="会社名"
+                {...register('company')}
               />
 
-              <Input
-                type="text"
+              <TextField
                 id="contactName"
                 label="担当者名"
-                {...register('contactName')}
                 placeholder="担当者名"
+                {...register('contactName')}
                 error={getErrorMessage(errors.contactName)}
               />
 
-              <Input
+              <TextField
                 type="email"
                 id="email"
                 label="メールアドレス"
@@ -128,15 +127,14 @@ export default function CustomerNew() {
                 error={getErrorMessage(errors.email)}
               />
 
-              <Input
-                type="text"
+              <TextField
                 id="phone"
                 label="電話番号"
-                {...register('phone')}
                 placeholder="090-0000-0000"
+                {...register('phone')}
               />
 
-              <Input
+              <TextField
                 type="url"
                 id="website"
                 label="Website"
@@ -144,12 +142,11 @@ export default function CustomerNew() {
                 placeholder="https://example.com"
               />
 
-              <Input
-                type="text"
+              <TextField
                 id="tagsStr"
                 label="Tags (comma separated)"
-                {...register('tagsStr')}
                 placeholder="vip,lead"
+                {...register('tagsStr')}
               />
 
               <label className="block text-sm font-medium text-gray-700">

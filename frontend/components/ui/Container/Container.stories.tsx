@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Card } from '../Card/Card';
+import TextField from '../TextField/TextField';
 import { Container } from './Container';
 
 const meta: Meta<typeof Container> = {
@@ -129,7 +130,7 @@ export const FormPage: Story = {
           <form className="space-y-4">
             <div>
               <label className="block font-semibold mb-1">名前</label>
-              <input type="text" className="w-full border rounded p-2" />
+              <TextField className="w-full" placeholder="" />
             </div>
             <div>
               <label className="block font-semibold mb-1">メールアドレス</label>

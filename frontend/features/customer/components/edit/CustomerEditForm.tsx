@@ -1,4 +1,4 @@
-import { Button, Input, Notification, Stack } from '@/components/ui';
+import { Button, Input, Notification, Stack, TextField } from '@/components/ui';
 import type { UpdateCustomerRequest } from '@/features/customer/types';
 import type { User } from '@/features/user/types';
 import React from 'react';
@@ -31,8 +31,7 @@ export default function CustomerEditForm({
       <Stack spacing="md">
         {error && <Notification variant="error">{error}</Notification>}
 
-        <Input
-          type="text"
+        <TextField
           id="company"
           name="company"
           label="会社名"
@@ -41,8 +40,7 @@ export default function CustomerEditForm({
           placeholder="会社名"
         />
 
-        <Input
-          type="text"
+        <TextField
           id="contactName"
           name="contactName"
           label="担当者名"
@@ -51,7 +49,7 @@ export default function CustomerEditForm({
           placeholder="担当者名"
         />
 
-        <Input
+        <TextField
           type="email"
           id="email"
           name="email"
@@ -61,8 +59,7 @@ export default function CustomerEditForm({
           placeholder="user@example.com"
         />
 
-        <Input
-          type="text"
+        <TextField
           id="phone"
           name="phone"
           label="電話番号"
@@ -71,8 +68,7 @@ export default function CustomerEditForm({
           placeholder="090-0000-0000"
         />
 
-        <Input
-          type="text"
+        <TextField
           id="address"
           name="address"
           label="住所"
@@ -81,7 +77,7 @@ export default function CustomerEditForm({
           placeholder="東京都"
         />
 
-        <Input
+        <TextField
           type="url"
           id="website"
           name="website"
@@ -91,8 +87,7 @@ export default function CustomerEditForm({
           placeholder="https://example.com"
         />
 
-        <Input
-          type="text"
+        <TextField
           id="tagsStr"
           name="tagsStr"
           label="Tags (comma separated)"

@@ -8,6 +8,7 @@ import {
   Input,
   Select,
   Stack,
+  TextField,
   useToast,
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
@@ -69,12 +70,11 @@ export default function UserNew() {
         <Card>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing="md">
-              <Input
-                type="text"
+              <TextField
                 id="name"
                 label="名前"
-                {...register('name')}
                 placeholder="山田太郎"
+                {...register('name')}
                 error={getErrorMessage(errors.name)}
               />
 

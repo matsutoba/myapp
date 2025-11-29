@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '../Button/Button';
 import { Card } from '../Card/Card';
 import { Container } from '../Container/Container';
-import { Input } from '../Input/Input';
 import { Notification } from '../Notification/Notification';
 import { Select } from '../Select/Select';
 import { Stack } from '../Stack/Stack';
+import TextField from '../TextField/TextField';
 
 const meta: Meta = {
   title: 'Layout/Examples',
@@ -25,13 +25,13 @@ export const LoginPage: Story = {
           <Stack spacing="md">
             <h1 className="text-2xl font-bold text-center">ログイン</h1>
 
-            <Input
+            <TextField
               label="メールアドレス"
               type="email"
               placeholder="user@example.com"
             />
 
-            <Input
+            <TextField
               label="パスワード"
               type="password"
               placeholder="パスワードを入力"
@@ -65,16 +65,16 @@ export const UserCreateForm: Story = {
               新しいユーザーを作成します。必要な情報を入力してください。
             </Notification>
 
-            <Input label="名前" required placeholder="山田太郎" />
+            <TextField label="名前" required placeholder="山田太郎" />
 
-            <Input
+            <TextField
               label="メールアドレス"
               type="email"
               required
               placeholder="user@example.com"
             />
 
-            <Input
+            <TextField
               label="パスワード"
               type="password"
               required
@@ -283,9 +283,9 @@ export const ErrorState: Story = {
               </ul>
             </Notification>
 
-            <Input label="名前" required value="山田太郎" />
+            <TextField label="名前" required value="山田太郎" />
 
-            <Input
+            <TextField
               label="メールアドレス"
               type="email"
               required
@@ -293,7 +293,7 @@ export const ErrorState: Story = {
               error="正しいメールアドレスを入力してください"
             />
 
-            <Input
+            <TextField
               label="パスワード"
               type="password"
               required
