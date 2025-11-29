@@ -14,15 +14,8 @@ export default function UserEditEntry() {
   const params = useParams<Props>();
   const userId = parseInt(params.id, 10);
 
-  const {
-    formData,
-    handleChange,
-    handleSubmit,
-    loading,
-    error,
-    isSubmitting,
-    goBack,
-  } = useUserEdit(userId);
+  const { formData, submit, loading, error, isSubmitting, goBack } =
+    useUserEdit(userId);
 
   if (loading) return <Spinner mask open />;
 
@@ -30,8 +23,7 @@ export default function UserEditEntry() {
     <UserEditLayout>
       <UserEditForm
         formData={formData}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
+        onSubmit={submit}
         isSubmitting={isSubmitting}
         error={error}
         onCancel={goBack}

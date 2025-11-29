@@ -1,10 +1,11 @@
 import { useToast } from '@/components/ui';
 import type { UpdateUserRequest } from '@/features/user/types';
+import type { UserEditForm } from '@/features/user/validation';
 import { userActions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-type FormData = UpdateUserRequest & { isActive?: boolean | null };
+type FormData = UserEditForm & { isActive?: boolean | null };
 
 export default function useUserEdit(userId: number) {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function useUserEdit(userId: number) {
           name: result.data.name || '',
           email: result.data.email,
           password: '',
-          role: result.data.role || 'user',
+          role: (result.data.role as 'user' | 'admin') ?? 'user',
           isActive: result.data.isActive,
         });
       }
@@ -46,37 +47,22 @@ export default function useUserEdit(userId: number) {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const name = e.target.name;
-    let value: any = e.target.value;
-    if (name === 'isActive') {
-      value = value === 'true';
-    }
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // フォームからバリデート済みの値を受け取り API 呼び出しを行う
+  const submit = async (values: FormData) => {
     if (!userId) return;
-
     setError('');
     setIsSubmitting(true);
 
     try {
       const updateData: UpdateUserRequest = {
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
+        name: values.name,
+        email: values.email,
+        role: values.role,
       };
 
-      if (formData.password) updateData.password = formData.password;
-      if (typeof formData.isActive !== 'undefined')
-        updateData.isActive = formData.isActive;
+      if (values.password) updateData.password = values.password;
+      if (typeof values.isActive !== 'undefined')
+        updateData.isActive = values.isActive;
 
       const result = await userActions.updateUser(userId, updateData);
 
@@ -102,8 +88,7 @@ export default function useUserEdit(userId: number) {
 
   return {
     formData,
-    handleChange,
-    handleSubmit,
+    submit,
     loading,
     error,
     isSubmitting,

@@ -108,6 +108,7 @@ export default function CustomerNew() {
                 label="会社名"
                 placeholder="会社名"
                 {...register('company')}
+                error={getErrorMessage(errors.company)}
               />
 
               <TextField

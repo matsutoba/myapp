@@ -6,15 +6,16 @@ import {
   Stack,
   TextField,
 } from '@/components/ui';
-import type { UpdateUserRequest } from '@/features/user/types';
-import React from 'react';
+import { userEditSchema, type UserEditForm } from '@/features/user/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormValues = UserEditForm & { isActive?: boolean | null };
 
 type Props = {
-  formData: UpdateUserRequest & { isActive?: boolean | null };
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  formData: FormValues;
+  onSubmit: (values: FormValues) => void;
   isSubmitting: boolean;
   error?: string;
   onCancel: () => void;
@@ -22,78 +23,113 @@ type Props = {
 
 export default function UserEditForm({
   formData,
-  onChange,
   onSubmit,
   isSubmitting,
   error,
   onCancel,
 }: Props) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    control,
+  } = useForm<any>({
+    resolver: zodResolver(userEditSchema),
+    defaultValues: {
+      ...formData,
+      isActive:
+        typeof formData.isActive === 'boolean'
+          ? String(formData.isActive)
+          : 'true',
+    },
+  });
+
+  useEffect(() => {
+    // 親からの読み込み完了後にフォームをリセットしてデフォルト値を反映
+    reset(formData);
+  }, [formData, reset]);
+
+  const internalSubmit = (values: any) => {
+    // isActive は select から文字列 'true'/'false' で来るため boolean に変換
+    const normalized = {
+      ...values,
+      isActive:
+        typeof values.isActive === 'string'
+          ? values.isActive === 'true'
+          : values.isActive,
+    } as FormValues;
+    onSubmit(normalized);
+  };
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit(internalSubmit)}>
       <Stack spacing="md">
         {error && <Notification variant="error">{error}</Notification>}
 
         <TextField
           id="name"
-          name="name"
+          {...register('name')}
           label="名前"
           required
-          value={formData.name}
-          onChange={onChange}
           placeholder="山田太郎"
+          error={errors.name?.message as string | undefined}
         />
 
         <Input
           type="email"
           id="email"
-          name="email"
+          {...register('email')}
           label="メールアドレス"
           required
-          value={formData.email}
-          onChange={onChange}
           placeholder="user@example.com"
+          error={errors.email?.message as string | undefined}
         />
 
         <Input
           type="password"
           id="password"
-          name="password"
+          {...register('password')}
           label="パスワード"
-          minLength={6}
-          value={formData.password}
-          onChange={onChange}
           placeholder="変更する場合のみ入力"
           helperText="変更しない場合は空のままにしてください"
+          error={errors.password?.message as string | undefined}
         />
 
-        <Select
-          id="role"
+        <Controller
           name="role"
-          label="ロール"
-          required
-          value={formData.role}
-          onChange={onChange}
-          options={[
-            { value: 'user', label: '一般ユーザー' },
-            { value: 'admin', label: '管理者' },
-          ]}
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="role"
+              label="ロール"
+              required
+              value={field.value}
+              onChange={(e: any) => field.onChange(e.target.value)}
+              options={[
+                { value: 'user', label: '一般ユーザー' },
+                { value: 'admin', label: '管理者' },
+              ]}
+            />
+          )}
         />
 
-        <Select
-          id="isActive"
+        <Controller
           name="isActive"
-          label="ステータス"
-          required
-          value={
-            typeof formData.isActive === 'boolean'
-              ? String(formData.isActive)
-              : 'true'
-          }
-          onChange={onChange}
-          options={[
-            { value: 'true', label: '有効' },
-            { value: 'false', label: '無効' },
-          ]}
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="isActive"
+              label="ステータス"
+              required
+              value={field.value}
+              onChange={(e: any) => field.onChange(e.target.value)}
+              options={[
+                { value: 'true', label: '有効' },
+                { value: 'false', label: '無効' },
+              ]}
+            />
+          )}
         />
 
         <Stack direction="horizontal" spacing="sm">

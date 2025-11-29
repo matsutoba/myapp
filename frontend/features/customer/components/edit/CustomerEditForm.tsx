@@ -1,16 +1,18 @@
 import { Button, Input, Notification, Stack, TextField } from '@/components/ui';
-import type { UpdateCustomerRequest } from '@/features/customer/types';
+import {
+  customerFormSchema,
+  type CustomerForm,
+} from '@/features/customer/validation';
 import type { User } from '@/features/user/types';
-import React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormValues = CustomerForm & { ownerId?: string | null };
 
 type Props = {
-  formData: UpdateCustomerRequest & { contactName?: string; email?: string };
-  onChange: (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  formData: any;
+  onSubmit: (values: FormValues) => void;
   isSubmitting: boolean;
   error?: string;
   onCancel: () => void;
@@ -19,120 +21,149 @@ type Props = {
 
 export default function CustomerEditForm({
   formData,
-  onChange,
   onSubmit,
   isSubmitting,
   error,
   onCancel,
   users,
 }: Props) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm<any>({
+    resolver: zodResolver(customerFormSchema),
+    defaultValues: {
+      ...formData,
+      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
+      tagsStr: (formData as any).tagsStr ?? '',
+      lastContactedAt: formData.lastContactedAt ?? '',
+      nextActionAt: formData.nextActionAt ?? '',
+    },
+  });
+
+  useEffect(() => {
+    reset({
+      ...formData,
+      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
+      tagsStr: (formData as any).tagsStr ?? '',
+      lastContactedAt: formData.lastContactedAt ?? '',
+      nextActionAt: formData.nextActionAt ?? '',
+    });
+  }, [formData, reset]);
+
+  const internalSubmit = (values: any) => {
+    onSubmit(values as FormValues);
+  };
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit(internalSubmit)}>
       <Stack spacing="md">
         {error && <Notification variant="error">{error}</Notification>}
 
         <TextField
           id="company"
-          name="company"
+          {...register('company')}
           label="会社名"
-          value={String(formData.company ?? '')}
-          onChange={onChange}
           placeholder="会社名"
+          error={errors.company?.message as string | undefined}
         />
 
         <TextField
           id="contactName"
-          name="contactName"
+          {...register('contactName')}
           label="担当者名"
-          value={String(formData.contactName ?? '')}
-          onChange={onChange}
           placeholder="担当者名"
+          error={errors.contactName?.message as string | undefined}
         />
 
         <TextField
           type="email"
           id="email"
-          name="email"
+          {...register('email')}
           label="メールアドレス"
-          value={String(formData.email ?? '')}
-          onChange={onChange}
           placeholder="user@example.com"
+          error={errors.email?.message as string | undefined}
         />
 
         <TextField
           id="phone"
-          name="phone"
+          {...register('phone')}
           label="電話番号"
-          value={String(formData.phone ?? '')}
-          onChange={onChange}
           placeholder="090-0000-0000"
+          error={errors.phone?.message as string | undefined}
         />
 
         <TextField
           id="address"
-          name="address"
+          {...register('address')}
           label="住所"
-          value={String(formData.address ?? '')}
-          onChange={onChange}
           placeholder="東京都"
+          error={errors.address?.message as string | undefined}
         />
 
         <TextField
           type="url"
           id="website"
-          name="website"
+          {...register('website')}
           label="Website"
-          value={String(formData.website ?? '')}
-          onChange={onChange}
           placeholder="https://example.com"
+          error={errors.website?.message as string | undefined}
         />
 
         <TextField
           id="tagsStr"
-          name="tagsStr"
+          {...register('tagsStr')}
           label="Tags (comma separated)"
-          value={
-            Array.isArray(formData.tags)
-              ? (formData.tags as string[]).join(', ')
-              : String(formData.tags ?? '')
-          }
-          onChange={onChange}
           placeholder="vip,lead"
+          error={errors.tagsStr?.message as string | undefined}
         />
 
         <label className="block text-sm font-medium text-gray-700">
           ステータス
         </label>
-        <select
-          id="status"
+        <Controller
           name="status"
-          value={String(formData.status ?? '')}
-          onChange={onChange}
-          className="mt-1 block w-full border rounded-md px-2 py-1"
-        >
-          <option value="">--</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="prospect">Prospect</option>
-        </select>
+          control={control}
+          render={({ field }) => (
+            <select
+              id="status"
+              value={field.value ?? ''}
+              onChange={(e) => field.onChange(e.target.value)}
+              className="mt-1 block w-full border rounded-md px-2 py-1"
+            >
+              <option value="">--</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="prospect">Prospect</option>
+            </select>
+          )}
+        />
 
         <label className="block text-sm font-medium text-gray-700">
           担当者
         </label>
-        <select
-          id="ownerId"
+        <Controller
           name="ownerId"
-          value={formData.ownerId == null ? '' : String(formData.ownerId)}
-          onChange={onChange}
-          className="mt-1 block w-full border rounded-md px-2 py-1"
-        >
-          <option value="">-- 未選択 --</option>
-          {(users ?? []).map((u: User) => (
-            <option key={u.id} value={String(u.id)}>
-              {u.name} ({u.email})
-            </option>
-          ))}
-        </select>
+          control={control}
+          render={({ field }) => (
+            <select
+              id="ownerId"
+              value={field.value ?? ''}
+              onChange={(e) => field.onChange(e.target.value)}
+              className="mt-1 block w-full border rounded-md px-2 py-1"
+            >
+              <option value="">-- 未選択 --</option>
+              {(users ?? []).map((u: User) => (
+                <option key={u.id} value={String(u.id)}>
+                  {u.name} ({u.email})
+                </option>
+              ))}
+            </select>
+          )}
+        />
 
         <label className="block text-sm font-medium text-gray-700">
           最終コンタクト日時
@@ -140,9 +171,7 @@ export default function CustomerEditForm({
         <Input
           type="datetime-local"
           id="lastContactedAt"
-          name="lastContactedAt"
-          value={String(formData.lastContactedAt ?? '')}
-          onChange={onChange}
+          {...register('lastContactedAt')}
         />
 
         <label className="block text-sm font-medium text-gray-700">
@@ -151,17 +180,13 @@ export default function CustomerEditForm({
         <Input
           type="datetime-local"
           id="nextActionAt"
-          name="nextActionAt"
-          value={String(formData.nextActionAt ?? '')}
-          onChange={onChange}
+          {...register('nextActionAt')}
         />
 
         <label className="block text-sm font-medium text-gray-700">メモ</label>
         <textarea
           id="notes"
-          name="notes"
-          value={String(formData.notes ?? '')}
-          onChange={onChange}
+          {...register('notes')}
           className="block w-full rounded border px-2 py-1"
         />
 

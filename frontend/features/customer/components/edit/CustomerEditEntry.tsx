@@ -14,16 +14,8 @@ export default function CustomerEditEntry() {
   const params = useParams<Params>();
   const id = parseInt(params.id, 10);
 
-  const {
-    formData,
-    handleChange,
-    handleSubmit,
-    loading,
-    error,
-    isSubmitting,
-    goToList,
-    goBack,
-  } = useCustomerEdit(id);
+  const { formData, submit, loading, error, isSubmitting, goToList, goBack } =
+    useCustomerEdit(id);
 
   const { users } = useUsers({ take: 1000 });
 
@@ -33,8 +25,7 @@ export default function CustomerEditEntry() {
     <CustomerEditLayout>
       <CustomerEditForm
         formData={formData}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
+        onSubmit={submit}
         isSubmitting={isSubmitting}
         error={error}
         onCancel={goBack}

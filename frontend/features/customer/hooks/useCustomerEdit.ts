@@ -2,14 +2,12 @@
 
 import { useToast } from '@/components/ui';
 import type { UpdateCustomerRequest } from '@/features/customer/types';
+import type { CustomerForm } from '@/features/customer/validation';
 import { actions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-type FormData = UpdateCustomerRequest & {
-  contactName?: string;
-  email?: string;
-};
+type FormData = Partial<CustomerForm> & { ownerId?: number | null };
 
 export default function useCustomerEdit(customerIdProp: number) {
   const router = useRouter();
@@ -38,7 +36,7 @@ export default function useCustomerEdit(customerIdProp: number) {
           address: res.data.address || '',
           company: res.data.company ?? '',
           website: res.data.website ?? '',
-          tags: res.data.tags ?? [],
+          tagsStr: Array.isArray(res.data.tags) ? res.data.tags.join(', ') : '',
           status: res.data.status ?? '',
           ownerId: res.data.ownerId ?? null,
           lastContactedAt: res.data.lastContactedAt ?? '',
@@ -54,53 +52,43 @@ export default function useCustomerEdit(customerIdProp: number) {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const name = e.target.name || e.target.id;
-    let value: any = e.target.value;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // フォームからバリデート済みの値を受け取り API 呼び出しを行う
+  const submit = async (values: CustomerForm & { ownerId?: string | null }) => {
     if (!customerId) return;
     setError('');
     setIsSubmitting(true);
+
     try {
       const updateData: UpdateCustomerRequest = {
-        contactName: formData.contactName,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        company: formData.company,
-        website: formData.website,
-        // Prefer tagsStr (editable text field) when present, otherwise use tags
+        contactName: values.contactName,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        company: values.company,
+        website: values.website,
         tags:
-          typeof (formData as any).tagsStr === 'string'
-            ? (formData as any).tagsStr
+          typeof values.tagsStr === 'string'
+            ? values.tagsStr
                 .split(',')
-                .map((s: string) => s.trim())
+                .map((s) => s.trim())
                 .filter(Boolean)
-            : formData.tags,
-        status: formData.status,
+            : undefined,
+        status: values.status,
         ownerId:
-          typeof formData.ownerId === 'string'
-            ? formData.ownerId
-              ? Number(formData.ownerId)
+          typeof values.ownerId === 'string'
+            ? values.ownerId
+              ? Number(values.ownerId)
               : undefined
-            : formData.ownerId,
+            : (values.ownerId as any),
         lastContactedAt:
-          formData.lastContactedAt && formData.lastContactedAt !== ''
-            ? new Date(formData.lastContactedAt).toISOString()
+          values.lastContactedAt && values.lastContactedAt !== ''
+            ? new Date(values.lastContactedAt).toISOString()
             : undefined,
         nextActionAt:
-          formData.nextActionAt && formData.nextActionAt !== ''
-            ? new Date(formData.nextActionAt).toISOString()
+          values.nextActionAt && values.nextActionAt !== ''
+            ? new Date(values.nextActionAt).toISOString()
             : undefined,
-        notes: formData.notes,
+        notes: values.notes,
       };
 
       const result = await actions.customer.updateCustomer(
@@ -131,8 +119,7 @@ export default function useCustomerEdit(customerIdProp: number) {
 
   return {
     formData,
-    handleChange,
-    handleSubmit,
+    submit,
     loading,
     error,
     isSubmitting,
