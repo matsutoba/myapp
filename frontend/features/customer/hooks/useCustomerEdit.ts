@@ -44,9 +44,6 @@ export default function useCustomerEdit(customerIdProp: number) {
           notes: res.data.notes ?? '',
         });
       }
-    } catch (err) {
-      console.error(err);
-      setError(String(err ?? 'エラーが発生しました'));
     } finally {
       setLoading(false);
     }
@@ -106,9 +103,6 @@ export default function useCustomerEdit(customerIdProp: number) {
       } else {
         setError('更新に失敗しました');
       }
-    } catch (err) {
-      console.error(err);
-      setError(String(err ?? '予期しないエラーが発生しました'));
     } finally {
       setIsSubmitting(false);
     }

@@ -39,9 +39,6 @@ export default function useUserEdit(userId: number) {
           isActive: result.data.isActive,
         });
       }
-    } catch (err) {
-      console.error('Unexpected error:', err);
-      setError(String(err ?? 'エラーが発生しました'));
     } finally {
       setLoading(false);
     }
@@ -75,9 +72,6 @@ export default function useUserEdit(userId: number) {
         });
         router.push('/admin/users');
       }
-    } catch (err) {
-      console.error('Unexpected error:', err);
-      setError(String(err ?? 'エラーが発生しました'));
     } finally {
       setIsSubmitting(false);
     }
