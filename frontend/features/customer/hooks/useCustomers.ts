@@ -1,21 +1,28 @@
 'use client';
 
-import type { User } from '@/features/user/types';
+import type { Customer } from '@/features/customer/types';
 import { actions } from '@/lib/actions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type UseUsersOptions = {
+export type UseCustomersOptions = {
   take?: number;
   skip?: number;
   page?: number;
   keyword?: string;
 };
 
-export function useUsers(
-  opts?: UseUsersOptions,
-  initial?: { users?: User[]; total?: number; take?: number; skip?: number },
+export function useCustomers(
+  opts?: UseCustomersOptions,
+  initial?: {
+    customers?: Customer[];
+    total?: number;
+    take?: number;
+    skip?: number;
+  },
 ) {
-  const [users, setUsers] = useState<User[]>(initial?.users ?? []);
+  const [customers, setCustomers] = useState<Customer[]>(
+    initial?.customers ?? [],
+  );
   const [loading, setLoading] = useState<boolean>(initial ? false : true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number | null>(initial?.total ?? null);
@@ -24,27 +31,36 @@ export function useUsers(
 
   const mountedRef = useRef(true);
 
-  const fetchUsers = useCallback(
-    async (override?: UseUsersOptions) => {
+  const fetchCustomers = useCallback(
+    async (override?: UseCustomersOptions) => {
       setLoading(true);
       setError(null);
       try {
         const merged = { ...(opts ?? {}), ...(override ?? {}) };
-        const res = await actions.user.getUsers({
+        const res = await actions.customer.getCustomers({
           take: merged.take,
           skip: merged.skip,
           page: merged.page,
           keyword: merged.keyword,
         });
         if (!mountedRef.current) return;
-        const items: User[] =
-          res.success && res.data ? res.data.items ?? [] : [];
-        setUsers(items);
+
         if (res.success && res.data) {
-          setTotal(res.data.total ?? null);
-          setTake(res.data.take ?? null);
-          setSkip(res.data.skip ?? null);
+          // data may be an array or a paged response
+          const raw = res.data as any;
+          if (Array.isArray(raw)) {
+            setCustomers(raw as Customer[]);
+            setTotal(null);
+            setTake(null);
+            setSkip(null);
+          } else {
+            setCustomers(raw.items ?? []);
+            setTotal(raw.total ?? null);
+            setTake(raw.take ?? null);
+            setSkip(raw.skip ?? null);
+          }
         } else {
+          setCustomers([]);
           setTotal(null);
           setTake(null);
           setSkip(null);
@@ -63,20 +79,20 @@ export function useUsers(
   useEffect(() => {
     mountedRef.current = true;
     if (!initial) {
-      void fetchUsers();
+      void fetchCustomers();
     }
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchUsers, initial]);
+  }, [fetchCustomers, initial]);
 
   return {
-    users,
+    customers,
     loading,
     error,
     total,
     take,
     skip,
-    refresh: fetchUsers,
+    refresh: fetchCustomers,
   } as const;
 }

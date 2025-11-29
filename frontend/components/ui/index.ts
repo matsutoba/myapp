@@ -18,6 +18,8 @@ export { Checkbox } from './Checkbox/Checkbox';
 
 export { Input } from './Input/Input';
 
+export { TextField } from './TextField/TextField';
+
 export { Select } from './Select/Select';
 
 export { Sidebar, type SidebarItem } from './Sidebar/Sidebar';
@@ -56,4 +58,13 @@ export { ConfirmModal } from './ConfirmModal/ConfirmModal';
 export type { ConfirmModalProps } from './ConfirmModal/ConfirmModal';
 
 export { Pagination } from './Pagination/Pagination';
+export {
+  default as Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  Table as _Table,
+} from './Table/Table';
 export { ToastProvider, useToast } from './Toast/ToastContext';

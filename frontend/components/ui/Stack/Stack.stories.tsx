@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '../Button/Button';
+import TextField from '../TextField/TextField';
 import { Stack } from './Stack';
 
 const meta: Meta<typeof Stack> = {
@@ -218,11 +219,7 @@ export const FormLayout: Story = {
     <Stack spacing="md">
       <div className="space-y-2">
         <label className="font-semibold">名前</label>
-        <input
-          type="text"
-          className="w-full border rounded p-2"
-          placeholder="山田太郎"
-        />
+        <TextField className="w-full" placeholder="山田太郎" />
       </div>
       <div className="space-y-2">
         <label className="font-semibold">メールアドレス</label>

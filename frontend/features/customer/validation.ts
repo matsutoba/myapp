@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 export const customerFormSchema = z.object({
+  company: z
+    .string()
+    .min(1, { message: '会社名は必須です' })
+    .max(255, { message: '会社名は255文字以内で入力してください' }),
   contactName: z
     .string()
     .min(1, { message: '担当者名は必須です' })
@@ -15,10 +19,6 @@ export const customerFormSchema = z.object({
   address: z
     .string()
     .max(255, { message: '住所は255文字以内で入力してください' })
-    .optional(),
-  company: z
-    .string()
-    .max(255, { message: '会社名は255文字以内で入力してください' })
     .optional(),
   website: z
     .string()

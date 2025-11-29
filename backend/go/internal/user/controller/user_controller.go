@@ -27,35 +27,11 @@ func NewUserController(s service.UserService) *UserController {
 }
 
 func (uc *UserController) GetUsers(c *gin.Context) {
-	// ページネーションパラメータがない場合
-	if c.Query("page") == "" && c.Query("skip") == "" && c.Query("take") == "" {
-		// キーワード検索があれば検索（全件取得ではなくフィルタ済み一覧を返す）
-		keyword := c.Query("keyword")
-		if keyword == "" {
-			users, err := uc.service.GetAllUsers()
-			if err != nil {
-				errors.WriteError(c, http.StatusInternalServerError, err)
-				return
-			}
-			c.JSON(http.StatusOK, dto.ToUserListResponse(users))
-			return
-		}
 
-		// キーワードあり：検索（全件ではなく検索結果を返す）
-		users, _, err := uc.service.GetUsers(0, 1000, keyword)
-		if err != nil {
-			errors.WriteError(c, http.StatusInternalServerError, err)
-			return
-		}
-		c.JSON(http.StatusOK, dto.ToUserListResponse(users))
-		return
-	}
-
-	// ページネーションパラメータがある場合
 	const defaultTake = 20
 	maxTake := 100
 
-	// takeパラメータの解析
+	// take の解析
 	takeParam := c.DefaultQuery("take", "")
 	take := defaultTake
 	if takeParam != "" {
@@ -70,13 +46,9 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 		take = maxTake
 	}
 
-	// skip, pageパラメータの解析
+	// skip の解析（デフォルト 0）
 	skip := 0
-	if pageParam := c.DefaultQuery("page", ""); pageParam != "" {
-		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
-			skip = (p - 1) * take
-		}
-	} else if skipParam := c.DefaultQuery("skip", ""); skipParam != "" {
+	if skipParam := c.DefaultQuery("skip", ""); skipParam != "" {
 		if s, err := strconv.Atoi(skipParam); err == nil && s >= 0 {
 			skip = s
 		}
