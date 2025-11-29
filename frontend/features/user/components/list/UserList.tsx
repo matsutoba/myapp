@@ -5,6 +5,7 @@ import {
   ConfirmModal,
   Container,
   FeatureTitleBar,
+  IconButton,
   Pagination,
   Spinner,
   Stack,
@@ -66,6 +67,24 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
                     setSearchTerm('');
                     handleSearch('');
                   }}
+                  trailing={
+                    searchTerm && searchTerm !== '' ? (
+                      <IconButton
+                        icon="X"
+                        onClick={() => {
+                          setSearchTerm('');
+                          handleSearch('');
+                        }}
+                        aria-label="検索条件をクリア"
+                      />
+                    ) : (
+                      <IconButton
+                        icon="Search"
+                        onClick={() => handleSearch()}
+                        aria-label="検索"
+                      />
+                    )
+                  }
                 />
               </div>
             </div>

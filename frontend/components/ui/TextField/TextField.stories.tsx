@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import TextField from './TextField';
@@ -56,6 +57,47 @@ export const Interactive: Story = {
               console.log('clear');
               setValue('');
             }}
+          />
+        </div>
+      );
+    }
+
+    return <Wrapper />;
+  },
+};
+
+export const WithTrailing: Story = {
+  render: () => {
+    function Wrapper() {
+      const [value, setValue] = useState('');
+      return (
+        <div className="p-4">
+          <TextField
+            placeholder="名前 or メールで検索 (trailingあり)"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onEnter={() => console.log('search:', value)}
+            onClear={() => {
+              console.log('clear');
+              setValue('');
+            }}
+            trailing={
+              value && value !== '' ? (
+                <IconButton
+                  icon={'X' as any}
+                  onClick={() => {
+                    setValue('');
+                  }}
+                  aria-label="検索条件をクリア"
+                />
+              ) : (
+                <IconButton
+                  icon={'Search' as any}
+                  onClick={() => console.log('search click')}
+                  aria-label="検索"
+                />
+              )
+            }
           />
         </div>
       );

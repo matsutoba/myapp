@@ -1,5 +1,4 @@
 import React from 'react';
-import { IconButton } from '../IconButton/IconButton';
 import { Input } from '../Input/Input';
 
 type TextFieldProps = {
@@ -10,6 +9,8 @@ type TextFieldProps = {
   placeholder?: string;
   id?: string;
   className?: string;
+  /** カスタムの trailing 要素を指定する（指定がなければ何もレンダリングしない） */
+  trailing?: React.ReactNode;
 };
 
 export function TextField({
@@ -20,9 +21,15 @@ export function TextField({
   placeholder,
   id,
   className,
+  trailing,
 }: TextFieldProps) {
   const handleEnter = (val: string) => {
     onEnter?.();
+  };
+
+  const renderTrailing = () => {
+    if (trailing === undefined) return null;
+    return trailing;
   };
 
   return (
@@ -33,26 +40,7 @@ export function TextField({
       value={value}
       onChange={onChange}
       onEnter={handleEnter}
-      trailing={
-        value && value !== '' ? (
-          <IconButton
-            icon="X"
-            onClick={() => {
-              onChange({
-                target: { value: '' },
-              } as unknown as React.ChangeEvent<HTMLInputElement>);
-              onClear?.();
-            }}
-            aria-label="検索条件をクリア"
-          />
-        ) : (
-          <IconButton
-            icon="Search"
-            onClick={() => onEnter?.()}
-            aria-label="検索"
-          />
-        )
-      }
+      trailing={renderTrailing()}
     />
   );
 }
