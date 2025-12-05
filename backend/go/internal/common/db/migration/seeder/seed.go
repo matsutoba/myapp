@@ -5,4 +5,5 @@ import "gorm.io/gorm"
 func SeedAll(db *gorm.DB) {
 	SeedCustomers(db)
 	SeedUsers(db)
+	SeedOrders(db)
 }

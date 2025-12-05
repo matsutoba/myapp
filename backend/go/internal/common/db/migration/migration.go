@@ -14,6 +14,10 @@ func AutoMigrate(db *gorm.DB) {
 		log.Fatalf("failed to migrat Customer table: %v", err)
 	}
 
+	if err := db.AutoMigrate(&domain.Order{}); err != nil {
+		log.Fatalf("failed to migrate Order table: %v", err)
+	}
+
 	if err := db.AutoMigrate(&domain.User{}); err != nil {
 		log.Fatalf("failed to migrate User table: %v", err)
 	}
