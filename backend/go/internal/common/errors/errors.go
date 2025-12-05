@@ -52,4 +52,10 @@ var (
 	AppErrCustomerAlreadyExists = NewAppError(11001, "顧客は既に存在します")
 	AppErrCustomerNotFound      = NewAppError(11002, "顧客が見つかりません")
 	AppErrCustomerUpdateFailed  = NewAppError(11003, "顧客の更新に失敗しました")
+
+	// Application Errors (orders)
+	AppErrOrderNotFound     = NewAppError(12001, "注文が見つかりません")
+	AppErrOrderCreateFailed = NewAppError(12002, "注文の作成に失敗しました")
+	AppErrOrderUpdateFailed = NewAppError(12003, "注文の更新に失敗しました")
+	AppErrOrderDeleteFailed = NewAppError(12004, "注文の削除に失敗しました")
 )
