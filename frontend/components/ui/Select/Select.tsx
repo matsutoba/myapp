@@ -11,6 +11,8 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
   helperText?: string;
   required?: boolean;
+  /** readonly: allow focus but prevent changes */
+  readOnly?: boolean;
   options: SelectOption[];
 }
 
@@ -29,9 +31,29 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     ref,
   ) => {
     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const isDisabled = Boolean((props as any).disabled);
+    const isReadOnly = Boolean((props as any).readOnly);
+    const originalOnChange = props.onChange as
+      | ((e: React.ChangeEvent<HTMLSelectElement>) => void)
+      | undefined;
+    const originalOnKeyDown = props.onKeyDown as
+      | ((e: React.KeyboardEvent<HTMLSelectElement>) => void)
+      | undefined;
+
+    const restProps: Record<string, any> = {
+      ...(props as Record<string, any>),
+    };
+    // remove handlers so we can attach our wrappers
+    delete restProps.onChange;
+    delete restProps.onKeyDown;
+    delete restProps.readOnly;
 
     return (
-      <div className="mb-6 relative">
+      <div
+        className={`mb-6 relative ${
+          isDisabled || isReadOnly ? 'cursor-not-allowed' : ''
+        }`}
+      >
         {label && (
           <label
             htmlFor={selectId}
@@ -41,25 +63,69 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {required && <span className="text-on-danger ml-1">*</span>}
           </label>
         )}
-        <select
-          ref={ref}
-          id={selectId}
-          className={`w-full appearance-none hover:cursor-pointer px-3 pr-10 py-2 border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus-ring-primary disabled:bg-card disabled:cursor-not-allowed ${
-            error ? 'border-danger' : 'border-surface'
-          } ${className}`}
-          {...props}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
 
-        {/* Custom dropdown icon placed on the right to avoid touching the edge */}
-        <div className="pointer-events-none absolute inset-y-12 right-3 flex items-center">
-          <Icon name="ChevronDown" size={20} className="text-muted" />
+        <div className="relative">
+          <select
+            ref={ref}
+            id={selectId}
+            aria-readonly={isReadOnly ? 'true' : undefined}
+            disabled={isDisabled}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              if (isReadOnly) {
+                e.preventDefault();
+                return;
+              }
+              originalOnChange?.(e);
+            }}
+            onKeyDown={(e: React.KeyboardEvent<HTMLSelectElement>) => {
+              if (isReadOnly) {
+                // allow Tab to move focus, block other keys to avoid selection changes
+                if (e.key === 'Tab') return;
+                e.preventDefault();
+                return;
+              }
+              originalOnKeyDown?.(e);
+            }}
+            onMouseDown={(e: React.MouseEvent<HTMLSelectElement>) => {
+              if (isReadOnly) {
+                // prevent the native dropdown from opening via mouse
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+            className={`w-full appearance-none px-3 pr-10 py-2 border rounded-md bg-card text-foreground ${
+              // If readOnly, keep focusable but suppress focus ring/outline
+              isReadOnly
+                ? 'focus:outline-none focus:ring-0'
+                : 'focus:outline-none focus:ring-2 focus-ring-primary'
+            } ${
+              isDisabled || isReadOnly ? 'cursor-not-allowed' : ''
+            } disabled:cursor-not-allowed ${
+              error ? 'border-danger' : 'border-surface'
+            } ${
+              isDisabled
+                ? 'opacity-60 bg-surface/50 text-muted pointer-events-none'
+                : isReadOnly
+                ? 'opacity-60 bg-surface/50 text-muted'
+                : ''
+            } ${className}`}
+            {...restProps}
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <Icon
+              name="ChevronDown"
+              className={isDisabled || isReadOnly ? 'opacity-50' : ''}
+            />
+          </span>
         </div>
+
         {helperText && !error && (
           <p className="mt-1 text-sm text-muted">{helperText}</p>
         )}
