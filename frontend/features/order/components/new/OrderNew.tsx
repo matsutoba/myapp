@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  Container,
-  FeatureTitleBar,
-  Stack,
-  useToast,
-} from '@/components/ui';
+import { Card, Container, FeatureTitleBar, useToast } from '@/components/ui';
 import { actions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import OrderForm from '../OrderForm';
@@ -17,14 +10,8 @@ export default function OrderNew() {
   const { showToast } = useToast();
 
   const handleCreate = async (data: any) => {
-    // data: { customerId, product, quantity }
-    const payload = {
-      customerId: data.customerId || undefined,
-      product: data.product,
-      quantity: Number(data.quantity) || 1,
-    };
-
-    const res = await actions.order.createOrder(payload as any);
+    // data should follow CreateOrderInput shape: { customerId, amount, currency, itemsCount, orderChannel, category, status }
+    const res = await actions.order.createOrder(data as any);
     if (res.success && res.data && res.data.id) {
       showToast({
         title: '注文を作成しました',
@@ -48,21 +35,13 @@ export default function OrderNew() {
       <FeatureTitleBar title="注文管理 > 新規作成" />
       <Container size="sm">
         <Card>
-          <form>
-            <Stack spacing="md">
-              <OrderForm initialValues={{}} onSubmit={handleCreate} />
-
-              <Stack direction="horizontal" spacing="sm">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => router.back()}
-                >
-                  キャンセル
-                </Button>
-              </Stack>
-            </Stack>
-          </form>
+          <OrderForm
+            initialValues={{}}
+            onSubmit={handleCreate}
+            onCancel={() => {
+              router.back();
+            }}
+          />
         </Card>
       </Container>
     </div>

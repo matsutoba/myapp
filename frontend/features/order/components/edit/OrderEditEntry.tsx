@@ -1,6 +1,6 @@
 'use client';
 
-import { Spinner } from '@/components/ui';
+import { Card, Container, FeatureTitleBar, Spinner } from '@/components/ui';
 import OrderForm from '@/features/order/components/OrderForm';
 import { useOrderEdit } from '@/features/order/hooks/useOrderEdit';
 import { useParams } from 'next/navigation';
@@ -18,10 +18,17 @@ export default function OrderEditEntry() {
 
   return (
     <div>
-      <OrderForm
-        initialValues={formData}
-        onSubmit={async (data) => await submit(data)}
-      />
+      <FeatureTitleBar title="注文管理 > 編集" />
+      <Container size="sm">
+        <Card>
+          <OrderForm
+            initialValues={formData}
+            onSubmit={async (data) => await submit(data)}
+            onCancel={goBack}
+            disableCustomerSelect
+          />
+        </Card>
+      </Container>
     </div>
   );
 }
