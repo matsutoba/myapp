@@ -20,8 +20,8 @@ export function createOrderListTableColumns({
 }: CreateOrderListTableColumnsArgs): ColumnDef<Order>[] {
   const columns: ColumnDef<Order>[] = [
     {
-      accessorKey: 'customerName',
-      header: '顧客',
+      accessorKey: 'companyName',
+      header: '会社名',
       cell: (ctx) => ctx.getValue() ?? '-',
     },
     {

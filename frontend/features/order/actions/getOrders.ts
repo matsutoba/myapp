@@ -5,7 +5,7 @@ import { apiServer } from '@/lib/api/client';
 export type Order = {
   id: string;
   customerId?: string;
-  customerName?: string;
+  companyName?: string;
   total?: number;
   status?: string;
   createdAt?: string;
