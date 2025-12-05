@@ -1,5 +1,5 @@
+import { IconButton } from '@/components/ui';
 import { ColumnDef } from '@tanstack/react-table';
-import Link from 'next/link';
 
 type Order = {
   id: string;
@@ -7,9 +7,15 @@ type Order = {
   total?: number;
 };
 
+type CreateOrderListTableColumnsArgs = {
+  router: any;
+  onDelete: (id: number) => void;
+};
+
 export function createOrderListTableColumns({
+  router,
   onDelete,
-}: { onDelete?: (id: string) => void } = {}) {
+}: CreateOrderListTableColumnsArgs): ColumnDef<Order>[] {
   const columns: ColumnDef<Order>[] = [
     {
       accessorKey: 'customerName',
@@ -31,26 +37,22 @@ export function createOrderListTableColumns({
         const id = row.original.id;
         return (
           <div className="flex gap-2">
-            <Link
-              href={`/orders/${id}`}
-              className="text-blue-600 hover:underline"
-            >
-              詳細
-            </Link>
-            <Link
-              href={`/orders/${id}/edit`}
-              className="text-green-600 hover:underline"
-            >
-              編集
-            </Link>
-            {onDelete ? (
-              <button
-                className="text-red-600 hover:underline"
-                onClick={() => onDelete(id)}
-              >
-                削除
-              </button>
-            ) : null}
+            <IconButton
+              icon="FileText"
+              onClick={() => router.push(`/orders/${id}`)}
+              aria-label="詳細"
+            />
+
+            <IconButton
+              icon="Pencil"
+              onClick={() => router.push(`/orders/${id}/edit`)}
+              aria-label="編集"
+            />
+            <IconButton
+              icon="Trash"
+              onClick={() => onDelete(Number(id))}
+              aria-label="削除"
+            />
           </div>
         );
       },

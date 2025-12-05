@@ -38,7 +38,7 @@ export default function OrderList({ opts }: { opts?: any }) {
 
   const { showToast } = useToast();
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
     setShowConfirmModal(true);
   };
@@ -69,8 +69,8 @@ export default function OrderList({ opts }: { opts?: any }) {
   // handlePageChange is provided by useOrderList/usePagination
 
   const columns = React.useMemo(
-    () => createOrderListTableColumns({ onDelete: handleDeleteClick }),
-    [],
+    () => createOrderListTableColumns({ router, onDelete: handleDeleteClick }),
+    [router],
   );
 
   const table = useReactTable({

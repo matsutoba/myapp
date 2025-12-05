@@ -31,7 +31,7 @@ export default function useOrderList(opts?: UseOrdersOptions) {
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function useOrderList(opts?: UseOrdersOptions) {
     else router.push(`/orders`);
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
     setShowConfirmModal(true);
   };
