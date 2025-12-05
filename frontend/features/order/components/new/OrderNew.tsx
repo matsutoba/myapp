@@ -10,14 +10,8 @@ export default function OrderNew() {
   const { showToast } = useToast();
 
   const handleCreate = async (data: any) => {
-    // data: { customerId, product, quantity }
-    const payload = {
-      customerId: data.customerId || undefined,
-      product: data.product,
-      quantity: Number(data.quantity) || 1,
-    };
-
-    const res = await actions.order.createOrder(payload as any);
+    // data should follow CreateOrderInput shape: { customerId, amount, currency, itemsCount, orderChannel, category, status }
+    const res = await actions.order.createOrder(data as any);
     if (res.success && res.data && res.data.id) {
       showToast({
         title: '注文を作成しました',
