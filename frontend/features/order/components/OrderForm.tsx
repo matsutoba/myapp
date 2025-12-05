@@ -1,13 +1,19 @@
 'use client';
 
+import { Button } from '@/components/ui';
 import React, { useState } from 'react';
 
 type Props = {
   initialValues?: any;
   onSubmit: (data: any) => Promise<void> | void;
+  onCancel: () => void;
 };
 
-export default function OrderForm({ initialValues = {}, onSubmit }: Props) {
+export default function OrderForm({
+  initialValues = {},
+  onSubmit,
+  onCancel,
+}: Props) {
   const [customerId, setCustomerId] = useState(initialValues.customerId || '');
   const [product, setProduct] = useState(initialValues.product || '');
   const [quantity, setQuantity] = useState(initialValues.quantity || 1);
@@ -56,6 +62,9 @@ export default function OrderForm({ initialValues = {}, onSubmit }: Props) {
         >
           保存
         </button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          キャンセル
+        </Button>
       </div>
     </form>
   );

@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  Container,
-  FeatureTitleBar,
-  Stack,
-  useToast,
-} from '@/components/ui';
+import { Card, Container, FeatureTitleBar, useToast } from '@/components/ui';
 import { actions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import OrderForm from '../OrderForm';
@@ -48,21 +41,13 @@ export default function OrderNew() {
       <FeatureTitleBar title="注文管理 > 新規作成" />
       <Container size="sm">
         <Card>
-          <form>
-            <Stack spacing="md">
-              <OrderForm initialValues={{}} onSubmit={handleCreate} />
-
-              <Stack direction="horizontal" spacing="sm">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => router.back()}
-                >
-                  キャンセル
-                </Button>
-              </Stack>
-            </Stack>
-          </form>
+          <OrderForm
+            initialValues={{}}
+            onSubmit={handleCreate}
+            onCancel={() => {
+              router.back();
+            }}
+          />
         </Card>
       </Container>
     </div>
