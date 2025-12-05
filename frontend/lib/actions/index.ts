@@ -28,6 +28,12 @@ import * as userCreateActions from '@/features/user/actions/createUser';
 import * as userGetActions from '@/features/user/actions/getUsers';
 import * as userUpdateActions from '@/features/user/actions/updateUser';
 
+// Order Actions
+import * as orderCreateActions from '@/features/order/actions/createOrder';
+import * as orderDeleteActions from '@/features/order/actions/deleteOrder';
+import * as orderGetActions from '@/features/order/actions/getOrders';
+import * as orderUpdateActions from '@/features/order/actions/updateOrder';
+
 /**
  * 複数のactionsモジュールを1つのオブジェクトにマージ
  * 型を保持するため、戻り値の型をマージしたモジュールの交差型にキャストする
@@ -70,6 +76,15 @@ export const actions = {
 
   user: createAutoErrorProxy(
     mergeActions(userGetActions, userCreateActions, userUpdateActions),
+  ),
+
+  order: createAutoErrorProxy(
+    mergeActions(
+      orderCreateActions,
+      orderGetActions,
+      orderUpdateActions,
+      orderDeleteActions,
+    ),
   ),
 };
 

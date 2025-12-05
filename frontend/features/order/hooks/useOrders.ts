@@ -1,29 +1,22 @@
 'use client';
 
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
-import type { Customer } from '@/features/customer/types';
+import type { Order } from '@/features/order/actions/getOrders';
 import { actions } from '@/lib/actions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type UseCustomersOptions = {
+export type UseOrdersOptions = {
   take?: number;
   skip?: number;
   page?: number;
   keyword?: string;
 };
 
-export function useCustomers(
-  opts?: UseCustomersOptions,
-  initial?: {
-    customers?: Customer[];
-    total?: number;
-    take?: number;
-    skip?: number;
-  },
+export function useOrders(
+  opts?: UseOrdersOptions,
+  initial?: { orders?: Order[]; total?: number; take?: number; skip?: number },
 ) {
-  const [customers, setCustomers] = useState<Customer[]>(
-    initial?.customers ?? [],
-  );
+  const [orders, setOrders] = useState<Order[]>(initial?.orders ?? []);
   const [loading, setLoading] = useState<boolean>(initial ? false : true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number | null>(initial?.total ?? null);
@@ -32,13 +25,13 @@ export function useCustomers(
 
   const mountedRef = useRef(true);
 
-  const fetchCustomers = useCallback(
-    async (override?: UseCustomersOptions) => {
+  const fetchOrders = useCallback(
+    async (override?: UseOrdersOptions) => {
       setLoading(true);
       setError(null);
       try {
         const merged = { ...(opts ?? {}), ...(override ?? {}) };
-        const res = await actions.customer.getCustomers({
+        const res = await actions.order.getOrders({
           take: merged.take ?? PAGINATION_DEFAULT_TAKE,
           skip: merged.skip,
           page: merged.page,
@@ -47,21 +40,20 @@ export function useCustomers(
         if (!mountedRef.current) return;
 
         if (res.success && res.data) {
-          // data may be an array or a paged response
           const raw = res.data as any;
           if (Array.isArray(raw)) {
-            setCustomers(raw as Customer[]);
+            setOrders(raw as Order[]);
             setTotal(null);
             setTake(null);
             setSkip(null);
           } else {
-            setCustomers(raw.items ?? []);
+            setOrders(raw.items ?? []);
             setTotal(raw.total ?? null);
             setTake(raw.take ?? null);
             setSkip(raw.skip ?? null);
           }
         } else {
-          setCustomers([]);
+          setOrders([]);
           setTotal(null);
           setTake(null);
           setSkip(null);
@@ -80,20 +72,20 @@ export function useCustomers(
   useEffect(() => {
     mountedRef.current = true;
     if (!initial) {
-      void fetchCustomers();
+      void fetchOrders();
     }
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchCustomers, initial]);
+  }, [fetchOrders, initial]);
 
   return {
-    customers,
+    orders,
     loading,
     error,
     total,
     take,
     skip,
-    refresh: fetchCustomers,
+    refresh: fetchOrders,
   } as const;
 }

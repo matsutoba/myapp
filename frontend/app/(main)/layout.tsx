@@ -34,6 +34,10 @@ export default function MainLayout({
       href: '/customers',
     },
     {
+      title: '注文管理',
+      href: '/orders',
+    },
+    {
       title: '日本の天気',
       href: '/weather-graph',
     },

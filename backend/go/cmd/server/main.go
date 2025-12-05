@@ -11,6 +11,7 @@ import (
 
 	authRouter "github.com/matsubara/myapp/internal/auth/router"
 	customerRouter "github.com/matsubara/myapp/internal/customer/router"
+	orderRouter "github.com/matsubara/myapp/internal/order/router"
 	userRouter "github.com/matsubara/myapp/internal/user/router"
 )
 
@@ -61,6 +62,7 @@ func main() {
 	authRouter.RegisterRoutes(apiGroup, db)
 	userRouter.RegisterRoutes(apiGroup, db)
 	customerRouter.RegisterRoutes(apiGroup, db)
+	orderRouter.RegisterRoutes(apiGroup, db)
 
 	/*
 	 * サーバー起動
