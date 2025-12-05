@@ -1,8 +1,12 @@
 'use client';
 
-import { Button, Select, TextField } from '@/components/ui';
+import { Button, Notification, Select, TextField } from '@/components/ui';
+import { orderFormSchema } from '@/features/order/validation';
 import { actions } from '@/lib/actions';
-import React, { useEffect, useState } from 'react';
+import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   initialValues?: any;
@@ -18,45 +22,31 @@ export default function OrderForm({
   onCancel,
   disableCustomerSelect = false,
 }: Props) {
-  const [customerId, setCustomerId] = useState<string>(
-    initialValues.customerId ? String(initialValues.customerId) : '',
-  );
   const [customerOptions, setCustomerOptions] = useState<
-    {
-      value: string;
-      label: string;
-    }[]
+    { value: string; label: string }[]
   >([]);
   const [customersLoading, setCustomersLoading] = useState(false);
-  const [amount, setAmount] = useState<number>(initialValues.amount || 0);
-  const [currency, setCurrency] = useState<string>(
-    initialValues.currency || 'JPY',
-  );
-  const [itemsCount, setItemsCount] = useState<number>(
-    initialValues.itemsCount || 1,
-  );
-  const [orderChannel, setOrderChannel] = useState<string>(
-    initialValues.orderChannel || 'web',
-  );
-  const [category, setCategory] = useState<string>(
-    initialValues.category || '',
-  );
-  const [status, setStatus] = useState<string>(
-    initialValues.status || 'pending',
-  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit({
-      customerId: customerId || undefined,
-      amount: Number(amount) || 0,
-      currency: currency || undefined,
-      itemsCount: Number(itemsCount) || undefined,
-      orderChannel: orderChannel || undefined,
-      category: category || undefined,
-      status: status || undefined,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    trigger,
+    control,
+  } = useForm<any>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      customerId: initialValues.customerId
+        ? String(initialValues.customerId)
+        : '',
+      amount: initialValues.amount ?? 0,
+      currency: initialValues.currency ?? 'JPY',
+      itemsCount: initialValues.itemsCount ?? 1,
+      orderChannel: initialValues.orderChannel ?? 'web',
+      category: initialValues.category ?? '',
+      status: initialValues.status ?? 'pending',
+    },
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -88,71 +78,116 @@ export default function OrderForm({
     };
   }, []);
 
+  const submitForm = handleSubmit(async (data) => {
+    // double-check validation (some custom components might bypass expected events)
+    const ok = await trigger();
+    if (!ok) return;
+
+    const payload = {
+      customerId: data.customerId || undefined,
+      amount: Number(data.amount) || 0,
+      currency: data.currency || undefined,
+      itemsCount: Number(data.itemsCount) || undefined,
+      orderChannel: data.orderChannel || undefined,
+      category: data.category || undefined,
+      status: data.status || undefined,
+    };
+
+    await onSubmit(payload);
+  });
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      <Select
-        label="顧客"
-        value={customerId}
-        onChange={(e) => setCustomerId(e.target.value)}
-        options={[{ value: '', label: '選択してください' }, ...customerOptions]}
-        helperText={customersLoading ? '読み込み中...' : undefined}
-        readOnly={disableCustomerSelect}
+    <form onSubmit={submitForm} className="space-y-4 max-w-lg">
+      {errors && Object.keys(errors).length > 0 && (
+        <Notification variant="error">入力に誤りがあります</Notification>
+      )}
+
+      <Controller
+        name="customerId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            label="顧客"
+            value={field.value}
+            onChange={(e) => field.onChange(e.target.value)}
+            options={[
+              { value: '', label: '選択してください' },
+              ...customerOptions,
+            ]}
+            helperText={customersLoading ? '読み込み中...' : undefined}
+            readOnly={disableCustomerSelect}
+            error={getErrorMessage(errors.customerId)}
+          />
+        )}
       />
 
       <TextField
         label="合計金額"
         type="number"
         placeholder="例: 1200"
-        value={String(amount)}
-        onChange={(e) => setAmount(Number(e.target.value))}
+        {...register('amount')}
+        error={getErrorMessage(errors.amount)}
       />
 
       <TextField
         label="通貨"
         placeholder="JPY"
-        value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
+        {...register('currency')}
+        error={getErrorMessage(errors.currency)}
       />
 
       <TextField
         label="アイテム数"
         type="number"
-        value={String(itemsCount)}
+        {...register('itemsCount')}
         min={1}
-        onChange={(e) => setItemsCount(Number(e.target.value))}
-        className="w-32"
+        error={getErrorMessage(errors.itemsCount)}
       />
 
-      <Select
-        label="注文チャネル"
-        value={orderChannel}
-        onChange={(e) => setOrderChannel(e.target.value)}
-        options={[
-          { value: 'web', label: 'Web' },
-          { value: 'app', label: 'App' },
-          { value: 'store', label: 'Store' },
-          { value: 'phone', label: 'Phone' },
-        ]}
+      <Controller
+        name="orderChannel"
+        control={control}
+        render={({ field }) => (
+          <Select
+            label="注文チャネル"
+            value={field.value}
+            onChange={(e) => field.onChange(e.target.value)}
+            options={[
+              { value: 'web', label: 'Web' },
+              { value: 'app', label: 'App' },
+              { value: 'store', label: 'Store' },
+              { value: 'phone', label: 'Phone' },
+            ]}
+          />
+        )}
       />
 
       <TextField
         label="カテゴリ"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
+        {...register('category')}
+        error={getErrorMessage(errors.category)}
       />
 
-      <Select
-        label="ステータス"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        options={[
-          { value: 'pending', label: 'Pending' },
-          { value: 'refunded', label: 'Refunded' },
-        ]}
+      <Controller
+        name="status"
+        control={control}
+        render={({ field }) => (
+          <Select
+            label="ステータス"
+            value={field.value}
+            onChange={(e) => field.onChange(e.target.value)}
+            options={[
+              { value: 'pending', label: 'Pending' },
+              { value: 'refunded', label: 'Refunded' },
+            ]}
+          />
+        )}
       />
 
       <div className="flex gap-2">
-        <Button type="submit">保存</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? '保存中...' : '保存'}
+        </Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
           キャンセル
         </Button>
