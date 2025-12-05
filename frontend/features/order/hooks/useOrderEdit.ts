@@ -6,9 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type FormData = {
-  customerId?: string;
-  product?: string;
-  quantity?: number;
+  customerId?: string | number;
+  amount?: number;
+  currency?: string;
+  itemsCount?: number;
+  orderChannel?: string;
+  category?: string;
+  status?: string;
 };
 
 export function useOrderEdit(orderIdProp: string) {
@@ -35,10 +39,13 @@ export function useOrderEdit(orderIdProp: string) {
         setOrderId(id);
         setFormData({
           customerId: res.data.customerId ?? '',
-          product: '',
-          quantity: 1,
+          amount: res.data.amount ?? res.data.total ?? 0,
+          currency: res.data.currency ?? 'JPY',
+          itemsCount: res.data.itemsCount ?? 1,
+          orderChannel: res.data.orderChannel ?? 'web',
+          category: res.data.category ?? '',
+          status: res.data.status ?? 'pending',
         });
-        // If backend returns product/quantity, map here
       }
     } catch (e) {
       console.error(e);
@@ -54,9 +61,13 @@ export function useOrderEdit(orderIdProp: string) {
     setIsSubmitting(true);
     try {
       const payload = {
-        // map form fields to update payload; backend accepts amount/currency/itemsCount/etc.
-        // For now, map quantity -> itemsCount as example
-        itemsCount: values.quantity,
+        amount: typeof values.amount === 'number' ? values.amount : undefined,
+        currency: values.currency || undefined,
+        itemsCount:
+          typeof values.itemsCount === 'number' ? values.itemsCount : undefined,
+        orderChannel: values.orderChannel || undefined,
+        category: values.category || undefined,
+        status: values.status || undefined,
       } as any;
 
       const result = await actions.order.updateOrder(orderId, payload);

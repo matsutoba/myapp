@@ -7,6 +7,11 @@ export type Order = {
   customerId?: string;
   companyName?: string;
   total?: number;
+  amount?: number;
+  currency?: string;
+  itemsCount?: number;
+  orderChannel?: string;
+  category?: string;
   status?: string;
   createdAt?: string;
 };

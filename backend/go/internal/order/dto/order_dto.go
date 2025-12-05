@@ -47,12 +47,17 @@ type UpdateOrderRequest struct {
 
 // OrderResponse is the API response DTO for an order
 type OrderResponse struct {
-	ID          uint      `json:"id"`
-	CustomerID  uint      `json:"customerId"`
-	CompanyName string    `json:"companyName,omitempty"`
-	Total       float64   `json:"total"`
-	Status      string    `json:"status,omitempty"`
-	CreatedAt   time.Time `json:"createdAt"`
+	ID           uint      `json:"id"`
+	CustomerID   uint      `json:"customerId"`
+	CompanyName  string    `json:"companyName,omitempty"`
+	Total        float64   `json:"total"`
+	Amount       float64   `json:"amount"`
+	Currency     string    `json:"currency,omitempty"`
+	ItemsCount   int       `json:"itemsCount"`
+	OrderChannel string    `json:"orderChannel,omitempty"`
+	Category     string    `json:"category,omitempty"`
+	Status       string    `json:"status,omitempty"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
 
 // OrderListPagedResponse is a paged response for orders
@@ -71,12 +76,17 @@ func ToOrderResponse(o *domain.Order) *OrderResponse {
 	// Use the customer's company as the displayed customer name
 	customerName := o.Customer.Company
 	return &OrderResponse{
-		ID:          o.ID,
-		CustomerID:  o.CustomerID,
-		CompanyName: customerName,
-		Total:       o.Amount,
-		Status:      o.Status,
-		CreatedAt:   o.CreatedAt,
+		ID:           o.ID,
+		CustomerID:   o.CustomerID,
+		CompanyName:  customerName,
+		Total:        o.Amount,
+		Amount:       o.Amount,
+		Currency:     o.Currency,
+		ItemsCount:   o.ItemsCount,
+		OrderChannel: o.OrderChannel,
+		Category:     o.Category,
+		Status:       o.Status,
+		CreatedAt:    o.CreatedAt,
 	}
 }
 
