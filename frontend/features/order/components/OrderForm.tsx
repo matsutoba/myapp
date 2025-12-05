@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 type Props = {
   initialValues?: any;
   onSubmit: (data: any) => Promise<void> | void;
-  onCancel?: () => void;
+  onCancel: () => void;
 };
 
 export default function OrderForm({
@@ -111,11 +111,9 @@ export default function OrderForm({
 
       <div className="flex gap-2">
         <Button type="submit">保存</Button>
-        {onCancel && (
-          <Button type="button" variant="secondary" onClick={onCancel}>
-            キャンセル
-          </Button>
-        )}
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          キャンセル
+        </Button>
       </div>
     </form>
   );
