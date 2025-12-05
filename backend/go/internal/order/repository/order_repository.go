@@ -28,7 +28,7 @@ type OrderRepository interface {
 
 func (r *orderRepository) FindByID(id uint) (*domain.Order, error) {
 	var o domain.Order
-	if err := r.db.First(&o, id).Error; err != nil {
+	if err := r.db.Preload("Customer").First(&o, id).Error; err != nil {
 		return nil, err
 	}
 	return &o, nil
@@ -44,7 +44,7 @@ func NewOrderRepository(db *gorm.DB) OrderRepository {
 
 func (r *orderRepository) GetByCustomer(customerID uint, limit int, offset int) ([]domain.Order, error) {
 	var orders []domain.Order
-	q := r.db.Where("customer_id = ?", customerID).Order("created_at desc")
+	q := r.db.Preload("Customer").Where("customer_id = ?", customerID).Order("created_at desc")
 	if limit > 0 {
 		q = q.Limit(limit)
 	}
@@ -59,7 +59,7 @@ func (r *orderRepository) GetByCustomer(customerID uint, limit int, offset int) 
 
 func (r *orderRepository) GetAll(limit int, offset int) ([]domain.Order, error) {
 	var orders []domain.Order
-	q := r.db.Order("created_at desc")
+	q := r.db.Preload("Customer").Order("created_at desc")
 	if limit > 0 {
 		q = q.Limit(limit)
 	}

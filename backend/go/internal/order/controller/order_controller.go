@@ -101,12 +101,8 @@ func (oc *OrderController) ListOrders(c *gin.Context) {
 		return
 	}
 
-	resp := map[string]interface{}{
-		"items": data,
-		"total": total,
-		"skip":  req.Offset,
-		"take":  limit,
-	}
+	// Use DTO converter to build a consistent paged response
+	resp := dto.ToOrderListPagedResponse(data, total, req.Offset, limit)
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -128,7 +124,9 @@ func (oc *OrderController) GetOrderById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, order)
+	// Use DTO converter for consistent single-order response
+	resp := dto.ToOrderResponse(order)
+	c.JSON(http.StatusOK, resp)
 }
 
 func (oc *OrderController) CreateOrder(c *gin.Context) {

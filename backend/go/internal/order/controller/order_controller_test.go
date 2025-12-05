@@ -41,7 +41,7 @@ func (m *mockOrderService) GetOrderByID(id uint) (*domain.Order, error) {
 }
 
 func (m *mockOrderService) GetOrders(limit int, offset int) ([]domain.Order, error) {
-	o := domain.Order{ID: 1, CustomerID: 1, Amount: 1000, Currency: "JPY", CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	o := domain.Order{ID: 1, CustomerID: 1, Amount: 1000, Currency: "JPY", CreatedAt: time.Now(), UpdatedAt: time.Now(), Customer: domain.Customer{ContactName: "Taro Yamada", Company: "ACME"}}
 	return []domain.Order{o}, nil
 }
 
@@ -170,6 +170,14 @@ func TestListOrdersHandler_Success(t *testing.T) {
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &out))
 	require.Contains(t, out, "items")
 	require.Contains(t, out, "total")
+	// verify companyName present in first item
+	items, ok := out["items"].([]interface{})
+	require.True(t, ok)
+	require.GreaterOrEqual(t, len(items), 1)
+	first, ok := items[0].(map[string]interface{})
+	require.True(t, ok)
+	require.Contains(t, first, "companyName")
+	require.Equal(t, "ACME", first["companyName"])
 }
 
 func TestGetOrderByIdHandler_SuccessAndNotFound(t *testing.T) {
