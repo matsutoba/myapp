@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui';
+import { Button, TextField } from '@/components/ui';
 import React, { useState } from 'react';
 
 type Props = {
@@ -14,9 +14,11 @@ export default function OrderForm({
   onSubmit,
   onCancel,
 }: Props) {
-  const [customerId, setCustomerId] = useState(initialValues.customerId || '');
-  const [product, setProduct] = useState(initialValues.product || '');
-  const [quantity, setQuantity] = useState(initialValues.quantity || 1);
+  const [customerId, setCustomerId] = useState<string>(
+    initialValues.customerId || '',
+  );
+  const [product, setProduct] = useState<string>(initialValues.product || '');
+  const [quantity, setQuantity] = useState<number>(initialValues.quantity || 1);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,43 +27,30 @@ export default function OrderForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      <div>
-        <label className="block text-sm font-medium">顧客ID</label>
-        <input
-          value={customerId}
-          onChange={(e) => setCustomerId(e.target.value)}
-          className="mt-1 block w-full rounded border px-2 py-1"
-          placeholder="顧客ID を入力または選択"
-        />
-      </div>
+      <TextField
+        label="顧客ID"
+        placeholder="顧客ID を入力または選択"
+        value={customerId}
+        onChange={(e) => setCustomerId(e.target.value)}
+      />
 
-      <div>
-        <label className="block text-sm font-medium">商品</label>
-        <input
-          value={product}
-          onChange={(e) => setProduct(e.target.value)}
-          className="mt-1 block w-full rounded border px-2 py-1"
-        />
-      </div>
+      <TextField
+        label="商品"
+        value={product}
+        onChange={(e) => setProduct(e.target.value)}
+      />
 
-      <div>
-        <label className="block text-sm font-medium">数量</label>
-        <input
-          type="number"
-          value={quantity}
-          min={1}
-          onChange={(e) => setQuantity(Number(e.target.value))}
-          className="mt-1 block w-32 rounded border px-2 py-1"
-        />
-      </div>
+      <TextField
+        label="数量"
+        type="number"
+        value={String(quantity)}
+        min={1}
+        onChange={(e) => setQuantity(Number(e.target.value))}
+        className="w-32"
+      />
 
       <div className="flex gap-2">
-        <button
-          className="rounded bg-blue-600 text-white px-3 py-1"
-          type="submit"
-        >
-          保存
-        </button>
+        <Button type="submit">保存</Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
           キャンセル
         </Button>
