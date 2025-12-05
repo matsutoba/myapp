@@ -1,22 +1,33 @@
 'use client';
 
 import { Button, Select, TextField } from '@/components/ui';
-import React, { useState } from 'react';
+import { actions } from '@/lib/actions';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
   initialValues?: any;
   onSubmit: (data: any) => Promise<void> | void;
-  onCancel: () => void;
+  onCancel?: () => void;
+  /** 編集時などに顧客選択を無効化する */
+  disableCustomerSelect?: boolean;
 };
 
 export default function OrderForm({
   initialValues = {},
   onSubmit,
   onCancel,
+  disableCustomerSelect = false,
 }: Props) {
   const [customerId, setCustomerId] = useState<string>(
     initialValues.customerId ? String(initialValues.customerId) : '',
   );
+  const [customerOptions, setCustomerOptions] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
+  const [customersLoading, setCustomersLoading] = useState(false);
   const [amount, setAmount] = useState<number>(initialValues.amount || 0);
   const [currency, setCurrency] = useState<string>(
     initialValues.currency || 'JPY',
@@ -47,13 +58,45 @@ export default function OrderForm({
     });
   };
 
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setCustomersLoading(true);
+      try {
+        const res = await actions.customer.getCustomers({ take: 200 });
+        if (!mounted) return;
+        if (res && res.success && res.data) {
+          const items = Array.isArray(res.data)
+            ? res.data
+            : (res.data as any).items || [];
+          const opts = items.map((c: any) => ({
+            value: String(c.id),
+            label: c.company || c.contactName || c.email || String(c.id),
+          }));
+          setCustomerOptions(opts);
+        }
+      } catch (e) {
+        console.error('load customers failed', e);
+      } finally {
+        if (mounted) setCustomersLoading(false);
+      }
+    };
+
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      <TextField
-        label="顧客ID"
-        placeholder="顧客ID を入力または選択"
+      <Select
+        label="顧客"
         value={customerId}
         onChange={(e) => setCustomerId(e.target.value)}
+        options={[{ value: '', label: '選択してください' }, ...customerOptions]}
+        helperText={customersLoading ? '読み込み中...' : undefined}
+        readOnly={disableCustomerSelect}
       />
 
       <TextField
@@ -104,7 +147,6 @@ export default function OrderForm({
         onChange={(e) => setStatus(e.target.value)}
         options={[
           { value: 'pending', label: 'Pending' },
-          { value: 'completed', label: 'Completed' },
           { value: 'refunded', label: 'Refunded' },
         ]}
       />

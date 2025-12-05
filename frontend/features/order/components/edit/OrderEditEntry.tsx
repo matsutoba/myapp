@@ -25,6 +25,7 @@ export default function OrderEditEntry() {
             initialValues={formData}
             onSubmit={async (data) => await submit(data)}
             onCancel={goBack}
+            disableCustomerSelect
           />
         </Card>
       </Container>
