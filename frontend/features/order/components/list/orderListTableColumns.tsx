@@ -1,10 +1,12 @@
-import { IconButton } from '@/components/ui';
+import { Badge, IconButton } from '@/components/ui';
 import { ColumnDef } from '@tanstack/react-table';
 
 type Order = {
   id: string;
   customerName?: string;
   total?: number;
+  createdAt?: string;
+  status?: string;
 };
 
 type CreateOrderListTableColumnsArgs = {
@@ -23,11 +25,39 @@ export function createOrderListTableColumns({
       cell: (ctx) => ctx.getValue() ?? '-',
     },
     {
+      accessorKey: 'createdAt',
+      header: '注文日',
+      cell: (ctx) => {
+        const v = ctx.getValue() as string | undefined;
+        if (!v) return '-';
+        try {
+          const d = new Date(v);
+          return d.toLocaleString();
+        } catch {
+          return v;
+        }
+      },
+    },
+    {
       accessorKey: 'total',
       header: '合計',
       cell: (ctx) => {
         const v = ctx.getValue() as number | undefined;
         return v != null ? `¥${v.toLocaleString()}` : '-';
+      },
+    },
+    {
+      accessorKey: 'status',
+      header: 'ステータス',
+      cell: ({ getValue }) => {
+        const val = String(getValue() ?? '');
+        const variant =
+          val === 'completed'
+            ? 'success'
+            : val === 'cancelled'
+            ? 'danger'
+            : 'default';
+        return <Badge variant={variant as any}>{val || '-'}</Badge>;
       },
     },
     {
