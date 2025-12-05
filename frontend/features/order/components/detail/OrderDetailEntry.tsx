@@ -1,11 +1,21 @@
 'use client';
 
-import { Spinner } from '@/components/ui';
+import { Card, FeatureTitleBar, Spinner } from '@/components/ui';
+import Table, { Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
 import { actions } from '@/lib/actions';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type Params = { id: string };
+
+function formatAmount(amount: unknown, currency?: string) {
+  if (amount == null) return '-';
+  const num = Number(amount);
+  if (Number.isNaN(num)) return String(amount);
+  const cur = currency ?? 'JPY';
+  if (cur === 'JPY') return `¥${num.toLocaleString()}`;
+  return `${num.toLocaleString()} ${cur}`;
+}
 
 export default function OrderDetailEntry() {
   const params = useParams<Params>();
@@ -15,13 +25,21 @@ export default function OrderDetailEntry() {
   const [order, setOrder] = useState<any | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     const load = async () => {
       setLoading(true);
-      const res = await actions.order.getOrderById(id);
-      if (res.success && res.data) setOrder(res.data);
-      setLoading(false);
+      try {
+        const res = await actions.order.getOrderById(id);
+        if (!mounted) return;
+        if (res.success && res.data) setOrder(res.data);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
     void load();
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
   if (loading) return <Spinner mask open />;
@@ -29,23 +47,60 @@ export default function OrderDetailEntry() {
   if (!order) return <div>注文が見つかりません</div>;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">注文 #{order.id}</h2>
-      </div>
+    <div className="space-y-4">
+      <FeatureTitleBar title={`注文管理 > 詳細: 注文 #${order.id}`} />
 
-      <div className="space-y-2">
-        <p>
-          <strong>顧客 ID:</strong> {order.customerId ?? '-'}
-        </p>
-        <p>
-          <strong>合計:</strong>{' '}
-          {order.total != null ? `¥${order.total.toLocaleString()}` : '-'}
-        </p>
-        <p>
-          <strong>ステータス:</strong> {order.status ?? '-'}
-        </p>
-      </div>
+      <Card className="max-w-lg p-md">
+        <Table>
+          <Tbody>
+            <Tr>
+              <Th>顧客</Th>
+              <Td>{order.companyName ?? order.customerId ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>合計</Th>
+              <Td>
+                {formatAmount(order.amount ?? order.total, order.currency)}
+              </Td>
+            </Tr>
+
+            <Tr>
+              <Th>通貨</Th>
+              <Td>{order.currency ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>アイテム数</Th>
+              <Td>{order.itemsCount ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>注文チャネル</Th>
+              <Td>{order.orderChannel ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>カテゴリ</Th>
+              <Td>{order.category ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>ステータス</Th>
+              <Td>{order.status ?? '-'}</Td>
+            </Tr>
+
+            <Tr>
+              <Th>作成日時</Th>
+              <Td>
+                {order.createdAt
+                  ? new Date(order.createdAt).toLocaleString()
+                  : '-'}
+              </Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </Card>
     </div>
   );
 }
