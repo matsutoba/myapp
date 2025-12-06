@@ -69,7 +69,7 @@ export function useOrders(
         if (mountedRef.current) setLoading(false);
       }
     },
-    [opts?.take, opts?.skip, opts?.page, opts?.keyword],
+    [opts],
   );
 
   useEffect(() => {

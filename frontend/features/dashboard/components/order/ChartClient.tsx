@@ -50,7 +50,7 @@ export default function ChartClient({ data, periodLabel }: Props) {
         return d.toISOString().slice(0, 10).replace(/-/g, '/');
       }
       return String(val);
-    } catch (e) {
+    } catch {
       return String(val);
     }
   };

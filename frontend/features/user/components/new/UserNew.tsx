@@ -62,7 +62,7 @@ export default function UserNew() {
       } else {
         // サーバー側のエラー表示は別途ハンドリング可
       }
-    } catch (err) {
+    } catch {
       // noop
     }
   };

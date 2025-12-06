@@ -13,7 +13,7 @@ export default function CustomerEditEntry() {
   const params = useParams<Params>();
   const id = parseInt(params.id, 10);
 
-  const { formData, submit, loading, error, isSubmitting, goToList, goBack } =
+  const { formData, submit, loading, error, isSubmitting, goBack } =
     useCustomerEdit(id);
 
   const { users } = useUsers({ take: 1000 });

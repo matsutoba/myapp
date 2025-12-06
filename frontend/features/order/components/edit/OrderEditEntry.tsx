@@ -11,8 +11,7 @@ export default function OrderEditEntry() {
   const params = useParams<Params>();
   const id = params.id;
 
-  const { formData, submit, loading, error, isSubmitting, goBack } =
-    useOrderEdit(id);
+  const { formData, submit, loading, goBack } = useOrderEdit(id);
 
   if (loading) return <Spinner mask open />;
 

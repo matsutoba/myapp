@@ -6,7 +6,7 @@ import { useOrders, UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
 import usePagination from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function useOrderList(opts?: UseOrdersOptions) {
   const router = useRouter();
@@ -20,22 +20,31 @@ export default function useOrderList(opts?: UseOrdersOptions) {
     ? Number(searchParams.get('skip'))
     : undefined;
 
-  const effectiveOpts: UseOrdersOptions = {
-    ...(opts ?? {}),
-    keyword: keywordFromUrl ?? opts?.keyword,
-    take: takeFromUrl ?? opts?.take,
-    skip: skipFromUrl ?? opts?.skip,
-  };
+  const effectiveOpts: UseOrdersOptions = useMemo(
+    () => ({
+      ...(opts ?? {}),
+      keyword: keywordFromUrl ?? opts?.keyword,
+      take: takeFromUrl ?? opts?.take,
+      skip: skipFromUrl ?? opts?.skip,
+    }),
+    [opts, keywordFromUrl, takeFromUrl, skipFromUrl],
+  );
 
   const { orders, loading, total, take, refresh } = useOrders(effectiveOpts);
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>(
+    () => keywordFromUrl ?? opts?.keyword ?? '',
+  );
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
-    setSearchTerm(keywordFromUrl ?? opts?.keyword ?? '');
+    const newVal = keywordFromUrl ?? opts?.keyword ?? '';
+    const id = setTimeout(() => {
+      setSearchTerm((prev) => (prev === newVal ? prev : newVal));
+    }, 0);
+    return () => clearTimeout(id);
   }, [keywordFromUrl, opts?.keyword]);
 
   const loadOrders = async (page?: number) => {

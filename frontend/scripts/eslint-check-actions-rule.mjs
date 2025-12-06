@@ -75,9 +75,13 @@ const checkActionsRule = {
         const allModules = findAllActionModules(featuresDir);
 
         // 未登録のactionsを検出
-        for (const module of allModules) {
+        for (const mod of allModules) {
           const importPattern = new RegExp(
-            `from ['"\`]@/features/${module.feature}/actions/${module.actionFile}['"\`]`,
+            'from [\'"`]@/features/' +
+              mod.feature +
+              '/actions/' +
+              mod.actionFile +
+              '[\'"`]',
             'g',
           );
 
@@ -86,8 +90,8 @@ const checkActionsRule = {
               node,
               messageId: 'unregisteredAction',
               data: {
-                feature: module.feature,
-                actionFile: module.actionFile,
+                feature: mod.feature,
+                actionFile: mod.actionFile,
               },
             });
           }
@@ -147,7 +151,7 @@ function findAllActionModules(featuresDir) {
           });
         }
       }
-    } catch (error) {
+    } catch {
       // ディレクトリアクセスエラーは無視
       continue;
     }

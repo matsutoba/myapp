@@ -83,14 +83,14 @@ function checkActions() {
   const unregistered: ActionModule[] = [];
   const registered: ActionModule[] = [];
 
-  for (const module of allModules) {
+  for (const mod of allModules) {
     // インポート文が存在するかチェック
-    const importPattern = new RegExp(`from ['"]${module.fullPath}['"]`, 'g');
+    const importPattern = new RegExp(`from ['"]${mod.fullPath}['"]`, 'g');
 
     if (importPattern.test(indexContent)) {
-      registered.push(module);
+      registered.push(mod);
     } else {
-      unregistered.push(module);
+      unregistered.push(mod);
     }
   }
 

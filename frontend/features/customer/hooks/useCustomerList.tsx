@@ -9,7 +9,7 @@ import {
 import { actions } from '@/lib/actions';
 import usePagination from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function useCustomerList(opts?: UseCustomersOptions) {
   const router = useRouter();
@@ -23,23 +23,32 @@ export default function useCustomerList(opts?: UseCustomersOptions) {
     ? Number(searchParams.get('skip'))
     : undefined;
 
-  const effectiveOpts: UseCustomersOptions = {
-    ...(opts ?? {}),
-    keyword: keywordFromUrl ?? opts?.keyword,
-    take: takeFromUrl ?? opts?.take,
-    skip: skipFromUrl ?? opts?.skip,
-  };
+  const effectiveOpts: UseCustomersOptions = useMemo(
+    () => ({
+      ...(opts ?? {}),
+      keyword: keywordFromUrl ?? opts?.keyword,
+      take: takeFromUrl ?? opts?.take,
+      skip: skipFromUrl ?? opts?.skip,
+    }),
+    [opts, keywordFromUrl, takeFromUrl, skipFromUrl],
+  );
 
   const { customers, loading, total, take, refresh } =
     useCustomers(effectiveOpts);
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>(
+    () => keywordFromUrl ?? opts?.keyword ?? '',
+  );
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
-    setSearchTerm(keywordFromUrl ?? opts?.keyword ?? '');
+    const newVal = keywordFromUrl ?? opts?.keyword ?? '';
+    const id = setTimeout(() => {
+      setSearchTerm((prev) => (prev === newVal ? prev : newVal));
+    }, 0);
+    return () => clearTimeout(id);
   }, [keywordFromUrl, opts?.keyword]);
 
   const loadCustomers = async (page?: number) => {
@@ -66,10 +75,13 @@ export default function useCustomerList(opts?: UseCustomersOptions) {
     else router.push(`/customers`);
   };
 
-  const handleDeleteClick = (id: number) => {
-    setDeleteTargetId(id);
-    setShowConfirmModal(true);
-  };
+  const handleDeleteClick = useCallback(
+    (id: number) => {
+      setDeleteTargetId(id);
+      setShowConfirmModal(true);
+    },
+    [setDeleteTargetId, setShowConfirmModal],
+  );
 
   const handleDeleteConfirm = async () => {
     if (deleteTargetId === null) return;

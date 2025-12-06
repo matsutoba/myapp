@@ -96,17 +96,8 @@ import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions
  * `unknown` に厳密化すると、各 action が異なるパラメータ型を持つために
  * 大量の型エラーが発生し、既存の多数のモジュールや呼び出し箇所に影響します。
  */
-type UnionToIntersection<U> = (
-  U extends unknown ? (k: U) => void : never
-) extends (k: infer I) => void
-  ? I
-  : never;
-
-function mergeActions<
-  Modules extends Array<Record<string, (...args: unknown[]) => unknown>>,
->(...modules: Modules): UnionToIntersection<Modules[number]> {
-  return Object.assign({}, ...modules) as UnionToIntersection<Modules[number]>;
-}
+// NOTE: older helper types (e.g. UnionToIntersection) were removed
+// when cleaning up unused compatibility helpers.
 
 /**
  * 機能ごとにグループ化されたActions
