@@ -10,11 +10,35 @@ export type GetOrderAnalyticsOptions = {
   groupBy?: 'day' | 'week' | 'month';
 };
 
+export type OrderAggregateRow = {
+  period: string; // e.g. '2023-11-01'
+  total: number; // revenue sum
+  count: number; // orders count
+  avg?: number; // average order value
+};
+
+export type DashboardKPIs = {
+  totalOrders: number;
+  totalRevenue: number;
+  avgOrderValue?: number;
+};
+
+export type OrderAnalyticsResponse = {
+  kpis?: DashboardKPIs;
+  timeseries?: OrderAggregateRow[];
+  generatedAt?: string;
+  cached?: boolean;
+  from?: string; // YYYY-MM-DD
+  to?: string; // YYYY-MM-DD
+};
+
 /**
  * サーバーアクション: 注文分析情報を取得して返す
  * デフォルト: `to` = today, `from` = 6ヶ月前, `group_by` = day
  */
-export async function getOrderAnalytics(opts?: GetOrderAnalyticsOptions) {
+export async function getOrderAnalytics(
+  opts?: GetOrderAnalyticsOptions,
+): Promise<OrderAnalyticsResponse> {
   const now = new Date();
   const to = opts?.to ?? formatDate(now);
 
@@ -32,5 +56,5 @@ export async function getOrderAnalytics(opts?: GetOrderAnalyticsOptions) {
   if (!res.success) {
     throw new Error(res.error?.message || 'failed to fetch dashboard');
   }
-  return res.data;
+  return res.data as OrderAnalyticsResponse;
 }

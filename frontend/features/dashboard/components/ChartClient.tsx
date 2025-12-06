@@ -1,5 +1,6 @@
 'use client';
 
+import { Card } from '@/components/ui';
 import React from 'react';
 import {
   CartesianGrid,
@@ -54,40 +55,49 @@ export default function ChartClient({ data }: Props) {
   };
 
   return (
-    <div style={{ width: '100%', height: 340 }}>
-      <ResponsiveContainer>
-        <LineChart
-          data={chartData}
-          margin={{ top: 10, right: 40, left: 0, bottom: 0 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" tickFormatter={(v) => formatToYMD(v)} />
-          <YAxis yAxisId="left" orientation="left" />
-          <YAxis yAxisId="right" orientation="right" />
-          <Tooltip
-            formatter={(value: number, name: string) => [
-              name === 'revenue' ? `¥${value}` : value,
-              name,
-            ]}
-            labelFormatter={(label) => formatToYMD(label)}
-          />
-          <Legend />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="orders"
-            stroke="#8884d8"
-            name="注文数"
-          />
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="revenue"
-            stroke="#82ca9d"
-            name="売上"
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+    <Card>
+      <h2 className="text-2xl font-semibold mb-4">注文数と売上</h2>
+      <div>
+        <div className="col-span-1 sm:col-span-2">
+          <div className="bg-white rounded-lg shadow p-4">
+            <div style={{ width: '100%', height: 340 }}>
+              <ResponsiveContainer>
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 10, right: 40, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tickFormatter={(v) => formatToYMD(v)} />
+                  <YAxis yAxisId="left" orientation="left" />
+                  <YAxis yAxisId="right" orientation="right" />
+                  <Tooltip
+                    formatter={(value: number, name: string) => [
+                      name === 'revenue' ? `¥${value}` : value,
+                      name,
+                    ]}
+                    labelFormatter={(label) => formatToYMD(label)}
+                  />
+                  <Legend />
+                  <Line
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="orders"
+                    stroke="#8884d8"
+                    name="注文数"
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#82ca9d"
+                    name="売上"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }

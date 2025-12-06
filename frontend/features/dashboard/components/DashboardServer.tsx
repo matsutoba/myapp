@@ -1,4 +1,3 @@
-import { Card } from '@/components/ui';
 import ChartClient from '@/features/dashboard/components/ChartClient';
 import KpiCard from '@/features/dashboard/components/KpiCard';
 
@@ -38,26 +37,8 @@ export default function DashboardServer({ data }: { data: any }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <Card>
-        <h2 className="text-2xl font-semibold mb-4">注文KPI</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          {kpis.map((k) => (
-            <div key={k.title}>
-              <KpiCard title={k.title} value={k.value} />
-            </div>
-          ))}
-        </div>
-      </Card>
-      <Card>
-        <h2 className="text-2xl font-semibold mb-4">注文数と売上</h2>
-        <div>
-          <div className="col-span-1 sm:col-span-2">
-            <div className="bg-white rounded-lg shadow p-4">
-              <ChartClient data={times} />
-            </div>
-          </div>
-        </div>
-      </Card>
+      <KpiCard data={data} />
+      <ChartClient data={times} />
     </div>
   );
 }
