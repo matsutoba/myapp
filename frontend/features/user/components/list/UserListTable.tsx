@@ -1,18 +1,19 @@
 'use client';
 
 import { Card, Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui';
+import type { User } from '@/features/user/types';
 import {
   flexRender,
   type ColumnDef,
   type Table as TanTable,
 } from '@tanstack/react-table';
 
-type ColumnWithMeta = ColumnDef<any, any> & {
+type ColumnWithMeta = ColumnDef<User> & {
   meta?: { thClass?: string; tdClass?: string } | undefined;
 };
 
 type Props = {
-  table: TanTable<any>;
+  table: TanTable<User>;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;

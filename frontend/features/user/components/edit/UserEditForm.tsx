@@ -40,7 +40,7 @@ export default function UserEditForm({
     reset,
     control,
   } = useForm<FormValuesRaw>({
-    resolver: zodResolver(userEditSchema) as unknown as Resolver<FormValuesRaw>,
+    resolver: zodResolver(userEditSchema) as Resolver<FormValuesRaw>,
     defaultValues: {
       ...formData,
       isActive:
@@ -58,13 +58,15 @@ export default function UserEditForm({
 
   const internalSubmit = (values: FormValuesRaw) => {
     // isActive は select から文字列 'true'/'false' で来るため boolean に変換
-    const normalized = {
+    const normalized: FormValues = {
       ...values,
       isActive:
         typeof values.isActive === 'string'
           ? values.isActive === 'true'
           : values.isActive,
-    } as FormValues;
+      password: values.password ?? undefined,
+    };
+
     onSubmit(normalized);
   };
 

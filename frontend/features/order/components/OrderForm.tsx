@@ -12,7 +12,9 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 type Props = {
-  initialValues?: Partial<OrderForm> | Record<string, unknown>;
+  initialValues?:
+    | Partial<OrderForm>
+    | Record<string, string | number | null | undefined>;
   onSubmit: (data: CreateOrderInput) => Promise<void> | void;
   onCancel?: () => void;
   /** 編集時などに顧客選択を無効化する */
@@ -37,37 +39,37 @@ export default function OrderForm({
     trigger,
     control,
   } = useForm<OrderForm>({
-    resolver: zodResolver(orderFormSchema) as unknown as Resolver<OrderForm>,
-    defaultValues: {
-      customerId: initialValues?.customerId
-        ? String(initialValues.customerId)
-        : '',
-      amount:
-        initialValues && 'amount' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).amount ?? 0
-          : 0,
-      currency:
-        initialValues && 'currency' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).currency ?? 'JPY'
-          : 'JPY',
-      itemsCount:
-        initialValues && 'itemsCount' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).itemsCount ?? 1
-          : 1,
-      orderChannel:
-        initialValues && 'orderChannel' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).orderChannel ??
-            'web'
-          : 'web',
-      category:
-        initialValues && 'category' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).category ?? ''
-          : '',
-      status:
-        initialValues && 'status' in initialValues
-          ? (initialValues as unknown as Partial<OrderForm>).status ?? 'pending'
-          : 'pending',
-    } as unknown as OrderForm,
+    resolver: zodResolver(orderFormSchema) as Resolver<OrderForm>,
+    defaultValues: (() => {
+      const iv = initialValues as Record<
+        string,
+        string | number | null | undefined
+      >;
+      const parseNumber = (
+        v: number | string | null | undefined,
+        fallback: number,
+      ) => {
+        if (v == null) return fallback;
+        if (typeof v === 'number') return v;
+        const n = Number(v);
+        return Number.isNaN(n) ? fallback : n;
+      };
+
+      return {
+        customerId:
+          iv.customerId == null
+            ? ''
+            : typeof iv.customerId === 'string'
+            ? iv.customerId
+            : String(iv.customerId),
+        amount: parseNumber(iv.amount, 0),
+        currency: iv.currency == null ? 'JPY' : String(iv.currency),
+        itemsCount: parseNumber(iv.itemsCount, 1),
+        orderChannel: iv.orderChannel == null ? 'web' : String(iv.orderChannel),
+        category: iv.category == null ? '' : String(iv.category),
+        status: iv.status == null ? 'pending' : String(iv.status),
+      } as OrderForm;
+    })(),
   });
 
   useEffect(() => {

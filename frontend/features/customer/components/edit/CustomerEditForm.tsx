@@ -40,9 +40,7 @@ export default function CustomerEditForm({
     formState: { errors },
     reset,
   } = useForm<FormValuesRaw>({
-    resolver: zodResolver(
-      customerFormSchema,
-    ) as unknown as Resolver<FormValuesRaw>,
+    resolver: zodResolver(customerFormSchema) as Resolver<FormValuesRaw>,
     defaultValues: {
       ...formData,
       ownerId: formData?.ownerId == null ? null : String(formData.ownerId),
@@ -64,7 +62,7 @@ export default function CustomerEditForm({
 
   const internalSubmit = (values: FormValuesRaw) => {
     // normalize ownerId to number when caller expects numeric id
-    const out = {
+    const out: FormValues = {
       ...values,
       ownerId:
         typeof values.ownerId === 'string'
@@ -72,7 +70,7 @@ export default function CustomerEditForm({
             ? Number(values.ownerId)
             : undefined
           : values.ownerId,
-    } as unknown as FormValues;
+    };
 
     onSubmit(out);
   };

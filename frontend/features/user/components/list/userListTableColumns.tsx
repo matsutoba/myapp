@@ -1,5 +1,6 @@
 import { Badge, IconButton } from '@/components/ui';
 import { USER_ROLES } from '@/constants';
+import type { User } from '@/features/user/types';
 import { ColumnDef } from '@tanstack/react-table';
 
 type CreateUserListTableColumnsArgs = {
@@ -10,7 +11,7 @@ type CreateUserListTableColumnsArgs = {
 export function createUserListTableColumns({
   router,
   onDelete,
-}: CreateUserListTableColumnsArgs): ColumnDef<any>[] {
+}: CreateUserListTableColumnsArgs): ColumnDef<User>[] {
   return [
     {
       accessorKey: 'name',

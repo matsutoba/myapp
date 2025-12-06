@@ -37,9 +37,7 @@ export default function CustomerNew() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CustomerFormRaw>({
-    resolver: zodResolver(
-      customerFormSchema,
-    ) as unknown as Resolver<CustomerFormRaw>,
+    resolver: zodResolver(customerFormSchema) as Resolver<CustomerFormRaw>,
     defaultValues: {
       contactName: '',
       email: '',

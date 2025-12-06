@@ -39,6 +39,10 @@ import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions
 /**
  * 複数のactionsモジュールを1つのオブジェクトにマージ
  * 型を保持するため、戻り値の型をマージしたモジュールの交差型にキャストする
+ *
+ * NOTE: `mergeActions` のジェネリクスは互換性を優先して `any` を使用しています。
+ * `unknown` に厳密化すると、各 action が異なるパラメータ型を持つために
+ * 大量の型エラーが発生し、既存の多数のモジュールや呼び出し箇所に影響します。
  */
 type UnionToIntersection<U> = (
   U extends unknown ? (k: U) => void : never

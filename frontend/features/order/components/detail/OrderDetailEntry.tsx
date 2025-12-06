@@ -19,9 +19,12 @@ import { useEffect, useState } from 'react';
 
 type Params = { id: string };
 
-function formatAmount(amount: unknown, currency?: string) {
+function formatAmount(
+  amount: number | string | null | undefined,
+  currency?: string,
+) {
   if (amount == null) return '-';
-  const num = Number(amount);
+  const num = typeof amount === 'number' ? amount : Number(amount);
   if (Number.isNaN(num)) return String(amount);
   const cur = currency ?? 'JPY';
   if (cur === 'JPY') return `¥${num.toLocaleString()}`;

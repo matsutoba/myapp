@@ -6,13 +6,14 @@ import {
   type ColumnDef,
   type Table as TanTable,
 } from '@tanstack/react-table';
+import type { Order } from '../../actions/getOrders';
 
-type ColumnWithMeta = ColumnDef<any, any> & {
+type ColumnWithMeta = ColumnDef<Order> & {
   meta?: { thClass?: string; tdClass?: string } | undefined;
 };
 
 type Props = {
-  table: TanTable<any>;
+  table: TanTable<Order>;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;

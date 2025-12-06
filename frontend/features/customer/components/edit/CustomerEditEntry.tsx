@@ -3,7 +3,6 @@
 import { Spinner } from '@/components/ui';
 import useCustomerEdit from '@/features/customer/hooks/useCustomerEdit';
 import { useUsers } from '@/features/user/hooks/useUsers';
-import type { User } from '@/features/user/types';
 import { useParams } from 'next/navigation';
 import CustomerEditForm from './CustomerEditForm';
 import CustomerEditLayout from './CustomerEditLayout';
@@ -29,7 +28,7 @@ export default function CustomerEditEntry() {
         isSubmitting={isSubmitting}
         error={error}
         onCancel={goBack}
-        users={users as User[]}
+        users={users}
       />
     </CustomerEditLayout>
   );

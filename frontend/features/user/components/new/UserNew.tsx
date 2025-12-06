@@ -32,9 +32,7 @@ export default function UserNew() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UserCreateForm>({
-    resolver: zodResolver(
-      userCreateSchema,
-    ) as unknown as Resolver<UserCreateForm>,
+    resolver: zodResolver(userCreateSchema) as Resolver<UserCreateForm>,
     defaultValues: {
       name: '',
       email: '',
