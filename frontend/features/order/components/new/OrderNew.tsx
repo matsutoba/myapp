@@ -2,12 +2,14 @@
 
 import { Card, Container, FeatureTitleBar, useToast } from '@/components/ui';
 import { actions } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import OrderForm from '../OrderForm';
 
 export default function OrderNew() {
   const router = useRouter();
   const { showToast } = useToast();
+  const searchParams = useSearchParams();
+  const customerIdFromQuery = searchParams.get('customerId') ?? undefined;
 
   const handleCreate = async (data: any) => {
     // data should follow CreateOrderInput shape: { customerId, amount, currency, itemsCount, orderChannel, category, status }
@@ -36,7 +38,7 @@ export default function OrderNew() {
       <Container size="sm">
         <Card>
           <OrderForm
-            initialValues={{}}
+            initialValues={{ customerId: customerIdFromQuery }}
             onSubmit={handleCreate}
             onCancel={() => {
               router.back();

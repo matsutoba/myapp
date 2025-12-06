@@ -33,9 +33,21 @@ export function createCustomerListTableColumns({
     {
       id: 'actions',
       header: '操作',
-      meta: { thClass: 'w-26', tdClass: 'w-26' },
+      meta: { thClass: 'w-36', tdClass: 'w-36' },
       cell: ({ row }) => (
         <div className="flex">
+          <IconButton
+            icon="Plus"
+            onClick={() =>
+              router.push(
+                `/orders/new?customerId=${encodeURIComponent(
+                  String(row.original.id),
+                )}`,
+              )
+            }
+            aria-label="この顧客で注文を作成"
+            title="この顧客で注文を作成"
+          />
           <IconButton
             icon="Pencil"
             onClick={() => router.push(`/customers/${row.original.id}`)}
