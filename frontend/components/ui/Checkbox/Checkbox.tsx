@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useId } from 'react';
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,8 +10,8 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, error, helperText, className = '', ...props }, ref) => {
-    const checkboxId =
-      props.id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+    const generated = useId();
+    const checkboxId = props.id ?? `checkbox-${generated}`;
 
     return (
       <div className="flex items-start">

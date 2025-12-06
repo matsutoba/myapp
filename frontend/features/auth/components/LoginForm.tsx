@@ -15,7 +15,7 @@ export function LoginForm() {
     e.preventDefault();
     try {
       await login(formData);
-    } catch (err) {
+    } catch {
       // エラーはuseLogin内で処理される
     }
   };

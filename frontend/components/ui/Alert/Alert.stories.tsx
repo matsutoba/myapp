@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Notification } from '../Notification/Notification';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 
 const meta: Meta<typeof Notification> = {
   title: 'Layout/Notification',

@@ -10,16 +10,21 @@ import {
   Spinner,
   useToast,
 } from '@/components/ui';
-import Table, { Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
+import type { BadgeVariant } from '@/components/ui/Badge/Badge';
+import { Table, Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
+import type { Order } from '@/features/order/actions/getOrders';
 import { actions } from '@/lib/actions';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type Params = { id: string };
 
-function formatAmount(amount: unknown, currency?: string) {
+function formatAmount(
+  amount: number | string | null | undefined,
+  currency?: string,
+) {
   if (amount == null) return '-';
-  const num = Number(amount);
+  const num = typeof amount === 'number' ? amount : Number(amount);
   if (Number.isNaN(num)) return String(amount);
   const cur = currency ?? 'JPY';
   if (cur === 'JPY') return `¥${num.toLocaleString()}`;
@@ -31,7 +36,7 @@ export default function OrderDetailEntry() {
   const id = params.id;
 
   const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<any | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { showToast } = useToast();
@@ -109,7 +114,7 @@ export default function OrderDetailEntry() {
                   {order.status
                     ? (() => {
                         const s = String(order.status).toLowerCase();
-                        const map: Record<string, any> = {
+                        const map: Record<string, BadgeVariant> = {
                           pending: 'warning',
                           processing: 'primary',
                           completed: 'success',
@@ -117,9 +122,7 @@ export default function OrderDetailEntry() {
                           cancelled: 'danger',
                         };
                         const variant = map[s] ?? 'default';
-                        return (
-                          <Badge variant={variant as any}>{order.status}</Badge>
-                        );
+                        return <Badge variant={variant}>{order.status}</Badge>;
                       })()
                     : '-'}
                 </Td>

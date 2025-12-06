@@ -1,9 +1,8 @@
 'use client';
 
 import { Spinner } from '@/components/ui';
-import useCustomerEdit from '@/features/customer/hooks/useCustomerEdit';
+import { useCustomerEdit } from '@/features/customer/hooks/useCustomerEdit';
 import { useUsers } from '@/features/user/hooks/useUsers';
-import type { User } from '@/features/user/types';
 import { useParams } from 'next/navigation';
 import CustomerEditForm from './CustomerEditForm';
 import CustomerEditLayout from './CustomerEditLayout';
@@ -14,7 +13,7 @@ export default function CustomerEditEntry() {
   const params = useParams<Params>();
   const id = parseInt(params.id, 10);
 
-  const { formData, submit, loading, error, isSubmitting, goToList, goBack } =
+  const { formData, submit, loading, error, isSubmitting, goBack } =
     useCustomerEdit(id);
 
   const { users } = useUsers({ take: 1000 });
@@ -29,7 +28,7 @@ export default function CustomerEditEntry() {
         isSubmitting={isSubmitting}
         error={error}
         onCancel={goBack}
-        users={users as User[]}
+        users={users}
       />
     </CustomerEditLayout>
   );

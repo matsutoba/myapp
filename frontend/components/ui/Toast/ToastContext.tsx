@@ -4,9 +4,10 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
-import ToastContainer from './ToastContainer';
+import { ToastContainer } from './ToastContainer';
 
 export type ToastVariant = 'success' | 'error' | 'info';
 
@@ -29,6 +30,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  // トースト ID -> タイマー ID の Map。
+  // トーストが早期に閉じられた場合や Provider がアンマウントされる際に
+  // タイマーをキャンセルして、アンマウント後の setState を防ぎメモリリークを避けます。
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
 
   const showToast = useCallback(
     (t: Omit<ToastItem, 'id'> & { id?: string }) => {
@@ -44,9 +51,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
       setToasts((s) => [...s, item]);
 
       if (item.duration && item.duration > 0) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
+          // トーストを削除し、対応するタイマー情報を Map から削除
           setToasts((s) => s.filter((x) => x.id !== id));
+          timersRef.current.delete(id);
         }, item.duration);
+        timersRef.current.set(id, timer);
       }
 
       return id;
@@ -55,12 +65,22 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const dismissToast = useCallback((id: string) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
     setToasts((s) => s.filter((x) => x.id !== id));
   }, []);
 
-  // cleanup on unmount
+  // アンマウント時のクリーンアップ: 保留中のタイマーを全てクリアし、トーストを空にする
   useEffect(() => {
-    return () => setToasts([]);
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+      setToasts([]);
+    };
   }, []);
 
   return (
@@ -77,4 +97,4 @@ export const useToast = (): ToastContextType => {
   return ctx;
 };
 
-export default ToastContext;
+export { ToastContext };

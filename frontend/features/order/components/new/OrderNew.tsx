@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, Container, FeatureTitleBar, useToast } from '@/components/ui';
+import type { CreateOrderInput } from '@/features/order/actions/createOrder';
 import { actions } from '@/lib/actions';
 import { useRouter, useSearchParams } from 'next/navigation';
 import OrderForm from '../OrderForm';
@@ -11,9 +12,9 @@ export default function OrderNew() {
   const searchParams = useSearchParams();
   const customerIdFromQuery = searchParams.get('customerId') ?? undefined;
 
-  const handleCreate = async (data: any) => {
-    // data should follow CreateOrderInput shape: { customerId, amount, currency, itemsCount, orderChannel, category, status }
-    const res = await actions.order.createOrder(data as any);
+  const handleCreate = async (data: CreateOrderInput) => {
+    // data follows CreateOrderInput shape
+    const res = await actions.order.createOrder(data);
     if (res.success && res.data && res.data.id) {
       showToast({
         title: '注文を作成しました',

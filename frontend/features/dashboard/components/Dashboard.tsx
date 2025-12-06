@@ -1,9 +1,17 @@
+import type {
+  OrderAggregateRow,
+  OrderAnalyticsResponse,
+} from '@/features/dashboard/actions/getOrderAnalytics';
 import ChartClient from '@/features/dashboard/components/order/ChartClient';
 import KpiCard from '@/features/dashboard/components/order/KpiCard';
 import { formatDate } from '@/lib/date/formatDate';
 
-export default function Dashboard({ data }: { data: any }) {
-  const times = (data?.timeseries ?? []).map((r: any) => ({
+export default function Dashboard({
+  data,
+}: {
+  data: OrderAnalyticsResponse | null;
+}) {
+  const times = (data?.timeseries ?? []).map((r: OrderAggregateRow) => ({
     date: r.period,
     orders: r.count,
     revenue: Math.round(r.total),

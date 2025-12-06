@@ -1,4 +1,5 @@
 import { Badge, IconButton } from '@/components/ui';
+import type { BadgeVariant } from '@/components/ui/Badge/Badge';
 import { ColumnDef } from '@tanstack/react-table';
 
 type Order = {
@@ -10,7 +11,7 @@ type Order = {
 };
 
 type CreateOrderListTableColumnsArgs = {
-  router: any;
+  router: { push: (url: string) => void };
   onDelete: (id: number) => void;
 };
 
@@ -71,13 +72,13 @@ export function createOrderListTableColumns({
       meta: { thClass: 'w-28', tdClass: 'w-28' },
       cell: ({ getValue }) => {
         const val = String(getValue() ?? '');
-        const variant =
+        const variant: BadgeVariant =
           val === 'completed'
             ? 'success'
             : val === 'cancelled'
             ? 'danger'
             : 'default';
-        return <Badge variant={variant as any}>{val || '-'}</Badge>;
+        return <Badge variant={variant}>{val || '-'}</Badge>;
       },
     },
     {

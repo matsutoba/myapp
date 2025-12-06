@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Icon } from './Icon';
+import { Icon, type IconName } from './Icon';
 
 const meta = {
   title: 'Components/Icon',
@@ -96,37 +96,39 @@ export const WithTailwindClass: Story = {
 export const IconGallery = {
   render: () => (
     <div className="grid grid-cols-6 gap-4">
-      {[
-        'User',
-        'Settings',
-        'Home',
-        'Search',
-        'Bell',
-        'Mail',
-        'Heart',
-        'Star',
-        'Check',
-        'X',
-        'ChevronRight',
-        'ChevronLeft',
-        'AlertCircle',
-        'Info',
-        'Trash',
-        'Edit',
-        'Download',
-        'Upload',
-        'Calendar',
-        'Clock',
-        'Menu',
-        'LogOut',
-        'Save',
-        'Share',
-      ].map((iconName) => (
+      {(
+        [
+          'User',
+          'Settings',
+          'Home',
+          'Search',
+          'Bell',
+          'Mail',
+          'Heart',
+          'Star',
+          'Check',
+          'X',
+          'ChevronRight',
+          'ChevronLeft',
+          'AlertCircle',
+          'Info',
+          'Trash',
+          'Edit',
+          'Download',
+          'Upload',
+          'Calendar',
+          'Clock',
+          'Menu',
+          'LogOut',
+          'Save',
+          'Share',
+        ] as IconName[]
+      ).map((iconName) => (
         <div
           key={iconName}
           className="flex flex-col items-center gap-2 p-4 border rounded hover:bg-gray-50"
         >
-          <Icon name={iconName as any} size={24} />
+          <Icon name={iconName} size={24} />
           <span className="text-xs text-gray-600">{iconName}</span>
         </div>
       ))}

@@ -1,7 +1,8 @@
-import { IconButton } from '@/components/ui';
+import { IconButton, type IconName } from '@/components/ui';
 import type { Meta, StoryObj } from '@storybook/react';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import TextField from './TextField';
+import { TextField } from './TextField';
 
 const meta: Meta<typeof TextField> = {
   title: 'UI/TextField',
@@ -24,21 +25,28 @@ export const Default: Story = {
 
 export const WithValue: Story = {
   render: () => {
-    const [value, setValue] = useState('山田太郎');
-    return (
-      <div className="p-4">
-        <TextField
-          placeholder="検索"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onEnter={() => console.log('enter', value)}
-          onClear={() => {
-            console.log('cleared');
-            setValue('');
-          }}
-        />
-      </div>
-    );
+    function Example() {
+      const [value, setValue] = useState('山田太郎');
+
+      return (
+        <div className="p-4">
+          <TextField
+            placeholder="検索"
+            value={value}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
+            onEnter={() => console.log('enter', value)}
+            onClear={() => {
+              console.log('cleared');
+              setValue('');
+            }}
+          />
+        </div>
+      );
+    }
+
+    return <Example />;
   },
 };
 
@@ -51,7 +59,9 @@ export const Interactive: Story = {
           <TextField
             placeholder="名前 or メールで検索"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
             onEnter={() => console.log('search:', value)}
             onClear={() => {
               console.log('clear');
@@ -75,7 +85,9 @@ export const WithTrailing: Story = {
           <TextField
             placeholder="名前 or メールで検索 (trailingあり)"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
             onEnter={() => console.log('search:', value)}
             onClear={() => {
               console.log('clear');
@@ -84,7 +96,7 @@ export const WithTrailing: Story = {
             trailing={
               value && value !== '' ? (
                 <IconButton
-                  icon={'X' as any}
+                  icon={'X' as IconName}
                   onClick={() => {
                     setValue('');
                   }}
@@ -92,7 +104,7 @@ export const WithTrailing: Story = {
                 />
               ) : (
                 <IconButton
-                  icon={'Search' as any}
+                  icon={'Search' as IconName}
                   onClick={() => console.log('search click')}
                   aria-label="検索"
                 />

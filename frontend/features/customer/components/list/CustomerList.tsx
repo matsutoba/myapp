@@ -13,7 +13,7 @@ import {
 } from '@/components/ui';
 import CustomerListTable from '@/features/customer/components/list/CustomerListTable';
 import { createCustomerListTableColumns } from '@/features/customer/components/list/customerListTableColumns';
-import useCustomerList from '@/features/customer/hooks/useCustomerList';
+import { useCustomerList } from '@/features/customer/hooks/useCustomerList';
 import { UseCustomersOptions } from '@/features/customer/hooks/useCustomers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';
@@ -25,7 +25,6 @@ export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
     loading,
     showConfirmModal,
     setShowConfirmModal,
-    deleteTargetId,
     setDeleteTargetId,
     handleSearch,
     handleDeleteClick,
@@ -42,9 +41,14 @@ export default function CustomerList({ opts }: { opts?: UseCustomersOptions }) {
       createCustomerListTableColumns({ router, onDelete: handleDeleteClick }),
     [router, handleDeleteClick],
   );
+  const memoCustomers = React.useMemo(() => customers ?? [], [customers]);
 
+  // `useReactTable` returns functions that React Compiler cannot safely memoize.
+  // We memoize `columns` and `data` above to avoid stale values; disable the
+  // incompatible-library lint here to avoid noisy warnings.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: customers,
+    data: memoCustomers,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

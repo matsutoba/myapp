@@ -13,7 +13,7 @@ import {
 } from '@/components/ui';
 import UserListTable from '@/features/user/components/list/UserListTable';
 import { createUserListTableColumns } from '@/features/user/components/list/userListTableColumns';
-import useUserList from '@/features/user/hooks/useUserList';
+import { useUserList } from '@/features/user/hooks/useUserList';
 import { UseUsersOptions } from '@/features/user/hooks/useUsers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';
@@ -25,7 +25,6 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
     loading,
     showConfirmModal,
     setShowConfirmModal,
-    deleteTargetId,
     setDeleteTargetId,
     handleSearch,
     handleDeleteClick,
@@ -41,9 +40,14 @@ export default function UserList({ opts }: { opts?: UseUsersOptions }) {
     () => createUserListTableColumns({ router, onDelete: handleDeleteClick }),
     [router, handleDeleteClick],
   );
+  const memoUsers = React.useMemo(() => users ?? [], [users]);
 
+  // `useReactTable` returns functions that React Compiler cannot safely memoize.
+  // We memoize `columns` and `data` above to avoid stale values; disable the
+  // incompatible-library lint here to avoid noisy warnings.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: users,
+    data: memoUsers,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

@@ -10,7 +10,7 @@ type UsePaginationOpts = {
   basePath?: string;
 };
 
-export default function usePagination({
+export function usePagination({
   takeFromHook,
   total,
   defaultTake = PAGINATION_DEFAULT_TAKE,

@@ -1,7 +1,7 @@
 'use client';
 
 import { Spinner } from '@/components/ui';
-import useUserEdit from '@/features/user/hooks/useUserEdit';
+import { useUserEdit } from '@/features/user/hooks/useUserEdit';
 import { useParams } from 'next/navigation';
 import UserEditForm from './UserEditForm';
 import UserEditLayout from './UserEditLayout';

@@ -1,7 +1,10 @@
 'use client';
 
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
-import type { Order } from '@/features/order/actions/getOrders';
+import type {
+  Order,
+  OrdersPagedResponse,
+} from '@/features/order/actions/getOrders';
 import { actions } from '@/lib/actions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -40,9 +43,9 @@ export function useOrders(
         if (!mountedRef.current) return;
 
         if (res.success && res.data) {
-          const raw = res.data as any;
+          const raw = res.data as Order[] | OrdersPagedResponse;
           if (Array.isArray(raw)) {
-            setOrders(raw as Order[]);
+            setOrders(raw);
             setTotal(null);
             setTake(null);
             setSkip(null);
@@ -66,7 +69,7 @@ export function useOrders(
         if (mountedRef.current) setLoading(false);
       }
     },
-    [opts?.take, opts?.skip, opts?.page, opts?.keyword],
+    [opts],
   );
 
   useEffect(() => {

@@ -104,5 +104,3 @@ export function Spinner({
     </div>
   );
 }
-
-export default Spinner;

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Card } from '../Card/Card';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 import { Container } from './Container';
 
 const meta: Meta<typeof Container> = {

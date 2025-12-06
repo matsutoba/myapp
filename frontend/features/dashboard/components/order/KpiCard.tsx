@@ -1,12 +1,13 @@
 'use client';
 
 import { Card } from '@/components/ui';
+import type { OrderAnalyticsResponse } from '@/features/dashboard/actions/getOrderAnalytics';
 
 export default function KpiCard({
   data,
   periodLabel,
 }: {
-  data: any;
+  data?: OrderAnalyticsResponse | null;
   periodLabel?: string;
 }) {
   const totalOrders = data?.kpis?.totalOrders ?? 0;

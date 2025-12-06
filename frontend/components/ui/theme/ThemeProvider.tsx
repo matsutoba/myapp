@@ -22,7 +22,7 @@ export const ThemeProvider: React.FC<{
       const saved =
         typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
       if (saved === 'light' || saved === 'dark') return saved;
-    } catch (e) {
+    } catch {
       // ignore
     }
     // fallback to prefers-color-scheme
@@ -39,7 +39,7 @@ export const ThemeProvider: React.FC<{
   useEffect(() => {
     try {
       localStorage.setItem('theme', theme);
-    } catch (e) {
+    } catch {
       // ignore
     }
     document.documentElement.setAttribute('data-theme', theme);

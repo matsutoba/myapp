@@ -42,7 +42,10 @@ export const Pagination: React.FC<Props> = ({
   }
 
   return (
-    <nav className={`flex justify-center ${className || ''}`} aria-label="Pagination">
+    <nav
+      className={`flex justify-center ${className || ''}`}
+      aria-label="Pagination"
+    >
       <ul className="inline-flex items-center space-x-2">
         <li>
           <button
@@ -87,5 +90,3 @@ export const Pagination: React.FC<Props> = ({
     </nav>
   );
 };
-
-export default Pagination;

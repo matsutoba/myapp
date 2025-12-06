@@ -38,7 +38,7 @@ export default function ChartClient({ data, periodLabel }: Props) {
   const internal = React.useMemo(() => generateMockData(), []);
   const chartData = data && data.length > 0 ? data : internal;
 
-  const formatToYMD = (val: unknown) => {
+  const formatToYMD = (val: string | number | null | undefined) => {
     try {
       if (typeof val === 'string') {
         // discard time portion if present
@@ -50,7 +50,7 @@ export default function ChartClient({ data, periodLabel }: Props) {
         return d.toISOString().slice(0, 10).replace(/-/g, '/');
       }
       return String(val);
-    } catch (e) {
+    } catch {
       return String(val);
     }
   };

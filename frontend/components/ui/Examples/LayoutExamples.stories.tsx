@@ -5,7 +5,7 @@ import { Container } from '../Container/Container';
 import { Notification } from '../Notification/Notification';
 import { Select } from '../Select/Select';
 import { Stack } from '../Stack/Stack';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 
 const meta: Meta = {
   title: 'Layout/Examples',

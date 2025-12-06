@@ -6,13 +6,19 @@ import {
 import type { User } from '@/features/user/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
+import type { Resolver } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-type FormValues = CustomerForm & { ownerId?: string | null };
+type FormValues = CustomerForm & { ownerId?: number | string | null };
+type FormValuesRaw = Omit<CustomerForm, 'ownerId'> & {
+  ownerId?: string | number | null;
+};
 
 type Props = {
-  formData: any;
-  onSubmit: (values: FormValues) => void;
+  formData?: Partial<FormValues>;
+  onSubmit: (
+    values: CustomerForm & { ownerId?: string | number | null },
+  ) => void | Promise<void>;
   isSubmitting: boolean;
   error?: string;
   onCancel: () => void;
@@ -33,29 +39,40 @@ export default function CustomerEditForm({
     control,
     formState: { errors },
     reset,
-  } = useForm<any>({
-    resolver: zodResolver(customerFormSchema),
+  } = useForm<FormValuesRaw>({
+    resolver: zodResolver(customerFormSchema) as Resolver<FormValuesRaw>,
     defaultValues: {
       ...formData,
-      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
-      tagsStr: (formData as any).tagsStr ?? '',
-      lastContactedAt: formData.lastContactedAt ?? '',
-      nextActionAt: formData.nextActionAt ?? '',
+      ownerId: formData?.ownerId == null ? null : String(formData.ownerId),
+      tagsStr: formData?.tagsStr ?? '',
+      lastContactedAt: formData?.lastContactedAt ?? '',
+      nextActionAt: formData?.nextActionAt ?? '',
     },
   });
 
   useEffect(() => {
     reset({
       ...formData,
-      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
-      tagsStr: (formData as any).tagsStr ?? '',
-      lastContactedAt: formData.lastContactedAt ?? '',
-      nextActionAt: formData.nextActionAt ?? '',
+      ownerId: formData?.ownerId == null ? null : String(formData.ownerId),
+      tagsStr: formData?.tagsStr ?? '',
+      lastContactedAt: formData?.lastContactedAt ?? '',
+      nextActionAt: formData?.nextActionAt ?? '',
     });
   }, [formData, reset]);
 
-  const internalSubmit = (values: any) => {
-    onSubmit(values as FormValues);
+  const internalSubmit = (values: FormValuesRaw) => {
+    // normalize ownerId to number when caller expects numeric id
+    const out: FormValues = {
+      ...values,
+      ownerId:
+        typeof values.ownerId === 'string'
+          ? values.ownerId
+            ? Number(values.ownerId)
+            : undefined
+          : values.ownerId,
+    };
+
+    onSubmit(out);
   };
 
   return (

@@ -4,6 +4,8 @@ import type { User } from '@/features/user/types';
 import { actions } from '@/lib/actions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 export type UseUsersOptions = {
   take?: number;
   skip?: number;
@@ -24,6 +26,12 @@ export function useUsers(
 
   const mountedRef = useRef(true);
 
+  const optsKey = JSON.stringify(opts ?? {});
+
+  // フェッチ用コールバックを作成します。
+  // 呼び出し側が内容は同じだが参照が新しいオブジェクトを渡した場合でも
+  // 不要にコールバックを再生成しないよう、オプションをシリアライズした
+  // 文字列キー（`optsKey`）に依存します。
   const fetchUsers = useCallback(
     async (override?: UseUsersOptions) => {
       setLoading(true);
@@ -57,18 +65,27 @@ export function useUsers(
         if (mountedRef.current) setLoading(false);
       }
     },
-    [opts?.take, opts?.skip, opts?.page, opts?.keyword],
+    [optsKey],
   );
+
+  // 最新の fetch 関数を参照するための ref を保持します。
+  // メインの effect は関数の参照(identity)に依存させず、安定した
+  // `optsKey` に依存して呼び出すため、参照は新しいが内容が同じオブジェクトを
+  // 渡した場合の effect の不必要な再実行を防ぎます。
+  const fetchRef = useRef<typeof fetchUsers | null>(null);
+  useEffect(() => {
+    fetchRef.current = fetchUsers;
+  }, [fetchUsers]);
 
   useEffect(() => {
     mountedRef.current = true;
     if (!initial) {
-      void fetchUsers();
+      void fetchRef.current?.();
     }
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchUsers, initial]);
+  }, [optsKey, initial]);
 
   return {
     users,

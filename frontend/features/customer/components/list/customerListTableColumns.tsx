@@ -1,15 +1,16 @@
 import { IconButton } from '@/components/ui';
+import type { Customer } from '@/features/customer/types';
 import { ColumnDef } from '@tanstack/react-table';
 
 type CreateCustomerListTableColumnsArgs = {
-  router: any;
+  router: { push: (url: string) => void };
   onDelete: (id: number) => void;
 };
 
 export function createCustomerListTableColumns({
   router,
   onDelete,
-}: CreateCustomerListTableColumnsArgs): ColumnDef<any>[] {
+}: CreateCustomerListTableColumnsArgs): ColumnDef<Customer>[] {
   return [
     {
       accessorKey: 'company',

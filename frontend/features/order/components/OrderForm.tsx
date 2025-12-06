@@ -1,16 +1,21 @@
 'use client';
 
 import { Button, Notification, Select, TextField } from '@/components/ui';
-import { orderFormSchema } from '@/features/order/validation';
+import type { CustomersPagedResponse } from '@/features/customer/actions/getCustomers';
+import type { Customer } from '@/features/customer/types';
+import type { CreateOrderInput } from '@/features/order/actions/createOrder';
+import { orderFormSchema, type OrderForm } from '@/features/order/validation';
 import { actions } from '@/lib/actions';
-import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { getErrorMessage } from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 type Props = {
-  initialValues?: any;
-  onSubmit: (data: any) => Promise<void> | void;
+  initialValues?:
+    | Partial<OrderForm>
+    | Record<string, string | number | null | undefined>;
+  onSubmit: (data: CreateOrderInput) => Promise<void> | void;
   onCancel?: () => void;
   /** 編集時などに顧客選択を無効化する */
   disableCustomerSelect?: boolean;
@@ -33,19 +38,38 @@ export default function OrderForm({
     formState: { errors, isSubmitting },
     trigger,
     control,
-  } = useForm<any>({
-    resolver: zodResolver(orderFormSchema),
-    defaultValues: {
-      customerId: initialValues.customerId
-        ? String(initialValues.customerId)
-        : '',
-      amount: initialValues.amount ?? 0,
-      currency: initialValues.currency ?? 'JPY',
-      itemsCount: initialValues.itemsCount ?? 1,
-      orderChannel: initialValues.orderChannel ?? 'web',
-      category: initialValues.category ?? '',
-      status: initialValues.status ?? 'pending',
-    },
+  } = useForm<OrderForm>({
+    resolver: zodResolver(orderFormSchema) as Resolver<OrderForm>,
+    defaultValues: (() => {
+      const iv = initialValues as Record<
+        string,
+        string | number | null | undefined
+      >;
+      const parseNumber = (
+        v: number | string | null | undefined,
+        fallback: number,
+      ) => {
+        if (v == null) return fallback;
+        if (typeof v === 'number') return v;
+        const n = Number(v);
+        return Number.isNaN(n) ? fallback : n;
+      };
+
+      return {
+        customerId:
+          iv.customerId == null
+            ? ''
+            : typeof iv.customerId === 'string'
+            ? iv.customerId
+            : String(iv.customerId),
+        amount: parseNumber(iv.amount, 0),
+        currency: iv.currency == null ? 'JPY' : String(iv.currency),
+        itemsCount: parseNumber(iv.itemsCount, 1),
+        orderChannel: iv.orderChannel == null ? 'web' : String(iv.orderChannel),
+        category: iv.category == null ? '' : String(iv.category),
+        status: iv.status == null ? 'pending' : String(iv.status),
+      } as OrderForm;
+    })(),
   });
 
   useEffect(() => {
@@ -56,10 +80,9 @@ export default function OrderForm({
         const res = await actions.customer.getCustomers({ take: 200 });
         if (!mounted) return;
         if (res && res.success && res.data) {
-          const items = Array.isArray(res.data)
-            ? res.data
-            : (res.data as any).items || [];
-          const opts = items.map((c: any) => ({
+          const raw = res.data as Customer[] | CustomersPagedResponse;
+          const items = Array.isArray(raw) ? raw : raw.items || [];
+          const opts = items.map((c: Customer) => ({
             value: String(c.id),
             label: c.company || c.contactName || c.email || String(c.id),
           }));
@@ -85,9 +108,15 @@ export default function OrderForm({
 
     const payload = {
       customerId: data.customerId || undefined,
-      amount: Number(data.amount) || 0,
+      amount:
+        typeof data.amount === 'number'
+          ? data.amount
+          : Number(data.amount) || 0,
       currency: data.currency || undefined,
-      itemsCount: Number(data.itemsCount) || undefined,
+      itemsCount:
+        typeof data.itemsCount === 'number'
+          ? data.itemsCount
+          : Number(data.itemsCount) || undefined,
       orderChannel: data.orderChannel || undefined,
       category: data.category || undefined,
       status: data.status || undefined,
@@ -109,7 +138,9 @@ export default function OrderForm({
           <Select
             label="顧客"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: '', label: '選択してください' },
               ...customerOptions,
@@ -151,7 +182,9 @@ export default function OrderForm({
           <Select
             label="注文チャネル"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: 'web', label: 'Web' },
               { value: 'app', label: 'App' },
@@ -175,7 +208,9 @@ export default function OrderForm({
           <Select
             label="ステータス"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: 'pending', label: 'Pending' },
               { value: 'refunded', label: 'Refunded' },

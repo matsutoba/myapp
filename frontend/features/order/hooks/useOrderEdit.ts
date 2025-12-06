@@ -1,6 +1,7 @@
 'use client';
 
 import { useToast } from '@/components/ui';
+import type { UpdateOrderInput } from '@/features/order/actions/updateOrder';
 import { actions } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -60,7 +61,7 @@ export function useOrderEdit(orderIdProp: string) {
     setError(null);
     setIsSubmitting(true);
     try {
-      const payload = {
+      const payload: UpdateOrderInput = {
         amount: typeof values.amount === 'number' ? values.amount : undefined,
         currency: values.currency || undefined,
         itemsCount:
@@ -68,7 +69,7 @@ export function useOrderEdit(orderIdProp: string) {
         orderChannel: values.orderChannel || undefined,
         category: values.category || undefined,
         status: values.status || undefined,
-      } as any;
+      };
 
       const result = await actions.order.updateOrder(orderId, payload);
       if (result && result.success) {

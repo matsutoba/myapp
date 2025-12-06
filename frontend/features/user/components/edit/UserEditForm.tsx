@@ -8,10 +8,15 @@ import {
 } from '@/components/ui';
 import { userEditSchema, type UserEditForm } from '@/features/user/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, type ChangeEvent } from 'react';
+import type { Resolver } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 type FormValues = UserEditForm & { isActive?: boolean | null };
+type FormValuesRaw = Omit<UserEditForm, 'password'> & {
+  isActive?: string | boolean | null;
+  password?: string | null;
+};
 
 type Props = {
   formData: FormValues;
@@ -34,14 +39,15 @@ export default function UserEditForm({
     formState: { errors },
     reset,
     control,
-  } = useForm<any>({
-    resolver: zodResolver(userEditSchema),
+  } = useForm<FormValuesRaw>({
+    resolver: zodResolver(userEditSchema) as Resolver<FormValuesRaw>,
     defaultValues: {
       ...formData,
       isActive:
         typeof formData.isActive === 'boolean'
           ? String(formData.isActive)
           : 'true',
+      password: '',
     },
   });
 
@@ -50,15 +56,17 @@ export default function UserEditForm({
     reset(formData);
   }, [formData, reset]);
 
-  const internalSubmit = (values: any) => {
+  const internalSubmit = (values: FormValuesRaw) => {
     // isActive は select から文字列 'true'/'false' で来るため boolean に変換
-    const normalized = {
+    const normalized: FormValues = {
       ...values,
       isActive:
         typeof values.isActive === 'string'
           ? values.isActive === 'true'
           : values.isActive,
-    } as FormValues;
+      password: values.password ?? undefined,
+    };
+
     onSubmit(normalized);
   };
 
@@ -105,7 +113,9 @@ export default function UserEditForm({
               label="ロール"
               required
               value={field.value}
-              onChange={(e: any) => field.onChange(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                field.onChange(e.target.value)
+              }
               options={[
                 { value: 'user', label: '一般ユーザー' },
                 { value: 'admin', label: '管理者' },
@@ -122,8 +132,14 @@ export default function UserEditForm({
               id="isActive"
               label="ステータス"
               required
-              value={field.value}
-              onChange={(e: any) => field.onChange(e.target.value)}
+              value={
+                typeof field.value === 'boolean'
+                  ? String(field.value)
+                  : field.value ?? ''
+              }
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                field.onChange(e.target.value)
+              }
               options={[
                 { value: 'true', label: '有効' },
                 { value: 'false', label: '無効' },

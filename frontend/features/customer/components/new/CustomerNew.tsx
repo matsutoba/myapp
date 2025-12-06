@@ -12,14 +12,21 @@ import {
   useToast,
 } from '@/components/ui';
 import type { CreateCustomerRequest } from '@/features/customer/types';
-import { customerFormSchema } from '@/features/customer/validation';
+import {
+  customerFormSchema,
+  type CustomerForm,
+} from '@/features/customer/validation';
 import { useUsers } from '@/features/user/hooks/useUsers';
 import type { User } from '@/features/user/types';
 import { actions } from '@/lib/actions';
-import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { getErrorMessage } from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+type CustomerFormRaw = Omit<CustomerForm, 'ownerId'> & {
+  ownerId?: string | null;
+};
 
 export default function CustomerNew() {
   const router = useRouter();
@@ -29,8 +36,8 @@ export default function CustomerNew() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<any>({
-    resolver: zodResolver(customerFormSchema),
+  } = useForm<CustomerFormRaw>({
+    resolver: zodResolver(customerFormSchema) as Resolver<CustomerFormRaw>,
     defaultValues: {
       contactName: '',
       email: '',
@@ -49,7 +56,7 @@ export default function CustomerNew() {
 
   const { users } = useUsers({ take: 1000 });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CustomerFormRaw) => {
     const payload: CreateCustomerRequest = {
       contactName: data.contactName,
       email: data.email,
@@ -58,20 +65,23 @@ export default function CustomerNew() {
       company: data.company || '',
       website: data.website || '',
       tags: data.tagsStr
-        ? data.tagsStr
+        ? String(data.tagsStr)
             .split(',')
             .map((s: string) => s.trim())
             .filter(Boolean)
         : [],
       status: data.status || undefined,
-      ownerId: data.ownerId == null ? undefined : data.ownerId,
+      ownerId:
+        data.ownerId == null || data.ownerId === ''
+          ? undefined
+          : Number(data.ownerId),
       lastContactedAt:
         data.lastContactedAt && data.lastContactedAt !== ''
-          ? new Date(data.lastContactedAt).toISOString()
+          ? new Date(String(data.lastContactedAt)).toISOString()
           : undefined,
       nextActionAt:
         data.nextActionAt && data.nextActionAt !== ''
-          ? new Date(data.nextActionAt).toISOString()
+          ? new Date(String(data.nextActionAt)).toISOString()
           : undefined,
       notes: data.notes || '',
     };

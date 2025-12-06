@@ -17,7 +17,7 @@ export const userCreateSchema = z.object({
 
 export type UserCreateForm = z.infer<typeof userCreateSchema>;
 
-export default userCreateSchema;
+// `userCreateSchema` を default export しないように変更しました。
 
 export const userEditSchema = z.object({
   name: z

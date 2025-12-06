@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 type FormData = UserEditForm & { isActive?: boolean | null };
 
-export default function useUserEdit(userId: number) {
+export function useUserEdit(userId: number) {
   const router = useRouter();
   const { showToast } = useToast();
 

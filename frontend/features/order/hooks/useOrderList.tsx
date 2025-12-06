@@ -4,11 +4,11 @@ import { useToast } from '@/components/ui';
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
 import { useOrders, UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
-import usePagination from '@/lib/hooks/usePagination';
+import { usePagination } from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-export default function useOrderList(opts?: UseOrdersOptions) {
+export function useOrderList(opts?: UseOrdersOptions) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -20,22 +20,42 @@ export default function useOrderList(opts?: UseOrdersOptions) {
     ? Number(searchParams.get('skip'))
     : undefined;
 
-  const effectiveOpts: UseOrdersOptions = {
-    ...(opts ?? {}),
-    keyword: keywordFromUrl ?? opts?.keyword,
-    take: takeFromUrl ?? opts?.take,
-    skip: skipFromUrl ?? opts?.skip,
-  };
+  const effectiveOpts: UseOrdersOptions = useMemo(
+    () => ({
+      ...(opts ?? {}),
+      keyword: keywordFromUrl ?? opts?.keyword,
+      take: takeFromUrl ?? opts?.take,
+      skip: skipFromUrl ?? opts?.skip,
+    }),
+    [opts, keywordFromUrl, takeFromUrl, skipFromUrl],
+  );
 
   const { orders, loading, total, take, refresh } = useOrders(effectiveOpts);
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>(
+    () => keywordFromUrl ?? opts?.keyword ?? '',
+  );
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const { showToast } = useToast();
 
+  // `searchTerm` の更新を次のマイクロタスクに遅延させます。
+  // effect 内で同期的に `setState` を行うと即時に再レンダーが発生し
+  // effect が再実行されることでレンダーループが起きる場合があります。
+  // `Promise.resolve()` によるマイクロタスクは遅延が極めて短く、
+  // 現在のレンダー/エフェクト処理の完了を待ってから更新を行います。
+  // クリーンアップ後の不要な更新を防ぐためにキャンセルフラグも使用します。
   useEffect(() => {
-    setSearchTerm(keywordFromUrl ?? opts?.keyword ?? '');
+    const newVal = keywordFromUrl ?? opts?.keyword ?? '';
+    let cancelled = false;
+    (async () => {
+      await Promise.resolve();
+      if (!cancelled)
+        setSearchTerm((prev) => (prev === newVal ? prev : newVal));
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [keywordFromUrl, opts?.keyword]);
 
   const loadOrders = async (page?: number) => {

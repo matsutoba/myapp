@@ -23,7 +23,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
       value,
       onChange,
       onEnter,
-      onClear,
+      onClear: _onClear,
       placeholder,
       id,
       className,
@@ -36,7 +36,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
     },
     ref,
   ) => {
-    const handleEnter = (val: string) => {
+    const handleEnter = () => {
       onEnter?.();
     };
 
@@ -66,5 +66,3 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
 );
 
 TextField.displayName = 'TextField';
-
-export default TextField;

@@ -14,19 +14,22 @@ import {
 } from '@/components/ui';
 import OrderListTable from '@/features/order/components/list/OrderListTable';
 import { createOrderListTableColumns } from '@/features/order/components/list/orderListTableColumns';
-import useOrderList from '@/features/order/hooks/useOrderList';
+import { useOrderList } from '@/features/order/hooks/useOrderList';
+import type { UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-export default function OrderList({ opts }: { opts?: any }) {
+export default function OrderList({
+  opts,
+}: {
+  opts?: UseOrdersOptions | undefined;
+}) {
   const router = useRouter();
   const {
     orders,
     loading,
-    total,
-    take,
     refresh,
     searchTerm,
     setSearchTerm,
@@ -34,9 +37,7 @@ export default function OrderList({ opts }: { opts?: any }) {
     setShowConfirmModal,
     deleteTargetId,
     setDeleteTargetId,
-    loadOrders,
     handleSearch,
-    takeVal,
     currentPage,
     totalPages,
     handlePageChange,
@@ -44,10 +45,13 @@ export default function OrderList({ opts }: { opts?: any }) {
 
   const { showToast } = useToast();
 
-  const handleDeleteClick = (id: number) => {
-    setDeleteTargetId(id);
-    setShowConfirmModal(true);
-  };
+  const handleDeleteClick = React.useCallback(
+    (id: number) => {
+      setDeleteTargetId(id);
+      setShowConfirmModal(true);
+    },
+    [setDeleteTargetId, setShowConfirmModal],
+  );
 
   const handleDeleteConfirm = async () => {
     if (!deleteTargetId) return;
@@ -76,11 +80,17 @@ export default function OrderList({ opts }: { opts?: any }) {
 
   const columns = React.useMemo(
     () => createOrderListTableColumns({ router, onDelete: handleDeleteClick }),
-    [router],
+    [router, handleDeleteClick],
   );
 
+  const memoOrders = React.useMemo(() => orders ?? [], [orders]);
+
+  // `useReactTable` returns functions that React Compiler cannot safely memoize.
+  // We memoize `columns` and `data` above to avoid stale values; disable the
+  // incompatible-library lint here to avoid noisy warnings.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: orders,
+    data: memoOrders,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

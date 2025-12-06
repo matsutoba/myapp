@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useId } from 'react';
 import { Icon } from '../Icon/Icon';
 
 interface SelectOption {
@@ -30,23 +32,18 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref,
   ) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
-    const isDisabled = Boolean((props as any).disabled);
-    const isReadOnly = Boolean((props as any).readOnly);
-    const originalOnChange = props.onChange as
-      | ((e: React.ChangeEvent<HTMLSelectElement>) => void)
-      | undefined;
-    const originalOnKeyDown = props.onKeyDown as
-      | ((e: React.KeyboardEvent<HTMLSelectElement>) => void)
-      | undefined;
+    const generated = useId();
+    const selectId = id ?? `select-${generated}`;
+    const {
+      onChange: originalOnChange,
+      onKeyDown: originalOnKeyDown,
+      readOnly: readOnlyProp,
+      disabled: disabledProp,
+      ...restProps
+    } = props;
 
-    const restProps: Record<string, any> = {
-      ...(props as Record<string, any>),
-    };
-    // remove handlers so we can attach our wrappers
-    delete restProps.onChange;
-    delete restProps.onKeyDown;
-    delete restProps.readOnly;
+    const isDisabled = Boolean(disabledProp);
+    const isReadOnly = Boolean(readOnlyProp);
 
     return (
       <div
@@ -109,7 +106,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                 ? 'opacity-60 bg-surface/50 text-muted'
                 : ''
             } ${className}`}
-            {...restProps}
+            {...(restProps as Omit<
+              SelectProps,
+              'onChange' | 'onKeyDown' | 'disabled' | 'readOnly'
+            >)}
           >
             {options.map((option) => (
               <option key={option.value} value={option.value}>
