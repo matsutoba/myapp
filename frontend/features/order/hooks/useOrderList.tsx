@@ -39,12 +39,23 @@ export default function useOrderList(opts?: UseOrdersOptions) {
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const { showToast } = useToast();
 
+  // `searchTerm` の更新を次のマイクロタスクに遅延させます。
+  // effect 内で同期的に `setState` を行うと即時に再レンダーが発生し
+  // effect が再実行されることでレンダーループが起きる場合があります。
+  // `Promise.resolve()` によるマイクロタスクは遅延が極めて短く、
+  // 現在のレンダー/エフェクト処理の完了を待ってから更新を行います。
+  // クリーンアップ後の不要な更新を防ぐためにキャンセルフラグも使用します。
   useEffect(() => {
     const newVal = keywordFromUrl ?? opts?.keyword ?? '';
-    const id = setTimeout(() => {
-      setSearchTerm((prev) => (prev === newVal ? prev : newVal));
-    }, 0);
-    return () => clearTimeout(id);
+    let cancelled = false;
+    (async () => {
+      await Promise.resolve();
+      if (!cancelled)
+        setSearchTerm((prev) => (prev === newVal ? prev : newVal));
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [keywordFromUrl, opts?.keyword]);
 
   const loadOrders = async (page?: number) => {
