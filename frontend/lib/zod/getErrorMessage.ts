@@ -21,5 +21,3 @@ export function getErrorMessage(err?: unknown): string | undefined {
 
   return undefined;
 }
-
-export default getErrorMessage;

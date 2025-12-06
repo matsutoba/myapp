@@ -17,7 +17,7 @@ import {
   userCreateSchema,
   type UserCreateForm,
 } from '@/features/user/validation';
-import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { getErrorMessage } from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import type { Resolver } from 'react-hook-form';

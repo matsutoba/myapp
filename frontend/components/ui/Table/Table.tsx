@@ -75,5 +75,3 @@ export function Td({
     </td>
   );
 }
-
-export default Table;

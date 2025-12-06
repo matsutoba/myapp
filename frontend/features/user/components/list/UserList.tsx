@@ -13,7 +13,7 @@ import {
 } from '@/components/ui';
 import UserListTable from '@/features/user/components/list/UserListTable';
 import { createUserListTableColumns } from '@/features/user/components/list/userListTableColumns';
-import useUserList from '@/features/user/hooks/useUserList';
+import { useUserList } from '@/features/user/hooks/useUserList';
 import { UseUsersOptions } from '@/features/user/hooks/useUsers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';

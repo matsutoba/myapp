@@ -4,11 +4,11 @@ import { useToast } from '@/components/ui';
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
 import { useUsers, UseUsersOptions } from '@/features/user/hooks/useUsers';
 import { userActions } from '@/lib/actions';
-import usePagination from '@/lib/hooks/usePagination';
+import { usePagination } from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export default function useUserList(opts?: UseUsersOptions) {
+export function useUserList(opts?: UseUsersOptions) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

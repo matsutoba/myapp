@@ -13,7 +13,7 @@ import {
 } from '@/components/ui';
 import CustomerListTable from '@/features/customer/components/list/CustomerListTable';
 import { createCustomerListTableColumns } from '@/features/customer/components/list/customerListTableColumns';
-import useCustomerList from '@/features/customer/hooks/useCustomerList';
+import { useCustomerList } from '@/features/customer/hooks/useCustomerList';
 import { UseCustomersOptions } from '@/features/customer/hooks/useCustomers';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';

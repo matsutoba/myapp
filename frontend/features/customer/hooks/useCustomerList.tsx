@@ -7,11 +7,11 @@ import {
   UseCustomersOptions,
 } from '@/features/customer/hooks/useCustomers';
 import { actions } from '@/lib/actions';
-import usePagination from '@/lib/hooks/usePagination';
+import { usePagination } from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export default function useCustomerList(opts?: UseCustomersOptions) {
+export function useCustomerList(opts?: UseCustomersOptions) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

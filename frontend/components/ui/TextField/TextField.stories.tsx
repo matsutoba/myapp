@@ -1,7 +1,8 @@
 import { IconButton, type IconName } from '@/components/ui';
 import type { Meta, StoryObj } from '@storybook/react';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
-import TextField from './TextField';
+import { TextField } from './TextField';
 
 const meta: Meta<typeof TextField> = {
   title: 'UI/TextField',
@@ -32,7 +33,9 @@ export const WithValue: Story = {
           <TextField
             placeholder="検索"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
             onEnter={() => console.log('enter', value)}
             onClear={() => {
               console.log('cleared');
@@ -56,7 +59,9 @@ export const Interactive: Story = {
           <TextField
             placeholder="名前 or メールで検索"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
             onEnter={() => console.log('search:', value)}
             onClear={() => {
               console.log('clear');
@@ -80,7 +85,9 @@ export const WithTrailing: Story = {
           <TextField
             placeholder="名前 or メールで検索 (trailingあり)"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value)
+            }
             onEnter={() => console.log('search:', value)}
             onClear={() => {
               console.log('clear');

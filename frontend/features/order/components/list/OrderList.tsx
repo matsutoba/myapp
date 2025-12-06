@@ -14,7 +14,7 @@ import {
 } from '@/components/ui';
 import OrderListTable from '@/features/order/components/list/OrderListTable';
 import { createOrderListTableColumns } from '@/features/order/components/list/orderListTableColumns';
-import useOrderList from '@/features/order/hooks/useOrderList';
+import { useOrderList } from '@/features/order/hooks/useOrderList';
 import type { UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '../Button/Button';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 import { Stack } from './Stack';
 
 const meta: Meta<typeof Stack> = {

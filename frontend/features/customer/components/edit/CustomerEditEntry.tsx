@@ -1,7 +1,7 @@
 'use client';
 
 import { Spinner } from '@/components/ui';
-import useCustomerEdit from '@/features/customer/hooks/useCustomerEdit';
+import { useCustomerEdit } from '@/features/customer/hooks/useCustomerEdit';
 import { useUsers } from '@/features/user/hooks/useUsers';
 import { useParams } from 'next/navigation';
 import CustomerEditForm from './CustomerEditForm';

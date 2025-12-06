@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ToastContainer from './ToastContainer';
+import { ToastContainer } from './ToastContainer';
 
 export type ToastVariant = 'success' | 'error' | 'info';
 
@@ -97,4 +97,4 @@ export const useToast = (): ToastContextType => {
   return ctx;
 };
 
-export default ToastContext;
+export { ToastContext };

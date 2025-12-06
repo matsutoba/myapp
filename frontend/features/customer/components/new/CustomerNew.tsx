@@ -19,7 +19,7 @@ import {
 import { useUsers } from '@/features/user/hooks/useUsers';
 import type { User } from '@/features/user/types';
 import { actions } from '@/lib/actions';
-import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { getErrorMessage } from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import type { Resolver } from 'react-hook-form';

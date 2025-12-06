@@ -11,7 +11,7 @@ import {
   useToast,
 } from '@/components/ui';
 import type { BadgeVariant } from '@/components/ui/Badge/Badge';
-import Table, { Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
+import { Table, Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
 import type { Order } from '@/features/order/actions/getOrders';
 import { actions } from '@/lib/actions';
 import { useParams, useRouter } from 'next/navigation';

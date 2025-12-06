@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 type FormData = Partial<CustomerForm> & { ownerId?: number | null };
 
-export default function useCustomerEdit(customerIdProp: number) {
+export function useCustomerEdit(customerIdProp: number) {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -20,6 +20,9 @@ export default function useCustomerEdit(customerIdProp: number) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Ignore invalid IDs (e.g. NaN) to avoid repeated failed loads / render loops
+    if (typeof customerIdProp !== 'number' || Number.isNaN(customerIdProp))
+      return;
     loadCustomer(customerIdProp);
   }, [customerIdProp]);
 

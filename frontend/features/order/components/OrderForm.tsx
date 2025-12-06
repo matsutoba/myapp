@@ -6,7 +6,7 @@ import type { Customer } from '@/features/customer/types';
 import type { CreateOrderInput } from '@/features/order/actions/createOrder';
 import { orderFormSchema, type OrderForm } from '@/features/order/validation';
 import { actions } from '@/lib/actions';
-import getErrorMessage from '@/lib/zod/getErrorMessage';
+import { getErrorMessage } from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { Controller, useForm, type Resolver } from 'react-hook-form';

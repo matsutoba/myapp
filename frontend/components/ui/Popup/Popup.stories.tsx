@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 import { Popup } from './Popup';
 
 const meta: Meta<typeof Popup> = {

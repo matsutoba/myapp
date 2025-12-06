@@ -1,8 +1,8 @@
 import React from 'react';
-import Toast from './Toast';
+import { Toast } from './Toast';
 import type { ToastItem } from './ToastContext';
 
-const ToastContainer: React.FC<{
+export const ToastContainer: React.FC<{
   toasts: ToastItem[];
   onDismiss: (id: string) => void;
 }> = ({ toasts, onDismiss }) => {
@@ -18,5 +18,3 @@ const ToastContainer: React.FC<{
     </div>
   );
 };
-
-export default ToastContainer;

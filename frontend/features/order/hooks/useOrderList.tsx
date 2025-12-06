@@ -4,11 +4,11 @@ import { useToast } from '@/components/ui';
 import { PAGINATION_DEFAULT_TAKE } from '@/constants';
 import { useOrders, UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
-import usePagination from '@/lib/hooks/usePagination';
+import { usePagination } from '@/lib/hooks/usePagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
-export default function useOrderList(opts?: UseOrdersOptions) {
+export function useOrderList(opts?: UseOrdersOptions) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

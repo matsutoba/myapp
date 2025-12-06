@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TextField from '../TextField/TextField';
+import { TextField } from '../TextField/TextField';
 import { Card } from './Card';
 
 const meta: Meta<typeof Card> = {
