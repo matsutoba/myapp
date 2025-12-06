@@ -1,25 +1,8 @@
-import ChartClient from '@/features/dashboard/components/ChartClient';
-import KpiCard from '@/features/dashboard/components/KpiCard';
+import ChartClient from '@/features/dashboard/components/order/ChartClient';
+import KpiCard from '@/features/dashboard/components/order/KpiCard';
 import { formatDate } from '@/lib/date/formatDate';
 
-export default function DashboardServer({ data }: { data: any }) {
-  const totalOrders = data?.kpis?.totalOrders ?? 0;
-  const totalRevenue = data?.kpis?.totalRevenue ?? 0;
-  const avg = data?.kpis?.avgOrderValue ?? 0;
-
-  const nf = new Intl.NumberFormat('ja-JP');
-  const currency = new Intl.NumberFormat('ja-JP', {
-    style: 'currency',
-    currency: 'JPY',
-    maximumFractionDigits: 0,
-  });
-
-  const kpis = [
-    { title: '総注文数', value: nf.format(totalOrders) },
-    { title: '総売上', value: currency.format(Math.round(totalRevenue)) },
-    { title: '平均注文額', value: currency.format(Math.round(avg)) },
-  ];
-
+export default function Dashboard({ data }: { data: any }) {
   const times = (data?.timeseries ?? []).map((r: any) => ({
     date: r.period,
     orders: r.count,
