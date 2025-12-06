@@ -6,7 +6,7 @@ interface DisplayControllerProps {
   currentDisplayKind: DisplayKind;
   currentDisplayMode: DisplayMode;
   onDateChange: (date: Date) => void;
-  onDisplaySwitchChange: (newSwitch: any) => void;
+  onDisplaySwitchChange: (newSwitch: DisplayKind) => void;
   onDisplayModeChange: (mode: DisplayMode) => void;
 }
 

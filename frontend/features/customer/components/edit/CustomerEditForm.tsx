@@ -6,9 +6,13 @@ import {
 import type { User } from '@/features/user/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
+import type { Resolver } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 type FormValues = CustomerForm & { ownerId?: number | string | null };
+type FormValuesRaw = Omit<CustomerForm, 'ownerId'> & {
+  ownerId?: string | number | null;
+};
 
 type Props = {
   formData?: Partial<FormValues>;
@@ -35,16 +39,13 @@ export default function CustomerEditForm({
     control,
     formState: { errors },
     reset,
-  } = useForm<any>({
-    resolver: zodResolver(customerFormSchema),
+  } = useForm<FormValuesRaw>({
+    resolver: zodResolver(
+      customerFormSchema,
+    ) as unknown as Resolver<FormValuesRaw>,
     defaultValues: {
       ...formData,
-      ownerId:
-        formData?.ownerId == null
-          ? null
-          : typeof formData.ownerId === 'string'
-          ? Number(formData.ownerId)
-          : formData.ownerId,
+      ownerId: formData?.ownerId == null ? null : String(formData.ownerId),
       tagsStr: formData?.tagsStr ?? '',
       lastContactedAt: formData?.lastContactedAt ?? '',
       nextActionAt: formData?.nextActionAt ?? '',
@@ -54,20 +55,26 @@ export default function CustomerEditForm({
   useEffect(() => {
     reset({
       ...formData,
-      ownerId:
-        formData?.ownerId == null
-          ? null
-          : typeof formData.ownerId === 'string'
-          ? Number(formData.ownerId)
-          : formData.ownerId,
+      ownerId: formData?.ownerId == null ? null : String(formData.ownerId),
       tagsStr: formData?.tagsStr ?? '',
       lastContactedAt: formData?.lastContactedAt ?? '',
       nextActionAt: formData?.nextActionAt ?? '',
     });
   }, [formData, reset]);
 
-  const internalSubmit = (values: any) => {
-    onSubmit(values as FormValues);
+  const internalSubmit = (values: FormValuesRaw) => {
+    // normalize ownerId to number when caller expects numeric id
+    const out = {
+      ...values,
+      ownerId:
+        typeof values.ownerId === 'string'
+          ? values.ownerId
+            ? Number(values.ownerId)
+            : undefined
+          : values.ownerId,
+    } as unknown as FormValues;
+
+    onSubmit(out);
   };
 
   return (

@@ -2,6 +2,7 @@
 
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
+import unusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 const eslintConfig = defineConfig([
@@ -9,6 +10,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Project-specific rules
   {
+    plugins: {
+      'unused-imports': unusedImports,
+    },
     rules: {
       // Disallow `as any` via AST selector for TS `as` expressions with `any` type
       'no-restricted-syntax': [

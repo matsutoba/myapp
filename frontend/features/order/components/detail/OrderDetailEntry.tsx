@@ -12,6 +12,7 @@ import {
 } from '@/components/ui';
 import type { BadgeVariant } from '@/components/ui/Badge/Badge';
 import Table, { Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
+import type { Order } from '@/features/order/actions/getOrders';
 import { actions } from '@/lib/actions';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -32,7 +33,7 @@ export default function OrderDetailEntry() {
   const id = params.id;
 
   const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<any | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { showToast } = useToast();

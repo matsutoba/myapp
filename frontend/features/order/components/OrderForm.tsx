@@ -3,16 +3,17 @@
 import { Button, Notification, Select, TextField } from '@/components/ui';
 import type { CustomersPagedResponse } from '@/features/customer/actions/getCustomers';
 import type { Customer } from '@/features/customer/types';
-import { orderFormSchema } from '@/features/order/validation';
+import type { CreateOrderInput } from '@/features/order/actions/createOrder';
+import { orderFormSchema, type OrderForm } from '@/features/order/validation';
 import { actions } from '@/lib/actions';
 import getErrorMessage from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, type Resolver } from 'react-hook-form';
 
 type Props = {
-  initialValues?: any;
-  onSubmit: (data: any) => Promise<void> | void;
+  initialValues?: Partial<OrderForm> | Record<string, unknown>;
+  onSubmit: (data: CreateOrderInput) => Promise<void> | void;
   onCancel?: () => void;
   /** 編集時などに顧客選択を無効化する */
   disableCustomerSelect?: boolean;
@@ -35,19 +36,38 @@ export default function OrderForm({
     formState: { errors, isSubmitting },
     trigger,
     control,
-  } = useForm<any>({
-    resolver: zodResolver(orderFormSchema),
+  } = useForm<OrderForm>({
+    resolver: zodResolver(orderFormSchema) as unknown as Resolver<OrderForm>,
     defaultValues: {
-      customerId: initialValues.customerId
+      customerId: initialValues?.customerId
         ? String(initialValues.customerId)
         : '',
-      amount: initialValues.amount ?? 0,
-      currency: initialValues.currency ?? 'JPY',
-      itemsCount: initialValues.itemsCount ?? 1,
-      orderChannel: initialValues.orderChannel ?? 'web',
-      category: initialValues.category ?? '',
-      status: initialValues.status ?? 'pending',
-    },
+      amount:
+        initialValues && 'amount' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).amount ?? 0
+          : 0,
+      currency:
+        initialValues && 'currency' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).currency ?? 'JPY'
+          : 'JPY',
+      itemsCount:
+        initialValues && 'itemsCount' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).itemsCount ?? 1
+          : 1,
+      orderChannel:
+        initialValues && 'orderChannel' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).orderChannel ??
+            'web'
+          : 'web',
+      category:
+        initialValues && 'category' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).category ?? ''
+          : '',
+      status:
+        initialValues && 'status' in initialValues
+          ? (initialValues as unknown as Partial<OrderForm>).status ?? 'pending'
+          : 'pending',
+    } as unknown as OrderForm,
   });
 
   useEffect(() => {
@@ -86,9 +106,15 @@ export default function OrderForm({
 
     const payload = {
       customerId: data.customerId || undefined,
-      amount: Number(data.amount) || 0,
+      amount:
+        typeof data.amount === 'number'
+          ? data.amount
+          : Number(data.amount) || 0,
       currency: data.currency || undefined,
-      itemsCount: Number(data.itemsCount) || undefined,
+      itemsCount:
+        typeof data.itemsCount === 'number'
+          ? data.itemsCount
+          : Number(data.itemsCount) || undefined,
       orderChannel: data.orderChannel || undefined,
       category: data.category || undefined,
       status: data.status || undefined,
@@ -110,7 +136,9 @@ export default function OrderForm({
           <Select
             label="顧客"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: '', label: '選択してください' },
               ...customerOptions,
@@ -152,7 +180,9 @@ export default function OrderForm({
           <Select
             label="注文チャネル"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: 'web', label: 'Web' },
               { value: 'app', label: 'App' },
@@ -176,7 +206,9 @@ export default function OrderForm({
           <Select
             label="ステータス"
             value={field.value}
-            onChange={(e) => field.onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              field.onChange(e.target.value)
+            }
             options={[
               { value: 'pending', label: 'Pending' },
               { value: 'refunded', label: 'Refunded' },

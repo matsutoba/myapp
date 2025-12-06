@@ -15,12 +15,17 @@ import {
 import OrderListTable from '@/features/order/components/list/OrderListTable';
 import { createOrderListTableColumns } from '@/features/order/components/list/orderListTableColumns';
 import useOrderList from '@/features/order/hooks/useOrderList';
+import type { UseOrdersOptions } from '@/features/order/hooks/useOrders';
 import { actions } from '@/lib/actions';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-export default function OrderList({ opts }: { opts?: any }) {
+export default function OrderList({
+  opts,
+}: {
+  opts?: UseOrdersOptions | undefined;
+}) {
   const router = useRouter();
   const {
     orders,

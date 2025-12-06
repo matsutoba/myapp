@@ -13,10 +13,14 @@ import {
 } from '@/components/ui';
 import { createUser } from '@/features/user/actions/createUser';
 import type { CreateUserRequest } from '@/features/user/types';
-import { UserCreateForm, userCreateSchema } from '@/features/user/validation';
+import {
+  userCreateSchema,
+  type UserCreateForm,
+} from '@/features/user/validation';
 import getErrorMessage from '@/lib/zod/getErrorMessage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
 export default function UserNew() {
@@ -27,8 +31,10 @@ export default function UserNew() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<any>({
-    resolver: zodResolver(userCreateSchema),
+  } = useForm<UserCreateForm>({
+    resolver: zodResolver(
+      userCreateSchema,
+    ) as unknown as Resolver<UserCreateForm>,
     defaultValues: {
       name: '',
       email: '',
@@ -37,13 +43,13 @@ export default function UserNew() {
     },
   });
 
-  const onSubmit = async (data: UserCreateForm | any) => {
+  const onSubmit = async (data: UserCreateForm) => {
     const payload: CreateUserRequest = {
       name: data.name,
       email: data.email,
       password: data.password,
       role: data.role || 'user',
-    } as CreateUserRequest;
+    };
 
     try {
       const result = await createUser(payload);

@@ -32,11 +32,12 @@ export const WeatherChartContent: React.FC<WeatherChartProps> = ({
 }) => {
   const { data: weatherData } = useWeatherQuery({ date, latitude, longitude });
 
+  type WeatherPoint = { time: Date; temperature_2m: number; rain: number };
   const data = useMemo(() => {
-    return weatherData?.map((item: any, index: number) => ({
-      date: formatDate(item!.time, { formatStr: 'MM/dd HH:00' }),
-      temp: displayKind.temp ? item!.temperature_2m : undefined,
-      rain: displayKind.rain ? item!.rain : undefined,
+    return weatherData?.map((item: WeatherPoint, index: number) => ({
+      date: formatDate(item.time, { formatStr: 'MM/dd HH:00' }),
+      temp: displayKind.temp ? item.temperature_2m : undefined,
+      rain: displayKind.rain ? item.rain : undefined,
     }));
   }, [weatherData, displayKind]);
 

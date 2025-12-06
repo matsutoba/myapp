@@ -3,7 +3,7 @@ import { USER_ROLES } from '@/constants';
 import { ColumnDef } from '@tanstack/react-table';
 
 type CreateUserListTableColumnsArgs = {
-  router: any;
+  router: { push: (url: string) => void };
   onDelete: (id: number) => void;
 };
 

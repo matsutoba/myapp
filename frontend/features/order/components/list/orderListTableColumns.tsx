@@ -11,7 +11,7 @@ type Order = {
 };
 
 type CreateOrderListTableColumnsArgs = {
-  router: any;
+  router: { push: (url: string) => void };
   onDelete: (id: number) => void;
 };
 

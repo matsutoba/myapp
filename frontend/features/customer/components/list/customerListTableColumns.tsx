@@ -2,7 +2,7 @@ import { IconButton } from '@/components/ui';
 import { ColumnDef } from '@tanstack/react-table';
 
 type CreateCustomerListTableColumnsArgs = {
-  router: any;
+  router: { push: (url: string) => void };
   onDelete: (id: number) => void;
 };
 

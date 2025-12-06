@@ -8,7 +8,7 @@ import { API_ERROR_EVENT } from '@/lib/contexts/ErrorContext';
  * const wrappedGetUsers = withAutoError(getUsers);
  * const result = await wrappedGetUsers(); // エラー時は自動的にモーダル表示
  */
-export function withAutoError<TArgs extends any[], TResult>(
+export function withAutoError<TArgs extends unknown[], TResult>(
   serverAction: (...args: TArgs) => Promise<ApiResponse<TResult>>,
 ) {
   return async (...args: TArgs): Promise<ApiResponse<TResult>> => {

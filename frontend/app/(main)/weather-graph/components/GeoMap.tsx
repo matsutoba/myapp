@@ -22,7 +22,7 @@ interface GeoMapProps {
 }
 
 export const GeoMap: React.FC<GeoMapProps> = ({ cities, onSelectCity }) => {
-  const [geoData, setGeoData] = useState<any | null>(null);
+  const [geoData, setGeoData] = useState<unknown | null>(null);
   const [hoveredCityId, setHoveredCityId] = useState<number | null>(null);
 
   useEffect(() => {

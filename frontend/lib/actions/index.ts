@@ -40,15 +40,15 @@ import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions
  * 複数のactionsモジュールを1つのオブジェクトにマージ
  * 型を保持するため、戻り値の型をマージしたモジュールの交差型にキャストする
  */
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
+type UnionToIntersection<U> = (
+  U extends unknown ? (k: U) => void : never
+) extends (k: infer I) => void
   ? I
   : never;
 
-function mergeActions<Modules extends Record<string, any>[]>(
-  ...modules: Modules
-): UnionToIntersection<Modules[number]> {
+function mergeActions<
+  Modules extends Array<Record<string, (...args: any[]) => any>>,
+>(...modules: Modules): UnionToIntersection<Modules[number]> {
   return Object.assign({}, ...modules) as UnionToIntersection<Modules[number]>;
 }
 
