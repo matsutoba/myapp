@@ -15,7 +15,7 @@ import {
 
 // モックデータを生成（直近30日）
 function generateMockData() {
-  const data = [];
+  const data: Array<{ date: string; orders: number; revenue: number }> = [];
   const today = new Date();
   for (let i = 29; i >= 0; i--) {
     const d = new Date(today);
@@ -63,6 +63,7 @@ export default function ChartClient({ data, periodLabel }: Props) {
           集計期間：{periodLabel}
         </div>
       ) : null}
+      {/* 上部に表示していた Y 軸ラベルは削除（チャート内のラベルを使用） */}
       <div>
         <div className="col-span-1 sm:col-span-2">
           <div className="bg-white rounded-lg shadow p-4">
@@ -70,12 +71,36 @@ export default function ChartClient({ data, periodLabel }: Props) {
               <ResponsiveContainer>
                 <LineChart
                   data={chartData}
-                  margin={{ top: 10, right: 40, left: 0, bottom: 0 }}
+                  margin={{ top: 36, right: 40, left: 0, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tickFormatter={(v) => formatToYMD(v)} />
-                  <YAxis yAxisId="left" orientation="left" />
-                  <YAxis yAxisId="right" orientation="right" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(v) => formatToYMD(v)}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    orientation="left"
+                    label={{
+                      value: '注文数',
+                      angle: 0,
+                      dy: -12,
+                      position: 'top',
+                    }}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    label={{
+                      value: '売上',
+                      angle: 0,
+                      dy: -12,
+                      position: 'top',
+                    }}
+                  />
                   <Tooltip
                     formatter={(value: number, name: string) => [
                       name === 'revenue' ? `¥${value}` : value,
