@@ -5,9 +5,11 @@ import {
   ConfirmModal,
   Container,
   FeatureTitleBar,
+  IconButton,
   Pagination,
   Spinner,
   Stack,
+  TextField,
   useToast,
 } from '@/components/ui';
 import OrderListTable from '@/features/order/components/list/OrderListTable';
@@ -26,10 +28,14 @@ export default function OrderList({ opts }: { opts?: any }) {
     total,
     take,
     refresh,
+    searchTerm,
+    setSearchTerm,
     showConfirmModal,
     setShowConfirmModal,
     deleteTargetId,
     setDeleteTargetId,
+    loadOrders,
+    handleSearch,
     takeVal,
     currentPage,
     totalPages,
@@ -89,7 +95,38 @@ export default function OrderList({ opts }: { opts?: any }) {
       <Container>
         <Stack spacing="lg">
           <Stack direction="horizontal" justify="between" align="center">
-            <div />
+            <div className="flex items-center space-x-2">
+              <div className="w-72">
+                <TextField
+                  placeholder="検索 (注文ID or 会社名)"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onEnter={() => handleSearch()}
+                  onClear={() => {
+                    setSearchTerm('');
+                    handleSearch('');
+                  }}
+                  trailing={
+                    searchTerm && searchTerm !== '' ? (
+                      <IconButton
+                        icon="X"
+                        onClick={() => {
+                          setSearchTerm('');
+                          handleSearch('');
+                        }}
+                        aria-label="検索条件をクリア"
+                      />
+                    ) : (
+                      <IconButton
+                        icon="Search"
+                        onClick={() => handleSearch()}
+                        aria-label="検索"
+                      />
+                    )
+                  }
+                />
+              </div>
+            </div>
             <Button size="sm" onClick={() => router.push('/orders/new')}>
               新規作成
             </Button>

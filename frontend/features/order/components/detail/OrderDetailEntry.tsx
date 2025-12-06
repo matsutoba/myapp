@@ -67,6 +67,11 @@ export default function OrderDetailEntry() {
           <Table>
             <Tbody>
               <Tr>
+                <Th>注文番号</Th>
+                <Td>{order.id ?? '-'}</Td>
+              </Tr>
+
+              <Tr>
                 <Th>顧客</Th>
                 <Td>{order.companyName ?? order.customerId ?? '-'}</Td>
               </Tr>

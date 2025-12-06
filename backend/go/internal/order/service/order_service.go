@@ -13,6 +13,9 @@ import (
 type OrderService interface {
 	GetOrdersByCustomer(customerID uint, limit int, offset int) (interface{}, error)
 	GetOrders(limit int, offset int) ([]domain.Order, error)
+	// Search orders by query
+	GetOrdersWithQuery(q string, limit int, offset int) ([]domain.Order, error)
+	CountOrdersWithQuery(q string) (int64, error)
 	CountOrders(count *int64) error
 	GetAggregates(start time.Time, end time.Time, period string, status string, category string) ([]repository.OrderAggregateRow, error)
 	GetOrderByID(id uint) (*domain.Order, error)
@@ -36,6 +39,14 @@ func (s *orderService) GetOrdersByCustomer(customerID uint, limit int, offset in
 
 func (s *orderService) GetOrders(limit int, offset int) ([]domain.Order, error) {
 	return s.repo.GetAll(limit, offset)
+}
+
+func (s *orderService) GetOrdersWithQuery(q string, limit int, offset int) ([]domain.Order, error) {
+	return s.repo.Search(q, limit, offset)
+}
+
+func (s *orderService) CountOrdersWithQuery(q string) (int64, error) {
+	return s.repo.CountSearch(q)
 }
 
 func (s *orderService) GetOrderByID(id uint) (*domain.Order, error) {

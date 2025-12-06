@@ -39,7 +39,8 @@ export async function getOrders(opts?: {
     if (typeof opts.take === 'number') params.set('take', String(opts.take));
   }
   if (opts?.keyword) {
-    params.set('keyword', opts.keyword);
+    // backend expects `q` for search queries
+    params.set('q', opts.keyword);
   }
 
   const query = params.toString() ? `?${params.toString()}` : '';
