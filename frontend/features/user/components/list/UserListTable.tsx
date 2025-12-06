@@ -14,12 +14,17 @@ export default function UserListTable({ table }: Props) {
   return (
     <>
       <Card padding="none" className="overflow-hidden">
-        <Table>
+        <Table className="w-full table-fixed">
           <Thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <Tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <Th key={header.id}>
+                  <Th
+                    key={header.id}
+                    className={
+                      (header.column.columnDef as any).meta?.thClass ?? ''
+                    }
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -36,7 +41,12 @@ export default function UserListTable({ table }: Props) {
             {table.getRowModel().rows.map((row) => (
               <Tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <Td key={cell.id}>
+                  <Td
+                    key={cell.id}
+                    className={
+                      (cell.column.columnDef as any).meta?.tdClass ?? ''
+                    }
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Td>
                 ))}
