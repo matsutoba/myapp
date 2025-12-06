@@ -12,11 +12,24 @@ export function createUserListTableColumns({
   onDelete,
 }: CreateUserListTableColumnsArgs): ColumnDef<any>[] {
   return [
-    { accessorKey: 'name', header: '名前' },
-    { accessorKey: 'email', header: 'メール' },
+    {
+      accessorKey: 'name',
+      header: '名前',
+      meta: { tdClass: 'max-w-0 min-w-24' },
+      cell: (ctx) => {
+        const v = ctx.getValue() as string | undefined;
+        return <div className="truncate">{v ?? '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'email',
+      header: 'メール',
+      meta: { thClass: 'w-56', tdClass: 'w-56' },
+    },
     {
       accessorKey: 'role',
       header: 'ロール',
+      meta: { thClass: 'w-28', tdClass: 'w-28' },
       cell: ({ getValue }) => (
         <Badge variant={getValue() === USER_ROLES.ADMIN ? 'admin' : 'user'}>
           {String(getValue())}
@@ -26,6 +39,7 @@ export function createUserListTableColumns({
     {
       accessorKey: 'isActive',
       header: 'ステータス',
+      meta: { thClass: 'w-28', tdClass: 'w-28' },
       cell: ({ getValue }) => (
         <Badge variant={getValue() ? 'success' : 'danger'}>
           {getValue() ? '有効' : '無効'}
@@ -35,8 +49,9 @@ export function createUserListTableColumns({
     {
       id: 'actions',
       header: '操作',
+      meta: { thClass: 'w-26', tdClass: 'w-26' },
       cell: ({ row }) => (
-        <div className="inline-flex items-center space-x-2">
+        <div className="flex">
           <IconButton
             icon="Pencil"
             onClick={() => router.push(`/admin/users/${row.original.id}`)}

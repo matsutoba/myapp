@@ -11,14 +11,31 @@ export function createCustomerListTableColumns({
   onDelete,
 }: CreateCustomerListTableColumnsArgs): ColumnDef<any>[] {
   return [
-    { accessorKey: 'company', header: '会社名' },
-    { accessorKey: 'contactName', header: '担当者' },
-    { accessorKey: 'email', header: 'メール' },
+    {
+      accessorKey: 'company',
+      header: '会社名',
+      meta: { tdClass: 'max-w-0 min-w-24' },
+      cell: (ctx) => {
+        const v = ctx.getValue() as string | undefined;
+        return <div className="truncate">{v ?? '-'}</div>;
+      },
+    },
+    {
+      accessorKey: 'contactName',
+      header: '担当者',
+      meta: { thClass: 'w-36', tdClass: 'w-36' },
+    },
+    {
+      accessorKey: 'email',
+      header: 'メール',
+      meta: { thClass: 'w-56', tdClass: 'w-56' },
+    },
     {
       id: 'actions',
       header: '操作',
+      meta: { thClass: 'w-26', tdClass: 'w-26' },
       cell: ({ row }) => (
-        <div className="inline-flex items-center space-x-2">
+        <div className="flex">
           <IconButton
             icon="Pencil"
             onClick={() => router.push(`/customers/${row.original.id}`)}
