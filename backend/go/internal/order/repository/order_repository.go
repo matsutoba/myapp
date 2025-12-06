@@ -18,6 +18,10 @@ type OrderAggregateRow struct {
 type OrderRepository interface {
 	GetByCustomer(customerID uint, limit int, offset int) ([]domain.Order, error)
 	GetAll(limit int, offset int) ([]domain.Order, error)
+	// Search orders by query (partial match against order id and customer company)
+	Search(q string, limit int, offset int) ([]domain.Order, error)
+	// Count matching search results
+	CountSearch(q string) (int64, error)
 	CountAll() (int64, error)
 	Aggregate(start time.Time, end time.Time, period string, status string, category string) ([]OrderAggregateRow, error)
 	Create(order *domain.Order) (*domain.Order, error)
@@ -78,6 +82,35 @@ func (r *orderRepository) CountAll() (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (r *orderRepository) CountSearch(q string) (int64, error) {
+	var count int64
+	pattern := "%" + q + "%"
+	// join with customers to search company name
+	if err := r.db.Model(&domain.Order{}).
+		Joins("JOIN customers ON customers.id = orders.customer_id").
+		Where("CAST(orders.id AS CHAR) LIKE ? OR customers.company LIKE ?", pattern, pattern).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *orderRepository) Search(q string, limit int, offset int) ([]domain.Order, error) {
+	var orders []domain.Order
+	pattern := "%" + q + "%"
+	qdb := r.db.Preload("Customer").Joins("JOIN customers ON customers.id = orders.customer_id").Order("created_at desc").Where("CAST(orders.id AS CHAR) LIKE ? OR customers.company LIKE ?", pattern, pattern)
+	if limit > 0 {
+		qdb = qdb.Limit(limit)
+	}
+	if offset > 0 {
+		qdb = qdb.Offset(offset)
+	}
+	if err := qdb.Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
 }
 
 func (r *orderRepository) Aggregate(start time.Time, end time.Time, period string, status string, category string) ([]OrderAggregateRow, error) {

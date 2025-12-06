@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/matsubara/myapp/internal/common/errors"
+	"github.com/matsubara/myapp/internal/domain"
 	"github.com/matsubara/myapp/internal/order/dto"
 	"github.com/matsubara/myapp/internal/order/service"
 	"gorm.io/gorm"
@@ -89,16 +90,33 @@ func (oc *OrderController) ListOrders(c *gin.Context) {
 		limit = 20
 	}
 
-	data, err := oc.service.GetOrders(limit, req.Offset)
-	if err != nil {
-		errors.WriteError(c, http.StatusInternalServerError, err)
-		return
-	}
-	// Also return total count for pagination
+	// optional search query
+	q := c.Query("q")
+	var data []domain.Order
 	var total int64
-	if err := oc.service.CountOrders(&total); err != nil {
-		errors.WriteError(c, http.StatusInternalServerError, err)
-		return
+	var err error
+	if q != "" {
+		// search mode
+		data, err = oc.service.GetOrdersWithQuery(q, limit, req.Offset)
+		if err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
+		total, err = oc.service.CountOrdersWithQuery(q)
+		if err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
+	} else {
+		data, err = oc.service.GetOrders(limit, req.Offset)
+		if err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
+		if err := oc.service.CountOrders(&total); err != nil {
+			errors.WriteError(c, http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	// Use DTO converter to build a consistent paged response

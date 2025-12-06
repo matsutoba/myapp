@@ -33,6 +33,16 @@ func (m *mockOrderService) CountOrders(count *int64) error {
 	return nil
 }
 
+// search-related stubs
+func (m *mockOrderService) GetOrdersWithQuery(q string, limit int, offset int) ([]domain.Order, error) {
+	// reuse GetOrders behavior
+	return m.GetOrders(limit, offset)
+}
+
+func (m *mockOrderService) CountOrdersWithQuery(q string) (int64, error) {
+	return 1, nil
+}
+
 func (m *mockOrderService) GetOrderByID(id uint) (*domain.Order, error) {
 	if id == 0 {
 		return nil, gorm.ErrRecordNotFound

@@ -107,6 +107,15 @@ func (m *mockRepo) CountAll() (int64, error) {
 	return 2, nil
 }
 
+// Search-related stubs
+func (m *mockRepo) CountSearch(q string) (int64, error) {
+	return 2, nil
+}
+
+func (m *mockRepo) Search(q string, limit int, offset int) ([]domain.Order, error) {
+	return m.GetAll(limit, offset)
+}
+
 func (m *mockRepo) GetAll(limit int, offset int) ([]domain.Order, error) {
 	o1 := domain.Order{ID: 1, CustomerID: 1, Amount: 1000, Currency: "JPY", ItemsCount: 1, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	o2 := domain.Order{ID: 2, CustomerID: 2, Amount: 2000, Currency: "JPY", ItemsCount: 2, CreatedAt: time.Now(), UpdatedAt: time.Now()}
