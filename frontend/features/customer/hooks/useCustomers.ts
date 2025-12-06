@@ -48,7 +48,14 @@ export function useCustomers(
 
         if (res.success && res.data) {
           // data may be an array or a paged response
-          const raw = res.data as any;
+          const raw = res.data as
+            | Customer[]
+            | {
+                items?: Customer[];
+                total?: number | null;
+                take?: number | null;
+                skip?: number | null;
+              };
           if (Array.isArray(raw)) {
             setCustomers(raw as Customer[]);
             setTotal(null);

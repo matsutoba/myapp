@@ -1,6 +1,8 @@
 'use client';
 
 import { Button, Notification, Select, TextField } from '@/components/ui';
+import type { CustomersPagedResponse } from '@/features/customer/actions/getCustomers';
+import type { Customer } from '@/features/customer/types';
 import { orderFormSchema } from '@/features/order/validation';
 import { actions } from '@/lib/actions';
 import getErrorMessage from '@/lib/zod/getErrorMessage';
@@ -56,10 +58,9 @@ export default function OrderForm({
         const res = await actions.customer.getCustomers({ take: 200 });
         if (!mounted) return;
         if (res && res.success && res.data) {
-          const items = Array.isArray(res.data)
-            ? res.data
-            : (res.data as any).items || [];
-          const opts = items.map((c: any) => ({
+          const raw = res.data as Customer[] | CustomersPagedResponse;
+          const items = Array.isArray(raw) ? raw : raw.items || [];
+          const opts = items.map((c: Customer) => ({
             value: String(c.id),
             label: c.company || c.contactName || c.email || String(c.id),
           }));

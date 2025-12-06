@@ -50,7 +50,9 @@ export default function useCustomerEdit(customerIdProp: number) {
   };
 
   // フォームからバリデート済みの値を受け取り API 呼び出しを行う
-  const submit = async (values: CustomerForm & { ownerId?: string | null }) => {
+  const submit = async (
+    values: CustomerForm & { ownerId?: string | number | null },
+  ) => {
     if (!customerId) return;
     setError('');
     setIsSubmitting(true);
@@ -76,7 +78,9 @@ export default function useCustomerEdit(customerIdProp: number) {
             ? values.ownerId
               ? Number(values.ownerId)
               : undefined
-            : (values.ownerId as any),
+            : typeof values.ownerId === 'number'
+            ? values.ownerId
+            : undefined,
         lastContactedAt:
           values.lastContactedAt && values.lastContactedAt !== ''
             ? new Date(values.lastContactedAt).toISOString()

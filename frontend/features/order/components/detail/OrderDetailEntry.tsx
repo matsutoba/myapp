@@ -10,6 +10,7 @@ import {
   Spinner,
   useToast,
 } from '@/components/ui';
+import type { BadgeVariant } from '@/components/ui/Badge/Badge';
 import Table, { Tbody, Td, Th, Tr } from '@/components/ui/Table/Table';
 import { actions } from '@/lib/actions';
 import { useParams, useRouter } from 'next/navigation';
@@ -109,7 +110,7 @@ export default function OrderDetailEntry() {
                   {order.status
                     ? (() => {
                         const s = String(order.status).toLowerCase();
-                        const map: Record<string, any> = {
+                        const map: Record<string, BadgeVariant> = {
                           pending: 'warning',
                           processing: 'primary',
                           completed: 'success',
@@ -117,9 +118,7 @@ export default function OrderDetailEntry() {
                           cancelled: 'danger',
                         };
                         const variant = map[s] ?? 'default';
-                        return (
-                          <Badge variant={variant as any}>{order.status}</Badge>
-                        );
+                        return <Badge variant={variant}>{order.status}</Badge>;
                       })()
                     : '-'}
                 </Td>

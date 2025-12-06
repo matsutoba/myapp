@@ -12,37 +12,37 @@ export function createAutoErrorProxy<
 ): {
   [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
 } {
-  const proxy: Partial<{
-    [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
-  }> = {};
-
-  for (const [key, action] of Object.entries(actions)) {
-    if (typeof action === 'function') {
-      // オリジナルのパラメータと戻り値の型を割り当て時にキャストで保持
-      (proxy as any)[key] = async (...args: any[]) => {
-        const result = await (action as any)(...args);
-
-        // ApiResponseの形式をチェック
-        if (
-          result &&
-          typeof result === 'object' &&
-          'success' in result &&
-          !result.success &&
-          result.error &&
-          typeof window !== 'undefined'
-        ) {
-          // クライアント側でエラーイベントを発行
-          window.dispatchEvent(
-            new CustomEvent(API_ERROR_EVENT, { detail: result.error }),
-          );
-        }
-
-        return result;
-      };
-    }
-  }
-
-  return proxy as {
+  const proxy = {} as {
     [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<T[K]>;
   };
+
+  const keys = Object.keys(actions) as Array<keyof T>;
+  for (const key of keys) {
+    const action = actions[key];
+    if (typeof action !== 'function') continue;
+
+    const wrapped = (async (...args: Parameters<T[typeof key]>) => {
+      const result = await action(...args);
+
+      if (result && typeof result === 'object' && result !== null) {
+        const resObj = result as Record<string, any>;
+        if (
+          'success' in resObj &&
+          resObj.success === false &&
+          resObj.error !== undefined &&
+          typeof window !== 'undefined'
+        ) {
+          window.dispatchEvent(
+            new CustomEvent(API_ERROR_EVENT, { detail: resObj.error }),
+          );
+        }
+      }
+
+      return result as ReturnType<T[typeof key]>;
+    }) as (...a: Parameters<T[typeof key]>) => ReturnType<T[typeof key]>;
+
+    proxy[key] = wrapped;
+  }
+
+  return proxy;
 }

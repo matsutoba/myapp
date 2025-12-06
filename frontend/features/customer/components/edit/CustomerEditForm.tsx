@@ -8,11 +8,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-type FormValues = CustomerForm & { ownerId?: string | null };
+type FormValues = CustomerForm & { ownerId?: number | string | null };
 
 type Props = {
-  formData: any;
-  onSubmit: (values: FormValues) => void;
+  formData?: Partial<FormValues>;
+  onSubmit: (
+    values: CustomerForm & { ownerId?: string | number | null },
+  ) => void | Promise<void>;
   isSubmitting: boolean;
   error?: string;
   onCancel: () => void;
@@ -37,20 +39,30 @@ export default function CustomerEditForm({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
       ...formData,
-      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
-      tagsStr: (formData as any).tagsStr ?? '',
-      lastContactedAt: formData.lastContactedAt ?? '',
-      nextActionAt: formData.nextActionAt ?? '',
+      ownerId:
+        formData?.ownerId == null
+          ? null
+          : typeof formData.ownerId === 'string'
+          ? Number(formData.ownerId)
+          : formData.ownerId,
+      tagsStr: formData?.tagsStr ?? '',
+      lastContactedAt: formData?.lastContactedAt ?? '',
+      nextActionAt: formData?.nextActionAt ?? '',
     },
   });
 
   useEffect(() => {
     reset({
       ...formData,
-      ownerId: formData.ownerId == null ? '' : String(formData.ownerId),
-      tagsStr: (formData as any).tagsStr ?? '',
-      lastContactedAt: formData.lastContactedAt ?? '',
-      nextActionAt: formData.nextActionAt ?? '',
+      ownerId:
+        formData?.ownerId == null
+          ? null
+          : typeof formData.ownerId === 'string'
+          ? Number(formData.ownerId)
+          : formData.ownerId,
+      tagsStr: formData?.tagsStr ?? '',
+      lastContactedAt: formData?.lastContactedAt ?? '',
+      nextActionAt: formData?.nextActionAt ?? '',
     });
   }, [formData, reset]);
 

@@ -1,7 +1,15 @@
 'use client';
 
 import { Card, Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui';
-import { flexRender, type Table as TanTable } from '@tanstack/react-table';
+import {
+  flexRender,
+  type ColumnDef,
+  type Table as TanTable,
+} from '@tanstack/react-table';
+
+type ColumnWithMeta = ColumnDef<any, any> & {
+  meta?: { thClass?: string; tdClass?: string } | undefined;
+};
 
 type Props = {
   table: TanTable<any>;
@@ -22,7 +30,8 @@ export default function CustomerListTable({ table }: Props) {
                   <Th
                     key={header.id}
                     className={
-                      (header.column.columnDef as any).meta?.thClass ?? ''
+                      (header.column.columnDef as ColumnWithMeta).meta
+                        ?.thClass ?? ''
                     }
                   >
                     {header.isPlaceholder
@@ -44,7 +53,8 @@ export default function CustomerListTable({ table }: Props) {
                   <Td
                     key={cell.id}
                     className={
-                      (cell.column.columnDef as any).meta?.tdClass ?? ''
+                      (cell.column.columnDef as ColumnWithMeta).meta?.tdClass ??
+                      ''
                     }
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

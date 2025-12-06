@@ -1,4 +1,4 @@
-import { IconButton } from '@/components/ui';
+import { IconButton, type IconName } from '@/components/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import TextField from './TextField';
@@ -84,7 +84,7 @@ export const WithTrailing: Story = {
             trailing={
               value && value !== '' ? (
                 <IconButton
-                  icon={'X' as any}
+                  icon={'X' as IconName}
                   onClick={() => {
                     setValue('');
                   }}
@@ -92,7 +92,7 @@ export const WithTrailing: Story = {
                 />
               ) : (
                 <IconButton
-                  icon={'Search' as any}
+                  icon={'Search' as IconName}
                   onClick={() => console.log('search click')}
                   aria-label="検索"
                 />
