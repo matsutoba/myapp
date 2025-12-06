@@ -1,10 +1,13 @@
+import type { Meta } from '@storybook/react';
 import { useState } from 'react';
 import Pagination from './Pagination';
 
-export default {
+const meta: Meta<typeof Pagination> = {
   title: 'UI/Pagination',
   component: Pagination,
 };
+
+export default meta;
 
 export const Default = () => {
   const [page, setPage] = useState<number>(1);

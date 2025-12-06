@@ -53,51 +53,55 @@ export const WithIcons: Story = {
 
 export const Interactive: Story = {
   render: () => {
-    const [isOpen, setIsOpen] = useState(false);
+    function Example() {
+      const [isOpen, setIsOpen] = useState(false);
 
-    return (
-      <div className="h-screen bg-gray-100">
-        <div className="bg-indigo-900 text-white h-12 flex items-center px-4">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="hover:bg-indigo-800 p-2 rounded"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      return (
+        <div className="h-screen bg-gray-100">
+          <div className="bg-indigo-900 text-white h-12 flex items-center px-4">
+            <button
+              onClick={() => setIsOpen(true)}
+              className="hover:bg-indigo-800 p-2 rounded"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <div className="ml-4 font-bold">MyApp</div>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+            <div className="ml-4 font-bold">MyApp</div>
+          </div>
+          <div className="p-4">
+            <p>ハンバーガーメニューをクリックしてサイドバーを開いてください</p>
+          </div>
+          <Sidebar
+            isOpen={isOpen}
+            items={[
+              { title: 'ホーム', href: '/', icon: 'Home' },
+              {
+                title: 'ダッシュボード',
+                href: '/dashboard',
+                icon: 'LayoutDashboard',
+              },
+              { title: 'ユーザー管理', href: '/users', icon: 'Users' },
+              { title: 'レポート', href: '/reports', icon: 'FileText' },
+              { title: '設定', href: '/settings', icon: 'Settings' },
+            ]}
+            onClose={() => setIsOpen(false)}
+          />
         </div>
-        <div className="p-4">
-          <p>ハンバーガーメニューをクリックしてサイドバーを開いてください</p>
-        </div>
-        <Sidebar
-          isOpen={isOpen}
-          items={[
-            { title: 'ホーム', href: '/', icon: 'Home' },
-            {
-              title: 'ダッシュボード',
-              href: '/dashboard',
-              icon: 'LayoutDashboard',
-            },
-            { title: 'ユーザー管理', href: '/users', icon: 'Users' },
-            { title: 'レポート', href: '/reports', icon: 'FileText' },
-            { title: '設定', href: '/settings', icon: 'Settings' },
-          ]}
-          onClose={() => setIsOpen(false)}
-        />
-      </div>
-    );
+      );
+    }
+
+    return <Example />;
   },
 };
 

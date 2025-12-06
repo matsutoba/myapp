@@ -3,6 +3,7 @@
 import { flip, offset, shift, useFloating } from '@floating-ui/react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo } from 'react';
+/* eslint-disable react-hooks/refs -- floating-ui provides stable ref setters used on DOM elements */
 import { IconButton } from '../IconButton/IconButton';
 
 export type PopupSize = 'small' | 'medium' | 'large';
@@ -72,3 +73,5 @@ export function Popup({
     </AnimatePresence>
   );
 }
+
+/* eslint-enable react-hooks/refs */

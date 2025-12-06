@@ -1,13 +1,9 @@
 import React from 'react';
 import { IconButton } from '../IconButton/IconButton';
 
-interface HamburgerButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
-
-export function HamburgerButton({
-  className = '',
-  ...props
-}: HamburgerButtonProps) {
+export function HamburgerButton(
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>,
+) {
   return (
     <IconButton
       icon="Menu"

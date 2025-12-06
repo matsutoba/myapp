@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
+/* eslint-disable react-hooks/refs -- sidebar accesses portalRef.current during render intentionally */
 import { createPortal } from 'react-dom';
 import { IconButton } from '../IconButton/IconButton';
 
@@ -163,3 +164,5 @@ export function Sidebar({
   // Fallback: render inline until portal container is ready
   return content;
 }
+
+/* eslint-enable react-hooks/refs */

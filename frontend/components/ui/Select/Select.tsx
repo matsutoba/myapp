@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useId } from 'react';
 import { Icon } from '../Icon/Icon';
 
 interface SelectOption {
@@ -30,7 +32,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref,
   ) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const generated = useId();
+    const selectId = id ?? `select-${generated}`;
     const {
       onChange: originalOnChange,
       onKeyDown: originalOnKeyDown,

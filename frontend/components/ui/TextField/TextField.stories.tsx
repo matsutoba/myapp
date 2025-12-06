@@ -24,21 +24,26 @@ export const Default: Story = {
 
 export const WithValue: Story = {
   render: () => {
-    const [value, setValue] = useState('山田太郎');
-    return (
-      <div className="p-4">
-        <TextField
-          placeholder="検索"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onEnter={() => console.log('enter', value)}
-          onClear={() => {
-            console.log('cleared');
-            setValue('');
-          }}
-        />
-      </div>
-    );
+    function Example() {
+      const [value, setValue] = useState('山田太郎');
+
+      return (
+        <div className="p-4">
+          <TextField
+            placeholder="検索"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onEnter={() => console.log('enter', value)}
+            onClear={() => {
+              console.log('cleared');
+              setValue('');
+            }}
+          />
+        </div>
+      );
+    }
+
+    return <Example />;
   },
 };
 
