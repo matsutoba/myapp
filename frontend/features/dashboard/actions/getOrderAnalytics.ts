@@ -43,7 +43,7 @@ export async function getOrderAnalytics(
   const to = opts?.to ?? formatDate(now);
 
   const past = new Date(now);
-  past.setMonth(past.getMonth() - 12);
+  past.setMonth(past.getMonth() - 1);
   const from = opts?.from ?? formatDate(past);
 
   const groupBy = opts?.groupBy ?? 'day';
