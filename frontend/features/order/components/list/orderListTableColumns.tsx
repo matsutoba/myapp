@@ -20,6 +20,15 @@ export function createOrderListTableColumns({
 }: CreateOrderListTableColumnsArgs): ColumnDef<Order>[] {
   const columns: ColumnDef<Order>[] = [
     {
+      accessorKey: 'id',
+      header: '注文番号',
+      meta: { thClass: 'w-24', tdClass: 'w-24' },
+      cell: (ctx) => {
+        const v = ctx.getValue() as string | number | undefined;
+        return v != null ? String(v) : '-';
+      },
+    },
+    {
       accessorKey: 'companyName',
       header: '会社名',
       meta: { tdClass: 'max-w-0 min-w-8' },
