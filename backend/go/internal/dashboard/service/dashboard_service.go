@@ -67,6 +67,8 @@ func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Tim
 			AvgOrderValue: avg,
 		},
 		Timeseries:  rows,
+		From:        start.Format("2006-01-02"),
+		To:          end.Format("2006-01-02"),
 		GeneratedAt: time.Now().UTC(),
 		Cached:      false,
 	}

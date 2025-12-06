@@ -15,6 +15,8 @@ type KPIs struct {
 type DashboardResponse struct {
 	KPIs        KPIs                          `json:"kpis"`
 	Timeseries  []orderrepo.OrderAggregateRow `json:"timeseries"`
+	From        string                        `json:"from,omitempty"`
+	To          string                        `json:"to,omitempty"`
 	GeneratedAt time.Time                     `json:"generatedAt"`
 	Cached      bool                          `json:"cached"`
 }
