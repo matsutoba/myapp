@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-/* eslint-disable react-hooks/refs -- sidebar accesses portalRef.current during render intentionally */
+/* eslint-disable react-hooks/refs -- sidebar はレンダリング中に portalRef.current にアクセスします（意図的） */
 import { createPortal } from 'react-dom';
 import { IconButton } from '../IconButton/IconButton';
 
@@ -46,7 +46,7 @@ export function Sidebar({
     };
   }, []);
 
-  // Handle focus trap and Esc-to-close when open
+  // 開いているときにフォーカストラップと Esc キーで閉じる処理を扱う
   useEffect(() => {
     if (!isOpen) return;
 
@@ -54,7 +54,7 @@ export function Sidebar({
 
     const sidebarEl = sidebarRef.current;
 
-    // focus the first focusable element inside the sidebar, or the sidebar itself
+    // サイドバー内の最初のフォーカス可能な要素にフォーカスする、なければサイドバー自体にフォーカスする
     const focusableSelector =
       'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
     const focusFirst = () => {
@@ -67,8 +67,10 @@ export function Sidebar({
       }
     };
 
-    // small delay to ensure elements are in DOM
-    const t = setTimeout(focusFirst, 0);
+    // DOM が安定したタイミング（次の描画フレーム直前）でフォーカスを設定する
+    // `requestAnimationFrame` を使うことでレンダーやレイアウトが完了した直後に
+    // 実行され、setTimeout より描画タイミングに対して確実になります。
+    const raf = requestAnimationFrame(() => focusFirst());
 
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
@@ -104,9 +106,9 @@ export function Sidebar({
     document.addEventListener('keydown', onKey);
 
     return () => {
-      clearTimeout(t);
+      if (raf !== null) cancelAnimationFrame(raf);
       document.removeEventListener('keydown', onKey);
-      // restore focus
+      // フォーカスを以前の要素に戻す
       if (previouslyFocused.current && previouslyFocused.current.focus) {
         previouslyFocused.current.focus();
       }
@@ -115,7 +117,7 @@ export function Sidebar({
 
   const content = (
     <>
-      {/* Overlay */}
+      {/* オーバーレイ */}
       {isOpen && (
         <div
           className={`fixed inset-0 ${
@@ -126,7 +128,7 @@ export function Sidebar({
         />
       )}
 
-      {/* Sidebar */}
+      {/* サイドバー */}
       <div
         ref={sidebarRef}
         role={isOpen ? 'dialog' : undefined}
@@ -161,7 +163,7 @@ export function Sidebar({
     return createPortal(content, portalRef.current);
   }
 
-  // Fallback: render inline until portal container is ready
+  // フォールバック: ポータルコンテナが準備できるまでインラインでレンダリングする
   return content;
 }
 
