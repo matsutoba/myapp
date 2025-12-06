@@ -14,7 +14,6 @@
   - クライアントサイドでAPIを呼び出す場合は `apiClient` 関数を使用します（クライアントコンポーネント用）。
 */
 import { API_ERROR_EVENT } from '@/lib/contexts/ErrorContext';
-import { cookies } from 'next/headers';
 
 const API_BASE_URL = process.env.API_HOST || 'http://localhost:8080';
 
@@ -91,6 +90,7 @@ export async function apiServer<T>(
   options?: RequestInit,
 ): Promise<ApiResponse<T>> {
   try {
+    const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const accessToken =
       cookieStore.get('accessToken')?.value ||
@@ -162,6 +162,7 @@ export async function apiServer<T>(
 // リフレッシュが成功してクッキーが更新された場合はtrueを返す
 async function tryRefreshServerTokens(): Promise<boolean> {
   try {
+    const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get('refreshToken')?.value;
     if (!refreshToken) return false;

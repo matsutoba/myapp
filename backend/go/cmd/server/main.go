@@ -11,6 +11,7 @@ import (
 
 	authRouter "github.com/matsubara/myapp/internal/auth/router"
 	customerRouter "github.com/matsubara/myapp/internal/customer/router"
+	dashboardRouter "github.com/matsubara/myapp/internal/dashboard/router"
 	orderRouter "github.com/matsubara/myapp/internal/order/router"
 	userRouter "github.com/matsubara/myapp/internal/user/router"
 )
@@ -61,6 +62,8 @@ func main() {
 	// 各モジュールのルートを登録
 	authRouter.RegisterRoutes(apiGroup, db)
 	userRouter.RegisterRoutes(apiGroup, db)
+	// dashboard routes
+	dashboardRouter.RegisterRoutes(apiGroup, db)
 	customerRouter.RegisterRoutes(apiGroup, db)
 	orderRouter.RegisterRoutes(apiGroup, db)
 

@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 
 const menuItems: SidebarItem[] = [
   {
-    title: 'Home',
-    href: '/',
+    title: 'ダッシュボード',
+    href: '/dashboard',
   },
   {
     title: '管理者メニュー',

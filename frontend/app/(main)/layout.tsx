@@ -18,8 +18,8 @@ export default function MainLayout({
 
   const menuItems: SidebarItem[] = [
     {
-      title: 'Home',
-      href: '/',
+      title: 'ダッシュボード',
+      href: '/dashboard',
     },
     ...(user?.role === USER_ROLES.ADMIN
       ? [

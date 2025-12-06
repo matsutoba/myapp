@@ -33,6 +33,8 @@ import * as orderCreateActions from '@/features/order/actions/createOrder';
 import * as orderDeleteActions from '@/features/order/actions/deleteOrder';
 import * as orderGetActions from '@/features/order/actions/getOrders';
 import * as orderUpdateActions from '@/features/order/actions/updateOrder';
+// Dashboard Actions
+import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions/getOrderAnalytics';
 
 /**
  * 複数のactionsモジュールを1つのオブジェクトにマージ
@@ -85,6 +87,10 @@ export const actions = {
       orderUpdateActions,
       orderDeleteActions,
     ),
+  ),
+
+  dashboard: createAutoErrorProxy(
+    mergeActions(dashboardGetOrderAnalyticsActions),
   ),
 };
 
