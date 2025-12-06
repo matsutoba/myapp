@@ -1,5 +1,6 @@
 import ChartClient from '@/features/dashboard/components/ChartClient';
 import KpiCard from '@/features/dashboard/components/KpiCard';
+import { formatDate } from '@/lib/date/formatDate';
 
 export default function DashboardServer({ data }: { data: any }) {
   const totalOrders = data?.kpis?.totalOrders ?? 0;
@@ -25,7 +26,19 @@ export default function DashboardServer({ data }: { data: any }) {
     revenue: Math.round(r.total),
   }));
 
-  // Simple error / empty state handling
+  let periodLabel = '';
+  if (data?.from && data?.to) {
+    const f = formatDate(data.from, { formatStr: 'yyyy/MM/dd' });
+    const t = formatDate(data.to, { formatStr: 'yyyy/MM/dd' });
+    periodLabel = f === t ? f : `${f} 〜 ${t}`;
+  } else if (times.length > 0) {
+    const f = formatDate(times[0].date ?? '', { formatStr: 'yyyy/MM/dd' });
+    const t = formatDate(times[times.length - 1].date ?? '', {
+      formatStr: 'yyyy/MM/dd',
+    });
+    periodLabel = f === t ? f : `${f} 〜 ${t}`;
+  }
+
   if (!data) {
     return (
       <div>
@@ -37,8 +50,8 @@ export default function DashboardServer({ data }: { data: any }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <KpiCard data={data} />
-      <ChartClient data={times} />
+      <KpiCard data={data} periodLabel={periodLabel} />
+      <ChartClient data={times} periodLabel={periodLabel} />
     </div>
   );
 }

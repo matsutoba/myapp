@@ -2,12 +2,13 @@
 
 import { Card } from '@/components/ui';
 
-type Props = {
-  title: string;
-  value: string;
-};
-
-export default function KpiCard({ data }: { data: any }) {
+export default function KpiCard({
+  data,
+  periodLabel,
+}: {
+  data: any;
+  periodLabel?: string;
+}) {
   const totalOrders = data?.kpis?.totalOrders ?? 0;
   const totalRevenue = data?.kpis?.totalRevenue ?? 0;
   const avg = data?.kpis?.avgOrderValue ?? 0;
@@ -26,7 +27,12 @@ export default function KpiCard({ data }: { data: any }) {
 
   return (
     <Card>
-      <h2 className="text-2xl font-semibold mb-4">注文KPI</h2>
+      <h2 className="text-2xl font-semibold mb-2">注文KPI</h2>
+      {periodLabel ? (
+        <div className="text-sm text-gray-500 mb-4">
+          集計期間：{periodLabel}
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {kpis.map((k) => (
           <div key={k.title}>

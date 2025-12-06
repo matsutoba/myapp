@@ -31,9 +31,10 @@ function generateMockData() {
 
 type Props = {
   data?: Array<{ date: string; orders: number; revenue: number }>;
+  periodLabel?: string;
 };
 
-export default function ChartClient({ data }: Props) {
+export default function ChartClient({ data, periodLabel }: Props) {
   const internal = React.useMemo(() => generateMockData(), []);
   const chartData = data && data.length > 0 ? data : internal;
 
@@ -56,7 +57,12 @@ export default function ChartClient({ data }: Props) {
 
   return (
     <Card>
-      <h2 className="text-2xl font-semibold mb-4">注文数と売上</h2>
+      <h2 className="text-2xl font-semibold mb-2">注文数と売上</h2>
+      {periodLabel ? (
+        <div className="text-sm text-gray-500 mb-4">
+          集計期間：{periodLabel}
+        </div>
+      ) : null}
       <div>
         <div className="col-span-1 sm:col-span-2">
           <div className="bg-white rounded-lg shadow p-4">
