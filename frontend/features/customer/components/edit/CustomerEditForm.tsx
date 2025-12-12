@@ -160,6 +160,32 @@ export default function CustomerEditForm({
         />
 
         <label className="block text-sm font-medium text-gray-700">
+          顧客ランク
+        </label>
+        <Controller
+          name="customerRank"
+          control={control}
+          render={({ field }) => (
+            <select
+              id="customerRank"
+              value={field.value ?? ''}
+              onChange={(e) => field.onChange(e.target.value)}
+              className="mt-1 block w-full border rounded-md px-2 py-1"
+              title={errors.customerRank?.message as string | undefined}
+            >
+              <option value="">-- 選択なし --</option>
+              <option value="vip">VIP</option>
+              <option value="gold">ゴールド</option>
+              <option value="silver">シルバー</option>
+              <option value="bronze">ブロンズ</option>
+            </select>
+          )}
+        />
+        {errors.customerRank && (
+          <p className="text-red-600 text-sm">{errors.customerRank.message}</p>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700">
           担当者
         </label>
         <Controller

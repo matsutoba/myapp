@@ -4,20 +4,24 @@ import (
 	"context"
 	"time"
 
+	customerrepo "github.com/matsubara/myapp/internal/customer/repository"
 	"github.com/matsubara/myapp/internal/dashboard/dto"
 	orderrepo "github.com/matsubara/myapp/internal/order/repository"
 )
 
 type DashboardService interface {
 	GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error)
+	GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error)
+	GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error)
 }
 
 type dashboardService struct {
 	orderRepo orderrepo.OrderRepository
+	custRepo  customerrepo.CustomerRepository
 }
 
-func NewDashboardService(or orderrepo.OrderRepository) DashboardService {
-	return &dashboardService{orderRepo: or}
+func NewDashboardService(or orderrepo.OrderRepository, cr customerrepo.CustomerRepository) DashboardService {
+	return &dashboardService{orderRepo: or, custRepo: cr}
 }
 
 func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error) {
@@ -34,12 +38,13 @@ func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Tim
 	//
 	// 実装ノート:
 	// - 内部では既存の OrderRepository.Aggregate を利用して時系列集計を取得します。
-	// - `start`/`end` の範囲は inclusive として扱われます（service 側で end に 24h-1 を加算）。
+	// - `start`/`end` の範囲は inclusive として扱われます（コントローラで正規化済みの end をそのまま使用します）。
 	// - フィルタ（status, category）は現在空文字で渡しているため未指定となります。必要であれば引数を拡張してください。
 	// - 重い集計は将来的にキャッシュやマテリアライズドビューで最適化してください。
 
-	// Use order repository aggregate to get timeseries
-	rows, err := s.orderRepo.Aggregate(start, end.Add(24*time.Hour-1), groupBy, "", "")
+	// Use order repository aggregate to get timeseries. Controller is responsible for
+	// making `end` inclusive (end-of-day); service uses the timestamps as provided.
+	rows, err := s.orderRepo.Aggregate(start, end, groupBy, "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -73,5 +78,37 @@ func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Tim
 		Cached:      false,
 	}
 
+	return resp, nil
+}
+
+func (s *dashboardService) GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error) {
+	// datetime文字列の使用により、コントローラが包含的な終了日時を設定した場合でも、
+	// リポジトリの BETWEEN が正しく比較されるようにします。
+	startStr := start.Format("2006-01-02 15:04:05")
+	endStr := end.Format("2006-01-02 15:04:05")
+	rows, err := s.custRepo.CountByRankBetween(startStr, endStr)
+	if err != nil {
+		return nil, err
+	}
+	resp := make([]dto.RankCount, 0, len(rows))
+	for _, r := range rows {
+		resp = append(resp, dto.RankCount{Rank: r.CustomerRank, Count: r.Count})
+	}
+	return resp, nil
+}
+
+func (s *dashboardService) GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error) {
+	// datetime文字列の使用により、コントローラが包含的な終了日時を設定した場合でも、
+	// リポジトリの BETWEEN が正しく比較されるようにします。
+	startStr := start.Format("2006-01-02 15:04:05")
+	endStr := end.Format("2006-01-02 15:04:05")
+	rows, err := s.custRepo.MonthlyNewCustomers(startStr, endStr)
+	if err != nil {
+		return nil, err
+	}
+	resp := make([]dto.MonthlyNew, 0, len(rows))
+	for _, r := range rows {
+		resp = append(resp, dto.MonthlyNew{Month: r.YearMonth, NewCustomers: r.NewCustomers})
+	}
 	return resp, nil
 }

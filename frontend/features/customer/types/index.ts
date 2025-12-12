@@ -12,6 +12,8 @@ export interface Customer {
   lastContactedAt?: string | null;
   nextActionAt?: string | null;
   notes?: string | null;
+  customerRank?: string | null;
+  rankUpdatedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -29,6 +31,7 @@ export interface CreateCustomerRequest {
   lastContactedAt?: string | null;
   nextActionAt?: string | null;
   notes?: string | null;
+  customerRank?: string | null;
 }
 
 export interface UpdateCustomerRequest {
@@ -44,4 +47,5 @@ export interface UpdateCustomerRequest {
   lastContactedAt?: string | null;
   nextActionAt?: string | null;
   notes?: string | null;
+  customerRank?: string | null;
 }

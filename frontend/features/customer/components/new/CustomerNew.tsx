@@ -47,6 +47,7 @@ export default function CustomerNew() {
       website: '',
       tagsStr: '',
       status: '',
+      customerRank: '',
       ownerId: null,
       lastContactedAt: '',
       nextActionAt: '',
@@ -71,6 +72,7 @@ export default function CustomerNew() {
             .filter(Boolean)
         : [],
       status: data.status || undefined,
+      customerRank: data.customerRank || undefined,
       ownerId:
         data.ownerId == null || data.ownerId === ''
           ? undefined
@@ -171,6 +173,20 @@ export default function CustomerNew() {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
                 <option value="prospect">Prospect</option>
+              </select>
+
+              <label className="block text-sm font-medium text-gray-700">
+                顧客ランク
+              </label>
+              <select
+                {...register('customerRank')}
+                className="mt-1 block w-full border rounded-md px-2 py-1"
+              >
+                <option value="">-- 選択なし --</option>
+                <option value="vip">VIP</option>
+                <option value="gold">ゴールド</option>
+                <option value="silver">シルバー</option>
+                <option value="bronze">ブロンズ</option>
               </select>
 
               <label className="block text-sm font-medium text-gray-700">

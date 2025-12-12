@@ -1,48 +1,61 @@
-import type {
-  OrderAggregateRow,
-  OrderAnalyticsResponse,
-} from '@/features/dashboard/actions/getOrderAnalytics';
-import ChartClient from '@/features/dashboard/components/order/ChartClient';
-import KpiCard from '@/features/dashboard/components/order/KpiCard';
+'use client';
+
+import MonthlyNewBarClient from '@/features/dashboard/components/customers/MonthlyNewBarClient';
+import RankPieClient from '@/features/dashboard/components/customers/RankPieClient';
+import OrderSection from '@/features/dashboard/components/order';
 import { formatDate } from '@/lib/date/formatDate';
+import React from 'react';
 
-export default function Dashboard({
-  data,
-}: {
-  data: OrderAnalyticsResponse | null;
-}) {
-  const times = (data?.timeseries ?? []).map((r: OrderAggregateRow) => ({
-    date: r.period,
-    orders: r.count,
-    revenue: Math.round(r.total),
-  }));
+export default function Dashboard() {
+  // compute default period: today and 6 months ago (YYYY-MM-DD)
+  const now = new Date();
+  const sixMonthsAgo = new Date(
+    now.getFullYear(),
+    now.getMonth() - 6,
+    now.getDate(),
+  );
+  const defaultFrom = formatDate(sixMonthsAgo, { formatStr: 'yyyy-MM-dd' });
+  const defaultTo = formatDate(now, { formatStr: 'yyyy-MM-dd' });
 
-  let periodLabel = '';
-  if (data?.from && data?.to) {
-    const f = formatDate(data.from, { formatStr: 'yyyy/MM/dd' });
-    const t = formatDate(data.to, { formatStr: 'yyyy/MM/dd' });
-    periodLabel = f === t ? f : `${f} 〜 ${t}`;
-  } else if (times.length > 0) {
-    const f = formatDate(times[0].date ?? '', { formatStr: 'yyyy/MM/dd' });
-    const t = formatDate(times[times.length - 1].date ?? '', {
-      formatStr: 'yyyy/MM/dd',
-    });
-    periodLabel = f === t ? f : `${f} 〜 ${t}`;
-  }
-
-  if (!data) {
-    return (
-      <div>
-        <h1 className="text-2xl font-semibold mb-4">ダッシュボード</h1>
-        <div className="text-gray-600">データが存在しません。</div>
-      </div>
-    );
-  }
+  const [from, setFrom] = React.useState<string>(defaultFrom);
+  const [to, setTo] = React.useState<string>(defaultTo);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <KpiCard data={data} periodLabel={periodLabel} />
-      <ChartClient data={times} periodLabel={periodLabel} />
-    </div>
+    <>
+      <div className="mb-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">ダッシュボード</h1>
+          </div>
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-500">From</label>
+            <input
+              type="date"
+              value={from}
+              max={to}
+              onChange={(e) => setFrom(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+            <label className="text-sm text-gray-500">To</label>
+            <input
+              type="date"
+              value={to}
+              min={from}
+              onChange={(e) => setTo(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <OrderSection from={from} to={to} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RankPieClient from={from} to={to} />
+        <MonthlyNewBarClient from={from} to={to} />
+      </div>
+    </>
   );
 }

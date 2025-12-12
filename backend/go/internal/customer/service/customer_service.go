@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/matsubara/myapp/internal/common/errors"
 	"github.com/matsubara/myapp/internal/customer/dto"
 	"github.com/matsubara/myapp/internal/customer/repository"
@@ -47,6 +49,7 @@ func (s *customerService) FindByID(id uint) (*domain.Customer, error) {
 }
 
 func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*domain.Customer, error) {
+	now := time.Now()
 	newCustomer := domain.Customer{
 		ContactName:     input.ContactName,
 		Company:         input.Company,
@@ -60,6 +63,10 @@ func (s *customerService) CreateCustomer(input dto.CreateCustomerRequest) (*doma
 		LastContactedAt: input.LastContactedAt,
 		NextActionAt:    input.NextActionAt,
 		Notes:           input.Notes,
+		CustomerRank:    input.CustomerRank,
+	}
+	if input.CustomerRank != "" {
+		newCustomer.RankUpdatedAt = &now
 	}
 
 	created, err := s.repo.Create(newCustomer)
@@ -92,6 +99,16 @@ func (s *customerService) UpdateCustomer(id uint, input dto.UpdateCustomerReques
 	existingCustomer.LastContactedAt = input.LastContactedAt
 	existingCustomer.NextActionAt = input.NextActionAt
 	existingCustomer.Notes = input.Notes
+
+	// Handle rank update: if rank is provided and different from existing, update RankUpdatedAt
+	if input.CustomerRank != "" && input.CustomerRank != existingCustomer.CustomerRank {
+		now := time.Now()
+		existingCustomer.CustomerRank = input.CustomerRank
+		existingCustomer.RankUpdatedAt = &now
+	} else if input.CustomerRank != "" {
+		// Rank provided but same as existing, still update to handle current time tracking
+		existingCustomer.CustomerRank = input.CustomerRank
+	}
 
 	customer, err := s.repo.Update(*existingCustomer)
 	if err != nil {

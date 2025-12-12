@@ -20,3 +20,13 @@ type DashboardResponse struct {
 	GeneratedAt time.Time                     `json:"generatedAt"`
 	Cached      bool                          `json:"cached"`
 }
+
+type RankCount struct {
+	Rank  string `json:"rank"`
+	Count int64  `json:"count"`
+}
+
+type MonthlyNew struct {
+	Month        string `json:"month"`
+	NewCustomers int64  `json:"newCustomers"`
+}

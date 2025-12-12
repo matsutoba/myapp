@@ -86,6 +86,8 @@ import * as orderDeleteActions from '@/features/order/actions/deleteOrder';
 import * as orderGetActions from '@/features/order/actions/getOrders';
 import * as orderUpdateActions from '@/features/order/actions/updateOrder';
 // Dashboard Actions
+import * as dashboardGetCustomerRankActions from '@/features/dashboard/actions/getCustomerRank';
+import * as dashboardGetMonthlyNewActions from '@/features/dashboard/actions/getMonthlyNewCustomers';
 import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions/getOrderAnalytics';
 
 /**
@@ -137,7 +139,11 @@ export const actions = {
   ),
 
   dashboard: createAutoErrorProxy(
-    mergeActionsTyped(dashboardGetOrderAnalyticsActions),
+    mergeActionsTyped(
+      dashboardGetOrderAnalyticsActions,
+      dashboardGetCustomerRankActions,
+      dashboardGetMonthlyNewActions,
+    ),
   ),
 };
 
