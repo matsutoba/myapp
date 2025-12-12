@@ -5,10 +5,8 @@ import type { OrderAnalyticsResponse } from '@/features/dashboard/actions/getOrd
 
 export default function KpiCard({
   data,
-  periodLabel,
 }: {
   data?: OrderAnalyticsResponse | null;
-  periodLabel?: string;
 }) {
   const totalOrders = data?.kpis?.totalOrders ?? 0;
   const totalRevenue = data?.kpis?.totalRevenue ?? 0;
@@ -29,11 +27,6 @@ export default function KpiCard({
   return (
     <Card>
       <h2 className="text-2xl font-semibold mb-2">注文KPI</h2>
-      {periodLabel ? (
-        <div className="text-sm text-gray-500 mb-4">
-          集計期間：{periodLabel}
-        </div>
-      ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {kpis.map((k) => (
           <div key={k.title}>

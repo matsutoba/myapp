@@ -31,10 +31,9 @@ function generateMockData() {
 
 type Props = {
   data?: Array<{ date: string; orders: number; revenue: number }>;
-  periodLabel?: string;
 };
 
-export default function ChartClient({ data, periodLabel }: Props) {
+export default function ChartClient({ data }: Props) {
   const internal = React.useMemo(() => generateMockData(), []);
   const chartData = data && data.length > 0 ? data : internal;
 
@@ -58,11 +57,6 @@ export default function ChartClient({ data, periodLabel }: Props) {
   return (
     <Card>
       <h2 className="text-2xl font-semibold mb-2">注文数と売上</h2>
-      {periodLabel ? (
-        <div className="text-sm text-gray-500 mb-4">
-          集計期間：{periodLabel}
-        </div>
-      ) : null}
       {/* 上部に表示していた Y 軸ラベルは削除（チャート内のラベルを使用） */}
       <div>
         <div className="col-span-1 sm:col-span-2">

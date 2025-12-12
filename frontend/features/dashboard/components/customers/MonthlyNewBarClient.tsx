@@ -16,9 +16,12 @@ import {
 
 type MonthRow = { month: string; newCustomers: number };
 
-async function fetchMonthly(): Promise<MonthRow[] | null> {
+async function fetchMonthly(opts?: {
+  from?: string;
+  to?: string;
+}): Promise<MonthRow[] | null> {
   try {
-    const data = await actions.dashboard.getMonthlyNewCustomers();
+    const data = await actions.dashboard.getMonthlyNewCustomers(opts);
     return data as MonthRow[];
   } catch (e) {
     return null;
@@ -36,12 +39,18 @@ function generateMock(): MonthRow[] {
   return arr;
 }
 
-export default function MonthlyNewBarClient() {
+export default function MonthlyNewBarClient({
+  from,
+  to,
+}: {
+  from?: string;
+  to?: string;
+}) {
   const [data, setData] = React.useState<MonthRow[] | null>(null);
 
   React.useEffect(() => {
     let mounted = true;
-    fetchMonthly().then((d) => {
+    fetchMonthly({ from, to }).then((d) => {
       if (!mounted) return;
       if (d && d.length > 0) setData(d);
       else setData(generateMock());
@@ -49,7 +58,7 @@ export default function MonthlyNewBarClient() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [from, to]);
 
   const chartData = data ?? generateMock();
 

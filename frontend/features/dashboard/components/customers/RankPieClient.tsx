@@ -16,9 +16,12 @@ type RankRow = { rank: string; count: number };
 
 const COLORS = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#60a5fa'];
 
-async function fetchRankData(): Promise<RankRow[] | null> {
+async function fetchRankData(opts?: {
+  from?: string;
+  to?: string;
+}): Promise<RankRow[] | null> {
   try {
-    const data = await actions.dashboard.getCustomerRank();
+    const data = await actions.dashboard.getCustomerRank(opts);
     return data as RankRow[];
   } catch (e) {
     return null;
@@ -34,12 +37,18 @@ function generateMock(): RankRow[] {
   ];
 }
 
-export default function RankPieClient() {
+export default function RankPieClient({
+  from,
+  to,
+}: {
+  from?: string;
+  to?: string;
+}) {
   const [data, setData] = React.useState<RankRow[] | null>(null);
 
   React.useEffect(() => {
     let mounted = true;
-    fetchRankData().then((d) => {
+    fetchRankData({ from, to }).then((d) => {
       if (!mounted) return;
       if (d && d.length > 0) setData(d);
       else setData(generateMock());
@@ -47,7 +56,7 @@ export default function RankPieClient() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [from, to]);
 
   const chartData = data ?? generateMock();
 
