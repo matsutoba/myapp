@@ -19,6 +19,8 @@ type CustomerRepository interface {
 	Update(customer domain.Customer) (*domain.Customer, error)
 	Delete(id uint) error
 	CountByRank() ([]RankCountRow, error)
+	// CountByRankBetween: count customers grouped by rank within created_at between start and end (YYYY-MM-DD)
+	CountByRankBetween(start, end string) ([]RankCountRow, error)
 	MonthlyNewCustomers(start, end string) ([]MonthCountRow, error)
 }
 
@@ -135,6 +137,15 @@ func (r *customerRepository) MonthlyNewCustomers(start, end string) ([]MonthCoun
 	result := q.Scan(&rows)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+	return rows, nil
+}
+
+func (r *customerRepository) CountByRankBetween(start, end string) ([]RankCountRow, error) {
+	var rows []RankCountRow
+	q := r.db.Table("customers").Select("customer_rank as customer_rank, COUNT(*) as count").Where("created_at BETWEEN ? AND ?", start, end).Group("customer_rank")
+	if err := q.Scan(&rows).Error; err != nil {
+		return nil, err
 	}
 	return rows, nil
 }

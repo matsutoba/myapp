@@ -11,7 +11,7 @@ import (
 
 type DashboardService interface {
 	GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error)
-	GetCustomersByRank(ctx context.Context) ([]dto.RankCount, error)
+	GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error)
 	GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error)
 }
 
@@ -80,8 +80,10 @@ func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Tim
 	return resp, nil
 }
 
-func (s *dashboardService) GetCustomersByRank(ctx context.Context) ([]dto.RankCount, error) {
-	rows, err := s.custRepo.CountByRank()
+func (s *dashboardService) GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error) {
+	startStr := start.Format("2006-01-02")
+	endStr := end.Format("2006-01-02")
+	rows, err := s.custRepo.CountByRankBetween(startStr, endStr)
 	if err != nil {
 		return nil, err
 	}

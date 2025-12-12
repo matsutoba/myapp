@@ -1,6 +1,96 @@
 package repository
 
 import (
+    "testing"
+    "time"
+
+    "github.com/matsubara/myapp/internal/domain"
+    "github.com/stretchr/testify/assert"
+    "gorm.io/driver/sqlite"
+    "gorm.io/gorm"
+)
+
+func setupInMemoryDB(t *testing.T) *gorm.DB {
+    db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+    assert.NoError(t, err)
+
+    err = db.AutoMigrate(&domain.Customer{})
+    assert.NoError(t, err)
+    return db
+}
+
+func TestCountByRankBetween(t *testing.T) {
+    db := setupInMemoryDB(t)
+    // seed customers with different ranks and created_at
+    times := []string{"2025-06-01", "2025-07-15", "2025-08-20", "2025-10-05"}
+    ranks := []string{"vip", "gold", "vip", "bronze"}
+
+    for i := 0; i < len(times); i++ {
+        ct, _ := time.Parse("2006-01-02", times[i])
+        c := domain.Customer{ContactName: "T", Email: "t@example.com", CustomerRank: ranks[i], CreatedAt: ct, UpdatedAt: ct}
+        if err := db.Create(&c).Error; err != nil {
+            t.Fatalf("failed to seed customer: %v", err)
+        }
+    }
+
+    repo := NewCustomerRepository(db)
+    start := "2025-06-01"
+    end := "2025-12-31"
+    rows, err := repo.CountByRankBetween(start, end)
+    assert.NoError(t, err)
+
+    // convert to map for easy assertions
+    m := map[string]int64{}
+    for _, r := range rows {
+        m[r.CustomerRank] = r.Count
+    }
+
+    assert.Equal(t, int64(2), m["vip"])   // two vip
+    assert.Equal(t, int64(1), m["gold"])  // one gold
+    assert.Equal(t, int64(1), m["bronze"])// one bronze
+}
+
+func TestMonthlyNewCustomers(t *testing.T) {
+    db := setupInMemoryDB(t)
+    // seed customers spanning several months
+    seed := []struct{
+        date string
+        rank string
+    }{
+        {"2025-06-10", "vip"},
+        {"2025-06-20", "gold"},
+        {"2025-07-05", "vip"},
+        {"2025-07-15", "bronze"},
+        {"2025-08-01", "gold"},
+    }
+
+    for _, s := range seed {
+        ct, _ := time.Parse("2006-01-02", s.date)
+        c := domain.Customer{ContactName: "X", Email: "x@example.com", CustomerRank: s.rank, CreatedAt: ct, UpdatedAt: ct}
+        if err := db.Create(&c).Error; err != nil {
+            t.Fatalf("failed to seed customer: %v", err)
+        }
+    }
+
+    repo := NewCustomerRepository(db)
+    start := "2025-06-01"
+    end := "2025-08-31"
+    rows, err := repo.MonthlyNewCustomers(start, end)
+    assert.NoError(t, err)
+
+    // expect counts per month: 2025-06 => 2, 2025-07 => 2, 2025-08 => 1
+    m := map[string]int64{}
+    for _, r := range rows {
+        m[r.YearMonth] = r.NewCustomers
+    }
+
+    assert.Equal(t, int64(2), m["2025-06"])
+    assert.Equal(t, int64(2), m["2025-07"])
+    assert.Equal(t, int64(1), m["2025-08"])
+}
+package repository
+
+import (
 	"testing"
 	"time"
 

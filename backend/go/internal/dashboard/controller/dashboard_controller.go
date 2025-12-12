@@ -90,7 +90,29 @@ func (dc *DashboardController) GetOrderAnalytics(c *gin.Context) {
 
 // ランク別の顧客分布を返します
 func (dc *DashboardController) GetCustomersByRank(c *gin.Context) {
-	resp, err := dc.svc.GetCustomersByRank(c.Request.Context())
+	from := c.Query("from")
+	to := c.Query("to")
+
+	var start time.Time
+	var end time.Time
+	var err error
+	if from == "" || to == "" {
+		end = time.Now()
+		start = end.AddDate(0, -6, 0) // default: last 6 months
+	} else {
+		start, err = time.Parse("2006-01-02", from)
+		if err != nil {
+			errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
+			return
+		}
+		end, err = time.Parse("2006-01-02", to)
+		if err != nil {
+			errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
+			return
+		}
+	}
+
+	resp, err := dc.svc.GetCustomersByRank(c.Request.Context(), start, end)
 	if err != nil {
 		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
