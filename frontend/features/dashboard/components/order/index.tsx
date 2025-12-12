@@ -13,33 +13,36 @@ type Props = {
 export default function OrderSection({ from, to }: Props) {
   const [data, setData] = React.useState<any | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const mountedRef = React.useRef(true);
+
+  const fetchData = React.useCallback(async () => {
+    try {
+      const qs = `?group_by=day&from=${encodeURIComponent(
+        from ?? '',
+      )}&to=${encodeURIComponent(to ?? '')}`;
+      const res = await apiClient<any>(`/api/dashboard${qs}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!mountedRef.current) return;
+      setData(res.success ? res.data : null);
+    } catch (e) {
+      if (!mountedRef.current) return;
+      setData(null);
+    } finally {
+      if (!mountedRef.current) return;
+      setLoading(false);
+    }
+  }, [from, to]);
 
   React.useEffect(() => {
-    let mounted = true;
+    mountedRef.current = true;
     setLoading(true);
-    (async () => {
-      try {
-        const qs = `?group_by=day&from=${encodeURIComponent(
-          from ?? '',
-        )}&to=${encodeURIComponent(to ?? '')}`;
-        const res = await apiClient<any>(`/api/dashboard${qs}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        if (!mounted) return;
-        setData(res.success ? res.data : null);
-      } catch (e) {
-        if (!mounted) return;
-        setData(null);
-      } finally {
-        if (!mounted) return;
-        setLoading(false);
-      }
-    })();
+    void fetchData();
     return () => {
-      mounted = false;
+      mountedRef.current = false;
     };
-  }, [from, to]);
+  }, [fetchData]);
 
   // build times array for ChartClient
   const times = (data?.timeseries ?? []).map((r: any) => ({
