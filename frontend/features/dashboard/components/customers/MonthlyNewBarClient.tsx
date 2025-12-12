@@ -2,6 +2,7 @@
 
 import { Card } from '@/components/ui';
 import { apiClient } from '@/lib/api/client';
+import { MonthlyNew } from '@/features/dashboard/types';
 import React from 'react';
 import {
   Bar,
@@ -14,45 +15,30 @@ import {
   YAxis,
 } from 'recharts';
 
-type MonthRow = { month: string; newCustomers: number };
-
 async function fetchMonthly(opts?: {
   from?: string;
   to?: string;
-}): Promise<MonthRow[] | null> {
+}): Promise<MonthlyNew[] | null> {
   try {
     const qs = opts
       ? `?from=${encodeURIComponent(opts.from ?? '')}&to=${encodeURIComponent(
           opts.to ?? '',
         )}`
       : '';
-    const res = await apiClient<{ success: boolean; data?: MonthRow[] }>(
+    const res = await apiClient<{ success: boolean; data?: MonthlyNew[] }>(
       `/api/dashboard/customers/new-signups${qs}`,
       { method: 'GET', credentials: 'include' },
     );
     if (!res || !res.success) return null;
-    // Normalize API response keys to frontend MonthRow shape.
-    // Backend may return { year_month | YearMonth, new_customers | NewCustomers }
-    const raw = (res.data ?? []) as any[];
-    const mapped: MonthRow[] = raw.map((r) => {
-      const month = r.month ?? r.YearMonth ?? r.year_month ?? r.yearMonth ?? '';
-      const newCustomers =
-        r.newCustomers ??
-        r.new_customers ??
-        r.NewCustomers ??
-        r.new_customers ??
-        0;
-      return { month, newCustomers };
-    });
-    return mapped;
+    return (res.data ?? []) as MonthlyNew[];
   } catch (e) {
     return null;
   }
 }
 
-function generateMock(): MonthRow[] {
+function generateMock(): MonthlyNew[] {
   const now = new Date();
-  const arr: MonthRow[] = [];
+  const arr: MonthlyNew[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const m = d.toISOString().slice(0, 7);
@@ -68,7 +54,7 @@ export default function MonthlyNewBarClient({
   from?: string;
   to?: string;
 }) {
-  const [data, setData] = React.useState<MonthRow[] | null>(null);
+  const [data, setData] = React.useState<MonthlyNew[] | null>(null);
 
   React.useEffect(() => {
     let mounted = true;

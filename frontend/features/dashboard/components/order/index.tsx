@@ -1,6 +1,7 @@
 'use client';
 
 import { apiClient } from '@/lib/api/client';
+import { DashboardResponse } from '@/features/dashboard/types';
 import React from 'react';
 import ChartClient from './ChartClient';
 import KpiCard from './KpiCard';
@@ -11,7 +12,7 @@ type Props = {
 };
 
 export default function OrderSection({ from, to }: Props) {
-  const [data, setData] = React.useState<any | null>(null);
+  const [data, setData] = React.useState<DashboardResponse | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const mountedRef = React.useRef(true);
 
@@ -20,12 +21,12 @@ export default function OrderSection({ from, to }: Props) {
       const qs = `?group_by=day&from=${encodeURIComponent(
         from ?? '',
       )}&to=${encodeURIComponent(to ?? '')}`;
-      const res = await apiClient<any>(`/api/dashboard${qs}`, {
+      const res = await apiClient<DashboardResponse>(`/api/dashboard${qs}`, {
         method: 'GET',
         credentials: 'include',
       });
       if (!mountedRef.current) return;
-      setData(res.success ? res.data : null);
+      setData(res.success && res.data ? res.data : null);
     } catch (e) {
       if (!mountedRef.current) return;
       setData(null);
@@ -45,7 +46,7 @@ export default function OrderSection({ from, to }: Props) {
   }, [fetchData]);
 
   // build times array for ChartClient
-  const times = (data?.timeseries ?? []).map((r: any) => ({
+  const times = (data?.timeseries ?? []).map((r) => ({
     date: r.period,
     orders: r.count,
     revenue: Math.round(r.total),

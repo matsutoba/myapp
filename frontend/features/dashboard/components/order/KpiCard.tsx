@@ -1,13 +1,9 @@
 'use client';
 
 import { Card } from '@/components/ui';
-import type { OrderAnalyticsResponse } from '@/features/dashboard/actions/getOrderAnalytics';
+import type { DashboardResponse } from '@/features/dashboard/types';
 
-export default function KpiCard({
-  data,
-}: {
-  data?: OrderAnalyticsResponse | null;
-}) {
+export default function KpiCard({ data }: { data?: DashboardResponse | null }) {
   const totalOrders = data?.kpis?.totalOrders ?? 0;
   const totalRevenue = data?.kpis?.totalRevenue ?? 0;
   const avg = data?.kpis?.avgOrderValue ?? 0;
