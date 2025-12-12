@@ -20,12 +20,37 @@ const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 // グローバルAPIエラーイベント名
 export const API_ERROR_EVENT = 'api-error';
 
+// セッション無効エラーコード
+const SESSION_INVALID_ERROR_CODES = [3002, 3004];
+
 export function ErrorProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<ApiErrorDetail | null>(null);
+  const [isSessionInvalid, setIsSessionInvalid] = useState(false);
+
+  // ログイン画面に遷移したときにセッション無効フラグをリセット
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.pathname === '/login' &&
+      isSessionInvalid
+    ) {
+      setIsSessionInvalid(false);
+      setError(null);
+    }
+  }, [isSessionInvalid]);
 
   const showError = useCallback((error: ApiErrorDetail | null | undefined) => {
     if (error) {
-      setError(error);
+      // セッション無効エラーの場合
+      if (SESSION_INVALID_ERROR_CODES.includes(error.code)) {
+        setIsSessionInvalid(true);
+        setError({
+          code: error.code,
+          message: 'ログインセッションが無効です',
+        });
+      } else {
+        setError(error);
+      }
     } else {
       setError({
         code: 0,
@@ -58,6 +83,7 @@ export function ErrorProvider({ children }: { children: React.ReactNode }) {
         open={!!error}
         onClose={clearError}
         error={error || undefined}
+        isSessionInvalid={isSessionInvalid}
       />
     </ErrorContext.Provider>
   );
