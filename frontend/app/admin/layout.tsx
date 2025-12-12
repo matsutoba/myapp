@@ -3,6 +3,7 @@
 import { Sidebar, SidebarItem, TitleBar } from '@/components/ui';
 import { logoutAction } from '@/features/auth/actions/login';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useError } from '@/lib/contexts/ErrorContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -36,17 +37,20 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { showError } = useError();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.replace('/login');
-      } else if (user?.role !== 'admin') {
-        router.replace('/dashboard');
-      }
+    if (!isLoading && !isAuthenticated) {
+      // セッション無効エラーを表示
+      showError({
+        code: 3002,
+        message: 'ログインセッションが無効です',
+      });
+    } else if (!isLoading && user?.role !== 'admin') {
+      router.replace('/dashboard');
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [isLoading, isAuthenticated, user, router, showError]);
 
   if (isLoading) {
     return (
