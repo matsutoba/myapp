@@ -20,6 +20,7 @@ type CreateCustomerRequest struct {
 	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
 	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
 	Notes           string     `json:"notes,omitempty"`
+	CustomerRank    string     `json:"customerRank,omitempty" binding:"omitempty,oneof=vip gold silver bronze"`
 }
 
 // UpdateCustomerRequest: 顧客更新リクエスト
@@ -36,6 +37,7 @@ type UpdateCustomerRequest struct {
 	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
 	NextActionAt    *time.Time `json:"nextActionAt,omitempty"`
 	Notes           string     `json:"notes,omitempty" binding:"omitempty,max=500"`
+	CustomerRank    string     `json:"customerRank,omitempty" binding:"omitempty,oneof=vip gold silver bronze"`
 }
 
 // CustomerResponse: API レスポンス用 DTO
@@ -55,6 +57,8 @@ type CustomerResponse struct {
 	Notes           string     `json:"notes,omitempty"`
 	CreatedAt       time.Time  `json:"createdAt"`
 	UpdatedAt       time.Time  `json:"updatedAt"`
+	CustomerRank    string     `json:"customerRank,omitempty"`
+	RankUpdatedAt   *time.Time `json:"rankUpdatedAt,omitempty"`
 }
 
 // ToCustomerResponse converts domain.Customer -> CustomerResponse
@@ -78,6 +82,8 @@ func ToCustomerResponse(c *domain.Customer) *CustomerResponse {
 		Notes:           c.Notes,
 		CreatedAt:       c.CreatedAt,
 		UpdatedAt:       c.UpdatedAt,
+		CustomerRank:    c.CustomerRank,
+		RankUpdatedAt:   c.RankUpdatedAt,
 	}
 }
 

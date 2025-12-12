@@ -26,6 +26,10 @@ type Customer struct {
 	Status string `json:"status,omitempty"`
 	// OwnerID: 担当ユーザーのID（usersテーブル参照）
 	OwnerID *uint `json:"ownerId,omitempty"`
+	// CustomerRank: 顧客ランク（例: vip, gold, silver, bronze）
+	CustomerRank string `gorm:"type:varchar(32);default:'bronze'" json:"customerRank,omitempty"`
+	// RankUpdatedAt: ランクが最後に更新された日時
+	RankUpdatedAt *time.Time `json:"rankUpdatedAt,omitempty"`
 	// LastContactedAt: 最後にコンタクトした日時
 	LastContactedAt *time.Time `json:"lastContactedAt,omitempty"`
 	// NextActionAt: 次に行うアクションの予定日時（フォローリマインド等）
