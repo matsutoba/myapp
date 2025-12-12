@@ -45,6 +45,7 @@ export function useCustomerEdit(customerIdProp: number) {
           lastContactedAt: res.data.lastContactedAt ?? '',
           nextActionAt: res.data.nextActionAt ?? '',
           notes: res.data.notes ?? '',
+          customerRank: res.data.customerRank ?? '',
         });
       }
     } finally {
@@ -93,6 +94,7 @@ export function useCustomerEdit(customerIdProp: number) {
             ? new Date(values.nextActionAt).toISOString()
             : undefined,
         notes: values.notes,
+        customerRank: values.customerRank || undefined,
       };
 
       const result = await actions.customer.updateCustomer(

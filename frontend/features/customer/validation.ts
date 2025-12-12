@@ -36,6 +36,15 @@ export const customerFormSchema = z.object({
     .string()
     .max(500, { message: 'メモは500文字以内で入力してください' })
     .optional(),
+  customerRank: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || ['vip', 'gold', 'silver', 'bronze'].includes(val),
+      {
+        message: 'ランクは vip, gold, silver, bronze から選択してください',
+      },
+    ),
 });
 
 export type CustomerForm = z.infer<typeof customerFormSchema>;
