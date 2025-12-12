@@ -45,7 +45,12 @@ func (oc *OrderController) GetAggregates(c *gin.Context) {
 		return
 	}
 
-	rows, err := oc.service.GetAggregates(start, end.Add(24*time.Hour-1), period, req.Status, req.Category)
+	// `End` を日付文字列でパースすると時刻が 00:00:00 になるため、
+	// その日を含めるには範囲の終端を `YYYY-MM-DD 23:59:59.999...` にする必要があります。
+	// ここでは翌日の 00:00:00 に進めてから 1 ナノ秒戻すことで、実質的に「その日の終わり」を表現します。
+	end = end.AddDate(0, 0, 1).Add(-time.Nanosecond)
+
+	rows, err := oc.service.GetAggregates(start, end, period, req.Status, req.Category)
 	if err != nil {
 		errors.WriteError(c, http.StatusInternalServerError, err)
 		return
