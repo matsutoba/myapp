@@ -37,7 +37,7 @@ func (f *fakeOrderRepo) FindByID(id uint) (*domain.Order, error)           { ret
 
 func TestGetOrderAnalytics_ServiceAggregates(t *testing.T) {
 	repo := &fakeOrderRepo{}
-	s := svc.NewDashboardService(repo)
+	s := svc.NewDashboardService(repo, nil)
 
 	start := time.Date(2025, 11, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2025, 11, 2, 0, 0, 0, 0, time.UTC)

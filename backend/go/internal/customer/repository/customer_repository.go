@@ -18,6 +18,8 @@ type CustomerRepository interface {
 	Create(customer domain.Customer) (*domain.Customer, error)
 	Update(customer domain.Customer) (*domain.Customer, error)
 	Delete(id uint) error
+	CountByRank() ([]RankCountRow, error)
+	MonthlyNewCustomers(start, end string) ([]MonthCountRow, error)
 }
 
 /*
@@ -98,4 +100,41 @@ func (r *customerRepository) Delete(id uint) error {
 		return errors.ErrNotFound
 	}
 	return nil
+}
+
+type RankCountRow struct {
+	CustomerRank string
+	Count        int64
+}
+
+type MonthCountRow struct {
+	YearMonth    string
+	NewCustomers int64
+}
+
+func (r *customerRepository) CountByRank() ([]RankCountRow, error) {
+	var rows []RankCountRow
+	result := r.db.Table("customers").Select("customer_rank as customer_rank, COUNT(*) as count").Group("customer_rank").Scan(&rows)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return rows, nil
+}
+
+func (r *customerRepository) MonthlyNewCustomers(start, end string) ([]MonthCountRow, error) {
+	var rows []MonthCountRow
+	dialect := r.db.Dialector.Name()
+	var timeExpr string
+	switch dialect {
+	case "sqlite":
+		timeExpr = "strftime('%Y-%m', created_at)"
+	default:
+		timeExpr = "DATE_FORMAT(created_at, '%Y-%m')"
+	}
+	q := r.db.Table("customers").Select(timeExpr+" as year_month, COUNT(*) as new_customers").Where("created_at BETWEEN ? AND ?", start, end).Group("year_month").Order("year_month")
+	result := q.Scan(&rows)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return rows, nil
 }

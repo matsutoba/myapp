@@ -4,20 +4,24 @@ import (
 	"context"
 	"time"
 
+	customerrepo "github.com/matsubara/myapp/internal/customer/repository"
 	"github.com/matsubara/myapp/internal/dashboard/dto"
 	orderrepo "github.com/matsubara/myapp/internal/order/repository"
 )
 
 type DashboardService interface {
 	GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error)
+	GetCustomersByRank(ctx context.Context) ([]dto.RankCount, error)
+	GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error)
 }
 
 type dashboardService struct {
 	orderRepo orderrepo.OrderRepository
+	custRepo  customerrepo.CustomerRepository
 }
 
-func NewDashboardService(or orderrepo.OrderRepository) DashboardService {
-	return &dashboardService{orderRepo: or}
+func NewDashboardService(or orderrepo.OrderRepository, cr customerrepo.CustomerRepository) DashboardService {
+	return &dashboardService{orderRepo: or, custRepo: cr}
 }
 
 func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error) {
@@ -73,5 +77,31 @@ func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Tim
 		Cached:      false,
 	}
 
+	return resp, nil
+}
+
+func (s *dashboardService) GetCustomersByRank(ctx context.Context) ([]dto.RankCount, error) {
+	rows, err := s.custRepo.CountByRank()
+	if err != nil {
+		return nil, err
+	}
+	resp := make([]dto.RankCount, 0, len(rows))
+	for _, r := range rows {
+		resp = append(resp, dto.RankCount{Rank: r.CustomerRank, Count: r.Count})
+	}
+	return resp, nil
+}
+
+func (s *dashboardService) GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error) {
+	startStr := start.Format("2006-01-02")
+	endStr := end.Format("2006-01-02")
+	rows, err := s.custRepo.MonthlyNewCustomers(startStr, endStr)
+	if err != nil {
+		return nil, err
+	}
+	resp := make([]dto.MonthlyNew, 0, len(rows))
+	for _, r := range rows {
+		resp = append(resp, dto.MonthlyNew{Month: r.YearMonth, NewCustomers: r.NewCustomers})
+	}
 	return resp, nil
 }
