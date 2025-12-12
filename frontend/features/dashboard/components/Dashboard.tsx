@@ -2,6 +2,8 @@ import type {
   OrderAggregateRow,
   OrderAnalyticsResponse,
 } from '@/features/dashboard/actions/getOrderAnalytics';
+import MonthlyNewBarClient from '@/features/dashboard/components/customers/MonthlyNewBarClient';
+import RankPieClient from '@/features/dashboard/components/customers/RankPieClient';
 import ChartClient from '@/features/dashboard/components/order/ChartClient';
 import KpiCard from '@/features/dashboard/components/order/KpiCard';
 import { formatDate } from '@/lib/date/formatDate';
@@ -40,9 +42,16 @@ export default function Dashboard({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <KpiCard data={data} periodLabel={periodLabel} />
-      <ChartClient data={times} periodLabel={periodLabel} />
-    </div>
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <KpiCard data={data} periodLabel={periodLabel} />
+        <ChartClient data={times} periodLabel={periodLabel} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RankPieClient />
+        <MonthlyNewBarClient />
+      </div>
+    </>
   );
 }
