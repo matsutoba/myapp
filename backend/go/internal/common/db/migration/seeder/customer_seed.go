@@ -3,6 +3,7 @@ package seeder
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/matsubara/myapp/internal/domain"
@@ -15,11 +16,28 @@ func SeedCustomers(db *gorm.DB) {
 	customers := []domain.Customer{}
 
 	// 自動生成で合計20件になるように追加で作成
-	// assign ranks in a round-robin way for better distribution in dev environment
+	// 顧客ランクはラウンドロビンで割り当て、created_at と rank_updated_at は
+	// 過去12ヶ月にわたって月ごとにばらつかせて格納します。
 	ranks := []string{"vip", "gold", "silver", "bronze"}
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	monthsBack := 12
 	for i := 3; i <= 20; i++ {
 		rank := ranks[(i-3)%len(ranks)]
-		now := time.Now()
+		// distribute created_at across past months
+		offset := (i - 3) % monthsBack
+		base := time.Now().AddDate(0, -offset, 0)
+		// choose a day in month 1..28 to avoid month length issues
+		day := 1 + rng.Intn(28)
+		hour := rng.Intn(24)
+		min := rng.Intn(60)
+		sec := rng.Intn(60)
+		created := time.Date(base.Year(), base.Month(), day, hour, min, sec, 0, time.UTC)
+		// rank updated slightly after created (0-10 days)
+		ru := created.AddDate(0, 0, rng.Intn(11))
+		if ru.After(time.Now()) {
+			ru = time.Now()
+		}
+
 		c := domain.Customer{
 			ContactName:   fmt.Sprintf("担当者%d", i),
 			Company:       fmt.Sprintf("会社%d", i),
@@ -30,7 +48,9 @@ func SeedCustomers(db *gorm.DB) {
 			Tags:          "seed",
 			Status:        "lead",
 			CustomerRank:  rank,
-			RankUpdatedAt: &now,
+			RankUpdatedAt: &ru,
+			CreatedAt:     created,
+			UpdatedAt:     created,
 		}
 		customers = append(customers, c)
 	}
