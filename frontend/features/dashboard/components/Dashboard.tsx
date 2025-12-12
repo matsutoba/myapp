@@ -1,7 +1,10 @@
+'use client';
+
 import MonthlyNewBarClient from '@/features/dashboard/components/customers/MonthlyNewBarClient';
 import RankPieClient from '@/features/dashboard/components/customers/RankPieClient';
 import OrderSection from '@/features/dashboard/components/order';
 import { formatDate } from '@/lib/date/formatDate';
+import React from 'react';
 
 export default function Dashboard() {
   // compute default period: today and 6 months ago (YYYY-MM-DD)
@@ -14,34 +17,44 @@ export default function Dashboard() {
   const defaultFrom = formatDate(sixMonthsAgo, { formatStr: 'yyyy-MM-dd' });
   const defaultTo = formatDate(now, { formatStr: 'yyyy-MM-dd' });
 
-  const periodLabel = `${formatDate(new Date(defaultFrom), {
-    formatStr: 'yyyy/MM/dd',
-  })} 〜 ${formatDate(new Date(defaultTo), { formatStr: 'yyyy/MM/dd' })}`;
-
-  const effectiveFrom = defaultFrom;
-  const effectiveTo = defaultTo;
+  const [from, setFrom] = React.useState<string>(defaultFrom);
+  const [to, setTo] = React.useState<string>(defaultTo);
 
   return (
     <>
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold">ダッシュボード</h1>
-        <div className="text-sm text-gray-600">
-          集計期間:{' '}
-          {periodLabel ||
-            `${formatDate(new Date(effectiveFrom), {
-              formatStr: 'yyyy/MM/dd',
-            })} 〜 ${formatDate(new Date(effectiveTo), {
-              formatStr: 'yyyy/MM/dd',
-            })}`}
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">ダッシュボード</h1>
+          </div>
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-500">From</label>
+            <input
+              type="date"
+              value={from}
+              max={to}
+              onChange={(e) => setFrom(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+            <label className="text-sm text-gray-500">To</label>
+            <input
+              type="date"
+              value={to}
+              min={from}
+              onChange={(e) => setTo(e.target.value)}
+              className="border rounded px-2 py-1"
+            />
+          </div>
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <OrderSection from={defaultFrom} to={defaultTo} />
+        <OrderSection from={from} to={to} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <RankPieClient from={effectiveFrom} to={effectiveTo} />
-        <MonthlyNewBarClient from={effectiveFrom} to={effectiveTo} />
+        <RankPieClient from={from} to={to} />
+        <MonthlyNewBarClient from={from} to={to} />
       </div>
     </>
   );

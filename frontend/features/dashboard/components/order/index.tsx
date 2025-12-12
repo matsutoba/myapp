@@ -1,4 +1,7 @@
-import { getOrderAnalytics } from '@/features/dashboard/actions/getOrderAnalytics';
+'use client';
+
+import { apiClient } from '@/lib/api/client';
+import React from 'react';
 import ChartClient from './ChartClient';
 import KpiCard from './KpiCard';
 
@@ -7,17 +10,39 @@ type Props = {
   to?: string;
 };
 
-export default async function OrderSection({ from, to }: Props) {
-  // call server action to get analytics for provided range (or defaults)
-  let data;
-  try {
-    data = await getOrderAnalytics({ from, to, groupBy: 'day' });
-  } catch (e) {
-    data = null;
-  }
+export default function OrderSection({ from, to }: Props) {
+  const [data, setData] = React.useState<any | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    (async () => {
+      try {
+        const qs = `?group_by=day&from=${encodeURIComponent(
+          from ?? '',
+        )}&to=${encodeURIComponent(to ?? '')}`;
+        const res = await apiClient<any>(`/api/dashboard${qs}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (!mounted) return;
+        setData(res.success ? res.data : null);
+      } catch (e) {
+        if (!mounted) return;
+        setData(null);
+      } finally {
+        if (!mounted) return;
+        setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [from, to]);
 
   // build times array for ChartClient
-  const times = (data?.timeseries ?? []).map((r) => ({
+  const times = (data?.timeseries ?? []).map((r: any) => ({
     date: r.period,
     orders: r.count,
     revenue: Math.round(r.total),

@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui';
-import { actions } from '@/lib/actions';
+import { apiClient } from '@/lib/api/client';
 import React from 'react';
 import {
   Cell,
@@ -21,8 +21,17 @@ async function fetchRankData(opts?: {
   to?: string;
 }): Promise<RankRow[] | null> {
   try {
-    const data = await actions.dashboard.getCustomerRank(opts);
-    return data as RankRow[];
+    const qs = opts
+      ? `?from=${encodeURIComponent(opts.from ?? '')}&to=${encodeURIComponent(
+          opts.to ?? '',
+        )}`
+      : '';
+    const res = await apiClient<{ success: boolean; data?: RankRow[] }>(
+      `/api/dashboard/customers/by-rank${qs}`,
+      { method: 'GET', credentials: 'include' },
+    );
+    if (!res || !res.success) return null;
+    return (res.data ?? []) as RankRow[];
   } catch (e) {
     return null;
   }
@@ -30,10 +39,10 @@ async function fetchRankData(opts?: {
 
 function generateMock(): RankRow[] {
   return [
-    { rank: 'vip', count: 12 },
-    { rank: 'gold', count: 32 },
-    { rank: 'silver', count: 54 },
-    { rank: 'bronze', count: 22 },
+    { rank: 'vip', count: 0 },
+    { rank: 'gold', count: 0 },
+    { rank: 'silver', count: 0 },
+    { rank: 'bronze', count: 0 },
   ];
 }
 

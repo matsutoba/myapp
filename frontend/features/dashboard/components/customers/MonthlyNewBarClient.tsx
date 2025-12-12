@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui';
-import { actions } from '@/lib/actions';
+import { apiClient } from '@/lib/api/client';
 import React from 'react';
 import {
   Bar,
@@ -21,8 +21,30 @@ async function fetchMonthly(opts?: {
   to?: string;
 }): Promise<MonthRow[] | null> {
   try {
-    const data = await actions.dashboard.getMonthlyNewCustomers(opts);
-    return data as MonthRow[];
+    const qs = opts
+      ? `?from=${encodeURIComponent(opts.from ?? '')}&to=${encodeURIComponent(
+          opts.to ?? '',
+        )}`
+      : '';
+    const res = await apiClient<{ success: boolean; data?: MonthRow[] }>(
+      `/api/dashboard/customers/new-signups${qs}`,
+      { method: 'GET', credentials: 'include' },
+    );
+    if (!res || !res.success) return null;
+    // Normalize API response keys to frontend MonthRow shape.
+    // Backend may return { year_month | YearMonth, new_customers | NewCustomers }
+    const raw = (res.data ?? []) as any[];
+    const mapped: MonthRow[] = raw.map((r) => {
+      const month = r.month ?? r.YearMonth ?? r.year_month ?? r.yearMonth ?? '';
+      const newCustomers =
+        r.newCustomers ??
+        r.new_customers ??
+        r.NewCustomers ??
+        r.new_customers ??
+        0;
+      return { month, newCustomers };
+    });
+    return mapped;
   } catch (e) {
     return null;
   }
@@ -34,7 +56,7 @@ function generateMock(): MonthRow[] {
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const m = d.toISOString().slice(0, 7);
-    arr.push({ month: m, newCustomers: Math.floor(Math.random() * 40) + 5 });
+    arr.push({ month: m, newCustomers: 0 });
   }
   return arr;
 }
