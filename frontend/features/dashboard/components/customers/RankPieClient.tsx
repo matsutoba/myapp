@@ -33,7 +33,9 @@ export default function RankPieClient({ data }: { data: RankCount[] }) {
               outerRadius={90}
               fill="#8884d8"
               label={(props: { name?: string; percent?: number }) =>
-                `${props.name || ''} ${(Number(props.percent || 0) * 100).toFixed(0)}%`
+                `${props.name || ''} ${(
+                  Number(props.percent || 0) * 100
+                ).toFixed(0)}%`
               }
             >
               {chartData.map((entry, index) => (
