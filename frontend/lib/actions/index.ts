@@ -87,6 +87,7 @@ import * as orderGetActions from '@/features/order/actions/getOrders';
 import * as orderUpdateActions from '@/features/order/actions/updateOrder';
 // Dashboard Actions
 import * as dashboardGetCustomerRankActions from '@/features/dashboard/actions/getCustomerRank';
+import * as dashboardGetDashboardDataActions from '@/features/dashboard/actions/getDashboardData';
 import * as dashboardGetMonthlyNewActions from '@/features/dashboard/actions/getMonthlyNewCustomers';
 import * as dashboardGetOrderAnalyticsActions from '@/features/dashboard/actions/getOrderAnalytics';
 
@@ -143,6 +144,7 @@ export const actions = {
       dashboardGetOrderAnalyticsActions,
       dashboardGetCustomerRankActions,
       dashboardGetMonthlyNewActions,
+      dashboardGetDashboardDataActions,
     ),
   ),
 };

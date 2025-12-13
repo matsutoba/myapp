@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"log"
 	"time"
 
+	"github.com/matsubara/myapp/internal/ai"
 	customerrepo "github.com/matsubara/myapp/internal/customer/repository"
 	"github.com/matsubara/myapp/internal/dashboard/dto"
 	orderrepo "github.com/matsubara/myapp/internal/order/repository"
@@ -13,15 +15,21 @@ type DashboardService interface {
 	GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error)
 	GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error)
 	GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error)
+	SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (*ai.SummaryResponse, error)
 }
 
 type dashboardService struct {
 	orderRepo orderrepo.OrderRepository
 	custRepo  customerrepo.CustomerRepository
+	aiEngine  ai.Engine
 }
 
 func NewDashboardService(or orderrepo.OrderRepository, cr customerrepo.CustomerRepository) DashboardService {
 	return &dashboardService{orderRepo: or, custRepo: cr}
+}
+
+func NewDashboardServiceWithAI(or orderrepo.OrderRepository, cr customerrepo.CustomerRepository, engine ai.Engine) DashboardService {
+	return &dashboardService{orderRepo: or, custRepo: cr, aiEngine: engine}
 }
 
 func (s *dashboardService) GetOrderAnalytics(ctx context.Context, start time.Time, end time.Time, groupBy string) (*dto.DashboardResponse, error) {
@@ -111,4 +119,62 @@ func (s *dashboardService) GetMonthlyNewCustomers(ctx context.Context, start tim
 		resp = append(resp, dto.MonthlyNew{Month: r.YearMonth, NewCustomers: r.NewCustomers})
 	}
 	return resp, nil
+}
+
+// SummarizeDashboard: ダッシュボード全体を AI で要約
+func (s *dashboardService) SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (*ai.SummaryResponse, error) {
+	if s.aiEngine == nil {
+		return &ai.SummaryResponse{
+			Error: "AI engine is not configured",
+		}, nil
+	}
+
+	// 各種分析データを取得
+	orderAnalytics, err := s.GetOrderAnalytics(ctx, start, end, "day")
+	if err != nil {
+		return &ai.SummaryResponse{Error: "Failed to get order analytics"}, err
+	}
+
+	rankData, err := s.GetCustomersByRank(ctx, start, end)
+	if err != nil {
+		return &ai.SummaryResponse{Error: "Failed to get rank data"}, err
+	}
+
+	monthlyData, err := s.GetMonthlyNewCustomers(ctx, start, end)
+	if err != nil {
+		return &ai.SummaryResponse{Error: "Failed to get monthly data"}, err
+	}
+
+	// ランク分布マップを構築
+	rankDistribution := make(map[string]int64)
+	for _, r := range rankData {
+		rankDistribution[r.Rank] = r.Count
+	}
+
+	// 月別データを変換
+	monthlyNew := make([]ai.MonthlyData, 0, len(monthlyData))
+	for _, m := range monthlyData {
+		monthlyNew = append(monthlyNew, ai.MonthlyData{
+			Month: m.Month,
+			Count: m.NewCustomers,
+		})
+	}
+
+	// AI 要約リクエスト
+	summaryReq := ai.SummaryRequest{
+		From:                start.Format("2006-01-02"),
+		To:                  end.Format("2006-01-02"),
+		TotalOrders:         orderAnalytics.KPIs.TotalOrders,
+		TotalRevenue:        orderAnalytics.KPIs.TotalRevenue,
+		AvgOrderValue:       orderAnalytics.KPIs.AvgOrderValue,
+		RankDistribution:    rankDistribution,
+		MonthlyNewCustomers: monthlyNew,
+		Language:            language,
+	}
+
+	resp, err := s.aiEngine.Summarize(ctx, summaryReq)
+	if err != nil {
+		log.Printf("[Dashboard] AI Summarization error: %v, response: %+v\n", err, resp)
+	}
+	return resp, err
 }

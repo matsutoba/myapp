@@ -19,6 +19,13 @@ services:
       - GO_ENV=production
       # Application reads PORT env; platform (Railway) will set this automatically
       - PORT=8080
+      # AI Engine (本番環境ではOpenAI推奨、またはOllama)
+      - AI_ENGINE=${AI_ENGINE:-openai}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      # Ollama を使用する場合（オプション）
+      - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-mistral}
     # The production Dockerfile provides ENTRYPOINT, so no custom command required
     ports:
       - "8080:8080"
@@ -59,5 +66,23 @@ services:
   #   depends_on:
   #     - db
 
+  # Optional: Ollama サービス
+  # 本番環境では OpenAI 推奨ですが、自社ホスト LLM が必要な場合は
+  # 以下のコメントを解除してください。
+  # ollama:
+  #   build:
+  #     context: ./docker/ollama
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - OLLAMA_HOST=0.0.0.0:11434
+  #     - OLLAMA_MODELS=mistral
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   expose:
+  #     - "11434"
+  #   profiles:
+  #     - ai
+
 volumes:
   db_data:
+  # ollama_data:  # Ollama 使用時のみ有効化

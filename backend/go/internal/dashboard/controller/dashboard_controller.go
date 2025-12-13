@@ -151,3 +151,36 @@ func (dc *DashboardController) GetNewSignups(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resp)
 }
+
+// SummarizeDashboard: AI がダッシュボード全体を要約
+func (dc *DashboardController) SummarizeDashboard(c *gin.Context) {
+	from := c.Query("from")
+	to := c.Query("to")
+	language := c.DefaultQuery("language", "ja")
+
+	var start time.Time
+	var end time.Time
+	var err error
+	if from == "" || to == "" {
+		end = time.Now()
+		start = end.AddDate(0, -6, 0) // default: last 6 months
+	} else {
+		start, err = time.Parse("2006-01-02", from)
+		if err != nil {
+			errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
+			return
+		}
+		end, err = time.Parse("2006-01-02", to)
+		if err != nil {
+			errors.WriteError(c, http.StatusBadRequest, errors.ErrInvalidInput)
+			return
+		}
+	}
+
+	resp, err := dc.svc.SummarizeDashboard(c.Request.Context(), start, end, language)
+	if err != nil {
+		errors.WriteError(c, http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}

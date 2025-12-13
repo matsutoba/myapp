@@ -1,9 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui';
-import { apiClient } from '@/lib/api/client';
 import { RankCount } from '@/features/dashboard/types';
-import React from 'react';
 import {
   Cell,
   Legend,
@@ -15,58 +13,8 @@ import {
 
 const COLORS = ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#60a5fa'];
 
-async function fetchRankData(opts?: {
-  from?: string;
-  to?: string;
-}): Promise<RankCount[] | null> {
-  try {
-    const qs = opts
-      ? `?from=${encodeURIComponent(opts.from ?? '')}&to=${encodeURIComponent(
-          opts.to ?? '',
-        )}`
-      : '';
-    const res = await apiClient<{ success: boolean; data?: RankCount[] }>(
-      `/api/dashboard/customers/by-rank${qs}`,
-      { method: 'GET', credentials: 'include' },
-    );
-    if (!res || !res.success) return null;
-    return (res.data ?? []) as RankCount[];
-  } catch (e) {
-    return null;
-  }
-}
-
-function generateMock(): RankCount[] {
-  return [
-    { rank: 'vip', count: 0 },
-    { rank: 'gold', count: 0 },
-    { rank: 'silver', count: 0 },
-    { rank: 'bronze', count: 0 },
-  ];
-}
-
-export default function RankPieClient({
-  from,
-  to,
-}: {
-  from?: string;
-  to?: string;
-}) {
-  const [data, setData] = React.useState<RankCount[] | null>(null);
-
-  React.useEffect(() => {
-    let mounted = true;
-    fetchRankData({ from, to }).then((d) => {
-      if (!mounted) return;
-      if (d && d.length > 0) setData(d);
-      else setData(generateMock());
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [from, to]);
-
-  const chartData = data ?? generateMock();
+export default function RankPieClient({ data }: { data: RankCount[] }) {
+  const chartData = data ?? [];
 
   return (
     <Card>
