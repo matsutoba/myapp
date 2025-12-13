@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    name: Frontend (TypeScript, Next.js)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        working-directory: frontend
+        run: tsc --noEmit
+
+      - name: Lint
+        working-directory: frontend
+        run: pnpm run lint
+
+      - name: Check Server Actions registration
+        working-directory: frontend
+        run: pnpm run check-actions
+
+      - name: Build
+        working-directory: frontend
+        run: pnpm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    name: Backend (Go)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+          cache: true
+          cache-dependency-path: backend/go/go.sum
+
+      - name: Format check
+        working-directory: backend/go
+        run: |
+          if [ -n "$(gofmt -s -l .)" ]; then
+            echo "Go files are not formatted:"
+            gofmt -s -d .
+            exit 1
+          fi
+
+      - name: Vet
+        working-directory: backend/go
+        run: go vet ./...
+
+      - name: Build
+        working-directory: backend/go
+        run: go build -v -o server ./cmd/server
+
+      - name: Run tests
+        working-directory: backend/go
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/go/coverage.out
+          flags: backend
+          fail_ci_if_error: false
+
+  docker-compose:
+    runs-on: ubuntu-latest
+    name: Docker Compose validation
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v2
+
+      - name: Validate docker-compose.yml
+        working-directory: backend
+        run: docker-compose config > /dev/null
+
+      - name: Validate docker-compose.prod.yml
+        working-directory: backend
+        run: docker-compose -f docker-compose.prod.yml config > /dev/null
