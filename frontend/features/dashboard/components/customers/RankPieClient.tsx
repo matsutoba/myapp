@@ -32,8 +32,8 @@ export default function RankPieClient({ data }: { data: RankCount[] }) {
               cy="50%"
               outerRadius={90}
               fill="#8884d8"
-              label={(entry: { name: string; percent: number }) =>
-                `${entry.name} ${(Number(entry.percent) * 100).toFixed(0)}%`
+              label={(props: { name?: string; percent?: number }) =>
+                `${props.name || ''} ${(Number(props.percent || 0) * 100).toFixed(0)}%`
               }
             >
               {chartData.map((entry, index) => (
