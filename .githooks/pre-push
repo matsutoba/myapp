@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Pre-push hook: Ensure CI passes before pushing to main
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+PROTECTED_BRANCHES=("main" "develop")
+
+if [[ " ${PROTECTED_BRANCHES[@]} " =~ " ${BRANCH} " ]]; then
+    echo "Attempting to push to protected branch: $BRANCH"
+    echo "Running tests before push..."
+
+    # Run tests
+    cd backend/go
+    if ! go test ./...; then
+        echo "❌ Tests failed. Push blocked."
+        exit 1
+    fi
+
+    echo "✅ Tests passed. Proceeding with push."
+fi
+
+exit 0
