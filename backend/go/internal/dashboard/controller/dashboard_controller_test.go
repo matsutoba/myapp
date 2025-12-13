@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/matsubara/myapp/internal/ai"
 	ctrl "github.com/matsubara/myapp/internal/dashboard/controller"
 	"github.com/matsubara/myapp/internal/dashboard/dto"
 	orderrepo "github.com/matsubara/myapp/internal/order/repository"
@@ -34,7 +35,7 @@ func (s *svcImpl) GetMonthlyNewCustomers(ctx context.Context, start time.Time, e
 	return []dto.MonthlyNew{}, nil
 }
 
-func (s *svcImpl) SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (interface{}, error) {
+func (s *svcImpl) SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (*ai.SummaryResponse, error) {
 	return nil, nil
 }
 

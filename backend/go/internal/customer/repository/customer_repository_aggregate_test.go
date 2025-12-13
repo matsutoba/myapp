@@ -89,9 +89,6 @@ func TestMonthlyNewCustomers(t *testing.T) {
     assert.Equal(t, int64(1), m["2025-08"])
 }
 
-	"github.com/matsubara/myapp/internal/domain"
-)
-
 func TestCustomerRepository_Aggregates(t *testing.T) {
 	repo := NewCustomerRepository(testDB)
 
