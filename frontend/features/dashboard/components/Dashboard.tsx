@@ -2,6 +2,7 @@
 
 import MonthlyNewBarClient from '@/features/dashboard/components/customers/MonthlyNewBarClient';
 import RankPieClient from '@/features/dashboard/components/customers/RankPieClient';
+import DashboardSummary from '@/features/dashboard/components/DashboardSummary';
 import OrderSection from '@/features/dashboard/components/order';
 import { formatDate } from '@/lib/date/formatDate';
 import React from 'react';
@@ -47,6 +48,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* AI 要約パネル */}
+      <DashboardSummary from={from} to={to} language="ja" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <OrderSection from={from} to={to} />
