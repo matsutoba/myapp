@@ -110,8 +110,8 @@ type RankCountRow struct {
 }
 
 type MonthCountRow struct {
-	YearMonth    string
-	NewCustomers int64
+	YearMonth    string `gorm:"column:year_month;-"`
+	NewCustomers int64  `gorm:"column:new_customers;-"`
 }
 
 func (r *customerRepository) CountByRank() ([]RankCountRow, error) {
@@ -138,7 +138,7 @@ func (r *customerRepository) MonthlyNewCustomers(start, end string) ([]MonthCoun
 		// アプリ側でのフォーマット依存やエスケープの問題を回避します。
 		timeExpr = "CONCAT(YEAR(created_at), '-', LPAD(MONTH(created_at), 2, '0'))"
 	}
-	sql := "SELECT " + timeExpr + " AS `year_month`, COUNT(*) AS `new_customers` FROM `customers` WHERE `created_at` BETWEEN ? AND ? GROUP BY `year_month` ORDER BY `year_month`"
+	sql := "SELECT " + timeExpr + " AS year_month, COUNT(*) AS new_customers FROM `customers` WHERE `created_at` BETWEEN ? AND ? GROUP BY year_month ORDER BY year_month"
 	result := r.db.Raw(sql, start, end).Scan(&rows)
 	if result.Error != nil {
 		return nil, result.Error

@@ -9,6 +9,9 @@ import (
 func TestCustomerRepository_CRUD(t *testing.T) {
 	repo := NewCustomerRepository(testDB)
 
+	// Clean table before test
+	testDB.Exec("DELETE FROM customers")
+
 	// ======================
 	// Create
 	// ======================
