@@ -1,64 +1,14 @@
 'use client';
 
-import { apiClient } from '@/lib/api/client';
-import { useCallback, useEffect, useState } from 'react';
-
-type DashboardSummaryResponse = {
-  summary: string;
-};
-
 type DashboardSummaryProps = {
-  from: string;
-  to: string;
-  language?: string;
+  summary: string;
+  isLoading?: boolean;
 };
 
 export default function DashboardSummary({
-  from,
-  to,
-  language = 'ja',
+  summary,
+  isLoading = false,
 }: DashboardSummaryProps) {
-  const [summary, setSummary] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  // AI要約を取得
-  const fetchSummary = useCallback(async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const params = new URLSearchParams({
-        from,
-        to,
-        language,
-      });
-
-      const result = await apiClient<DashboardSummaryResponse>(
-        `/api/dashboard/summary?${params.toString()}`,
-      );
-
-      if (!result.success || !result.data) {
-        setError(result.error?.message || 'Failed to fetch summary');
-        setSummary('');
-        return;
-      }
-
-      setSummary(result.data.summary || '');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Failed to fetch summary: ${message}`);
-      setSummary('');
-    } finally {
-      setLoading(false);
-    }
-  }, [from, to, language]);
-
-  // 期間が変わったら要約を再取得
-  useEffect(() => {
-    fetchSummary();
-  }, [from, to, language, fetchSummary]);
-
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6">
       <div className="flex items-start gap-4">
@@ -79,7 +29,7 @@ export default function DashboardSummary({
             📊 ダッシュボード分析要約
           </h2>
 
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center gap-2 text-gray-600">
               <svg
                 className="animate-spin h-4 w-4 text-blue-600"
@@ -103,10 +53,6 @@ export default function DashboardSummary({
               </svg>
               <span className="text-sm">AI が分析中...</span>
             </div>
-          ) : error ? (
-            <div className="text-red-700 text-sm bg-red-50 p-3 rounded border border-red-200">
-              {error}
-            </div>
           ) : summary ? (
             <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
               {summary}
@@ -115,16 +61,6 @@ export default function DashboardSummary({
             <p className="text-gray-500 text-sm italic">
               要約データはありません
             </p>
-          )}
-
-          {/* 更新ボタン */}
-          {!loading && (
-            <button
-              onClick={fetchSummary}
-              className="mt-3 text-xs text-blue-600 hover:text-blue-800 underline"
-            >
-              🔄 再取得
-            </button>
           )}
         </div>
       </div>
