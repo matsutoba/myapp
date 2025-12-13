@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Install dependencies
@@ -89,12 +89,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v2
-
       - name: Validate docker-compose.yml
         working-directory: backend
-        run: docker-compose config > /dev/null
+        run: docker compose config > /dev/null
 
       - name: Validate docker-compose.prod.yml
         working-directory: backend
-        run: docker-compose -f docker-compose.prod.yml config > /dev/null
+        run: docker compose -f docker-compose.prod.yml config > /dev/null
