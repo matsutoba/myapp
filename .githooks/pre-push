@@ -1,21 +1,21 @@
 #!/bin/bash
 
-# Pre-push hook: Ensure CI passes before pushing to main
+# Pre-push フック：main/develop ブランチへの push 前にテストを実行
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 PROTECTED_BRANCHES=("main" "develop")
 
 if [[ " ${PROTECTED_BRANCHES[@]} " =~ " ${BRANCH} " ]]; then
-    echo "Attempting to push to protected branch: $BRANCH"
-    echo "Running tests before push..."
+    echo "保護されたブランチへの push を試みています: $BRANCH"
+    echo "push 前にテストを実行中..."
 
-    # Run tests
+    # バックエンドテストを実行
     cd backend/go
     if ! go test ./...; then
-        echo "❌ Tests failed. Push blocked."
+        echo "❌ テストに失敗しました。Push がブロックされました。"
         exit 1
     fi
 
-    echo "✅ Tests passed. Proceeding with push."
+    echo "✅ すべてのテストに成功しました。Push を続行します。"
 fi
 
 exit 0

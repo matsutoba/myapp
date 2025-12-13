@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Pre-commit フック：コミット前にリンティングを実行
+# 問題を早期に検出してコミット前にブロック
+
+echo "フロントエンドのリンティングをチェック中..."
+cd frontend
+if ! pnpm run lint; then
+    echo "❌ フロントエンドのリント検査に失敗しました。コミットがブロックされました。"
+    exit 1
+fi
+
+echo "✅ フロントエンドのリント検査に成功しました。"
+
+# オプション：TypeScript型チェック
+echo "TypeScript型チェックを実行中..."
+if ! pnpm exec tsc --noEmit; then
+    echo "⚠️  TypeScript エラーが見つかりました（コミット時は非ブロック）"
+fi
+
+exit 0
