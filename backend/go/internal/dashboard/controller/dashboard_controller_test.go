@@ -26,6 +26,18 @@ func (s *svcImpl) GetOrderAnalytics(ctx context.Context, start time.Time, end ti
 	}, nil
 }
 
+func (s *svcImpl) GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error) {
+	return []dto.RankCount{}, nil
+}
+
+func (s *svcImpl) GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error) {
+	return []dto.MonthlyNew{}, nil
+}
+
+func (s *svcImpl) SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (interface{}, error) {
+	return nil, nil
+}
+
 func TestGetOrderAnalytics_ControllerReturns200(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()

@@ -88,11 +88,6 @@ func TestMonthlyNewCustomers(t *testing.T) {
     assert.Equal(t, int64(2), m["2025-07"])
     assert.Equal(t, int64(1), m["2025-08"])
 }
-package repository
-
-import (
-	"testing"
-	"time"
 
 	"github.com/matsubara/myapp/internal/domain"
 )
