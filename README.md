@@ -1,5 +1,8 @@
 # myapp - SaaS ダッシュボードアプリケーション
 
+[![CI](https://github.com/matsutoba/myapp/actions/workflows/ci.yml/badge.svg)](https://github.com/matsutoba/myapp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Go バックエンド + Next.js フロントエンドで構築された SaaS ダッシュボード。AI による自動要約、複数のデータ可視化、リアルタイムデータ分析が特徴です。
 
 ## 概要
@@ -196,6 +199,34 @@ myapp/
 - **自動エラー検出**: ビルド時に Server Actions 登録漏れを検出
 - **型安全性**: TypeScript + Zod によるエンドツーエンドの型チェック
 - **環境再現性**: Docker Compose で開発環境を完全再現
+
+---
+
+## 品質保証・CI/CD
+
+### GitHub Actions による自動テスト
+
+すべてのコミットと PR に対して以下の自動チェックが実行されます：
+
+**フロントエンド検査:**
+
+- TypeScript 型チェック
+- ESLint による linting
+- Server Actions 登録チェック（`pnpm check-actions`）
+- Next.js ビルド検証
+
+**バックエンド検査:**
+
+- Go フォーマットチェック（`gofmt`）
+- Go vet による静的解析
+- ユニットテスト実行
+- ビルド検証
+
+**インフラ検査:**
+
+- Docker Compose ファイルの構成検証
+
+ワークフロー詳細: [.github/workflows/ci.yml](.github/workflows/ci.yml)
 
 ---
 
