@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Pre-push フック：main/develop ブランチへの push 前にテストを実行
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+PROTECTED_BRANCHES=("main" "develop")
+
+if [[ " ${PROTECTED_BRANCHES[@]} " =~ " ${BRANCH} " ]]; then
+    echo "保護されたブランチへの push を試みています: $BRANCH"
+    echo "push 前にテストを実行中..."
+
+    # バックエンドテストを実行
+    cd backend/go
+    if ! go test ./...; then
+        echo "❌ テストに失敗しました。Push がブロックされました。"
+        exit 1
+    fi
+
+    echo "✅ すべてのテストに成功しました。Push を続行します。"
+fi
+
+exit 0

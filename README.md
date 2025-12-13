@@ -100,6 +100,15 @@ type APIError = { error: { code: number; message: string } };
 
 ## セットアップ
 
+### Git Hooks セットアップ（必須）
+
+```bash
+# リポジトリをクローン後、以下を実行
+bash scripts/setup-hooks.sh
+```
+
+このスクリプトは、push 前に自動的にテストを実行する Git hooks をセットアップします。
+
 ### ローカル開発環境
 
 ```bash

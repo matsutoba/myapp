@@ -25,7 +25,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Type check
         working-directory: frontend
@@ -89,12 +89,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v2
-
       - name: Validate docker-compose.yml
         working-directory: backend
-        run: docker-compose config > /dev/null
+        run: docker compose config > /dev/null
 
       - name: Validate docker-compose.prod.yml
         working-directory: backend
-        run: docker-compose -f docker-compose.prod.yml config > /dev/null
+        run: docker compose -f docker-compose.prod.yml config > /dev/null

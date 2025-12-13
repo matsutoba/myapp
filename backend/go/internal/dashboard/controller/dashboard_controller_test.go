@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/matsubara/myapp/internal/ai"
 	ctrl "github.com/matsubara/myapp/internal/dashboard/controller"
 	"github.com/matsubara/myapp/internal/dashboard/dto"
 	orderrepo "github.com/matsubara/myapp/internal/order/repository"
@@ -24,6 +25,18 @@ func (s *svcImpl) GetOrderAnalytics(ctx context.Context, start time.Time, end ti
 		GeneratedAt: time.Now().UTC(),
 		Cached:      false,
 	}, nil
+}
+
+func (s *svcImpl) GetCustomersByRank(ctx context.Context, start time.Time, end time.Time) ([]dto.RankCount, error) {
+	return []dto.RankCount{}, nil
+}
+
+func (s *svcImpl) GetMonthlyNewCustomers(ctx context.Context, start time.Time, end time.Time) ([]dto.MonthlyNew, error) {
+	return []dto.MonthlyNew{}, nil
+}
+
+func (s *svcImpl) SummarizeDashboard(ctx context.Context, start time.Time, end time.Time, language string) (*ai.SummaryResponse, error) {
+	return nil, nil
 }
 
 func TestGetOrderAnalytics_ControllerReturns200(t *testing.T) {

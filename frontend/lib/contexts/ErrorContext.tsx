@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -26,16 +27,26 @@ const SESSION_INVALID_ERROR_CODES = [3002, 3004];
 export function ErrorProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<ApiErrorDetail | null>(null);
   const [isSessionInvalid, setIsSessionInvalid] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ログイン画面に遷移したときにセッション無効フラグをリセット
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.location.pathname === '/login' &&
-      isSessionInvalid
-    ) {
-      setIsSessionInvalid(false);
-      setError(null);
+    if (typeof window !== 'undefined') {
+      const handlePathChange = () => {
+        if (window.location.pathname === '/login' && isSessionInvalid) {
+          // マイクロタスクキューで遅延実行して setState のタイミングを調整
+          resetTimerRef.current = setTimeout(() => {
+            setIsSessionInvalid(false);
+            setError(null);
+          }, 0);
+        }
+      };
+
+      window.addEventListener('popstate', handlePathChange);
+      return () => {
+        window.removeEventListener('popstate', handlePathChange);
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      };
     }
   }, [isSessionInvalid]);
 

@@ -54,7 +54,7 @@ export default function Dashboard() {
 
     // summary は別途非同期で取得（ローディング中に他のデータを表示）
     void fetchSummary(from, to);
-  }, []);
+  }, [from, to, startTransition]);
 
   // 日付変更時にデータ再取得
   const handleDateChange = (newFrom: string, newTo: string) => {

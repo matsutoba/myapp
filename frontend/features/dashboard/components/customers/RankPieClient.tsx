@@ -23,15 +23,19 @@ export default function RankPieClient({ data }: { data: RankCount[] }) {
         <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={chartData as any}
+              data={
+                chartData as unknown as Array<{ rank: string; count: number }>
+              }
               dataKey="count"
               nameKey="rank"
               cx="50%"
               cy="50%"
               outerRadius={90}
               fill="#8884d8"
-              label={({ name, percent }: any) =>
-                `${name} ${(Number(percent) * 100).toFixed(0)}%`
+              label={(props: { name?: string; percent?: number }) =>
+                `${props.name || ''} ${(
+                  Number(props.percent || 0) * 100
+                ).toFixed(0)}%`
               }
             >
               {chartData.map((entry, index) => (
