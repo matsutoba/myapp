@@ -97,14 +97,6 @@ export default function Dashboard() {
               className="border rounded px-2 py-1"
               disabled={isPending || isSummaryLoading}
             />
-            {(isPending || isSummaryLoading) && (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin">⟳</div>
-                <span className="text-sm text-gray-500">
-                  {isSummaryLoading ? 'AI 分析中...' : '読込中...'}
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
