@@ -15,6 +15,9 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=myapp
       - GO_ENV=development
+      - AI_ENGINE=ollama
+      - OLLAMA_ENDPOINT=http://ollama:11434
+      - OLLAMA_MODEL=llama2
     depends_on:
       - mysql
 
@@ -31,5 +34,30 @@ services:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
 
+  ollama:
+    build:
+      context: ./docker/ollama
+      dockerfile: Dockerfile
+    container_name: myapp-ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      # ダウンロードするモデル（スペース区切り）
+      - OLLAMA_MODELS=mistral llama2
+    volumes:
+      - ollama_data:/root/.ollama
+    profiles:
+      - ai
+    # GPU サポートが必要な場合はコメント解除
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
 volumes:
   mysql_data:
+  ollama_data:

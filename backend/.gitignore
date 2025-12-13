@@ -16,6 +16,8 @@ dist/
 # === Go ===
 go/tmp
 go/.env
+go/server
+go/cmd/server/server
 
 # === Docker ボリューム / ビルド成果物 ===
 docker/mysql/data/
