@@ -45,7 +45,11 @@ export default function RankPieClient({ data }: { data: RankCount[] }) {
                 />
               ))}
             </Pie>
-            <Tooltip formatter={(v: number) => v} />
+            <Tooltip
+              formatter={(v: unknown): number =>
+                typeof v === 'number' ? v : 0
+              }
+            />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
