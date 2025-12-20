@@ -96,9 +96,16 @@ export default function ChartClient({ data }: Props) {
                     }}
                   />
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      name === 'revenue' ? `¥${value}` : value,
-                      name,
+                    formatter={(
+                      value: unknown,
+                      name: unknown,
+                    ): [string | number, string] => [
+                      name === 'revenue'
+                        ? `¥${typeof value === 'number' ? value : 0}`
+                        : typeof value === 'number'
+                        ? value
+                        : 0,
+                      String(name ?? ''),
                     ]}
                     labelFormatter={(label) => formatToYMD(label)}
                   />

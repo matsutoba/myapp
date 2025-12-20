@@ -110,7 +110,7 @@ type RankCountRow struct {
 }
 
 type MonthCountRow struct {
-	YearMonth    string `gorm:"column:year_month;-"`
+	YearMonth    string `gorm:"column:ym;-"`
 	NewCustomers int64  `gorm:"column:new_customers;-"`
 }
 
@@ -126,20 +126,23 @@ func (r *customerRepository) CountByRank() ([]RankCountRow, error) {
 func (r *customerRepository) MonthlyNewCustomers(start, end string) ([]MonthCountRow, error) {
 	var rows []MonthCountRow
 	dialect := r.db.Dialector.Name()
-	var timeExpr string
+	var query *gorm.DB
 	switch dialect {
 	case "sqlite":
-		timeExpr = "strftime('%%Y-%%m', created_at)"
+		query = r.db.Table("customers").
+			Select("strftime('%Y-%m', created_at) AS ym, COUNT(*) AS new_customers").
+			Where("created_at BETWEEN ? AND ?", start, end).
+			Group("strftime('%Y-%m', created_at)").
+			Order("ym")
 	default:
-		// MySQL の `DATE_FORMAT(..., '%Y-%m')` のように `%` を含む書式は、
-		// Go の `fmt` / `log` 等で誤ってフォーマット指定子として解釈され、
-		// SQL 文字列が壊れる（% が展開・消失する）恐れがあります。
-		// そのため `%` を使わない `YEAR()`/`MONTH()` の組み合わせで年月キーを生成し、
-		// アプリ側でのフォーマット依存やエスケープの問題を回避します。
-		timeExpr = "CONCAT(YEAR(created_at), '-', LPAD(MONTH(created_at), 2, '0'))"
+		// MySQL: SELECT句ではプレースホルダーを使用し、GROUP BYとORDER BYではエイリアスを使用
+		query = r.db.Table("customers").
+			Select("DATE_FORMAT(created_at, ?) AS ym, COUNT(*) AS new_customers", "%Y-%m").
+			Where("created_at BETWEEN ? AND ?", start, end).
+			Group("ym").
+			Order("ym")
 	}
-	sql := "SELECT " + timeExpr + " AS year_month, COUNT(*) AS new_customers FROM `customers` WHERE `created_at` BETWEEN ? AND ? GROUP BY year_month ORDER BY year_month"
-	result := r.db.Raw(sql, start, end).Scan(&rows)
+	result := query.Scan(&rows)
 	if result.Error != nil {
 		return nil, result.Error
 	}
